@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Serra do Mar Paranaense · Web GIS 3D</title>
-<meta name="description" content="Visualização Web GIS 3D da Serra do Mar paranaense: terreno, picos, trilhas e narrativa interativa. Por Avner Paes Gomes." />
+<title>Serra do Mar Paranaense · Web GIS</title>
+<meta name="description" content="Web GIS da Serra do Mar paranaense: picos, trilhas, locais de interesse e narrativa interativa. Por Avner Paes Gomes." />
 <script>
 /* Surface any load error in the spinner instead of hanging silently (also aids debugging). */
 window.__ERR__=[];
@@ -12,15 +12,15 @@ window.addEventListener('error',function(e){
   window.__ERR__.push((e&&(e.message||(e.error&&e.error.message)))||('recurso nao carregou: '+((e&&e.target&&(e.target.src||e.target.href))||'?')));
 },true);
 window.addEventListener('unhandledrejection',function(e){window.__ERR__.push('promise: '+e.reason);});
-/* If MapLibre itself never loads (blocked/offline), say so instead of hanging on the spinner. */
+/* If Leaflet itself never loads (blocked/offline), say so instead of hanging on the spinner. */
 window.addEventListener('load',function(){
-  if(typeof maplibregl==='undefined'){
+  if(typeof L==='undefined'){
     var l=document.getElementById('loading'); if(l){var p=l.querySelector('p'); if(p){p.style.color='#ff9b9b';p.textContent='Não foi possível carregar a biblioteca do mapa. Recarregue a página ou verifique a conexão.';}}
   }
 });
 </script>
-<link href="vendor/maplibre-gl.css" rel="stylesheet" />
-<script src="vendor/maplibre-gl.js"></script>
+<link href="vendor/leaflet.css" rel="stylesheet" />
+<script src="vendor/leaflet.js"></script>
 <style>
   :root{
     --bg:#07110f;
@@ -49,9 +49,51 @@ window.addEventListener('load',function(){
     font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     background:var(--bg);color:var(--txt);overflow:hidden;-webkit-font-smoothing:antialiased;
   }
-  #map{position:absolute;inset:0}
-  .maplibregl-ctrl-attrib{font-size:10px;background:rgba(6,14,12,.6)!important;color:#bcd!important}
-  .maplibregl-ctrl-attrib a{color:#cfe!important}
+  #map{position:absolute;inset:0;background:#07110f;z-index:0}  /* own stacking context: keep Leaflet panes (z 200-700) below the UI */
+  .leaflet-container{background:#07110f;font-family:inherit;font-size:12px}
+  /* Cesium 3D view (opt-in, lazy-loaded) sits above Leaflet, below the UI panels */
+  #cesiumContainer{position:absolute;inset:0;z-index:1;display:none;background:#000}
+  body.mode-3d #cesiumContainer{display:block}
+  body.mode-3d #map{visibility:hidden}
+  #cesiumContainer .cesium-widget-credits{display:none!important}
+  #cesiumContainer .cesium-viewer-bottom{bottom:22px}
+
+  /* 2D / 3D toggle */
+  .viewtoggle{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:8;display:flex;gap:2px;
+    background:var(--panel);border:1px solid var(--stroke-strong);border-radius:999px;padding:3px;
+    backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);box-shadow:var(--shadow)}
+  .viewtoggle button{border:0;background:none;color:var(--txt-dim);cursor:pointer;font-family:inherit;
+    font-weight:700;font-size:12.5px;padding:7px 16px;border-radius:999px;transition:.15s;white-space:nowrap}
+  .viewtoggle button:hover{color:var(--txt)}
+  .viewtoggle button.on{background:var(--accent);color:#04231b}
+
+  /* toast */
+  .toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);z-index:19;background:var(--panel-solid);
+    color:var(--txt);border:1px solid var(--stroke-strong);border-radius:10px;padding:9px 15px;font-size:12.5px;
+    box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s;max-width:88vw;text-align:center}
+  .toast.show{opacity:1}
+  .leaflet-control-attribution{font-size:10px;background:rgba(6,14,12,.62)!important;color:#9db4ac!important}
+  .leaflet-control-attribution a{color:#7ee0c2!important}
+  /* zoom + scale controls (dark) */
+  .leaflet-bar{border:1px solid var(--stroke)!important;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+  .leaflet-bar a{background:var(--panel-solid);color:var(--txt);border-bottom-color:var(--stroke)!important}
+  .leaflet-bar a:hover{background:rgba(18,214,154,.18);color:#fff}
+  .leaflet-control-scale-line{background:rgba(6,14,12,.6);color:#cfe;border-color:rgba(120,190,170,.35)}
+  /* popups (dark theme) */
+  .leaflet-popup-content-wrapper{background:var(--panel-solid);color:var(--txt);border:1px solid var(--stroke-strong);border-radius:12px;box-shadow:var(--shadow)}
+  .leaflet-popup-content{margin:12px 15px;font-size:12.5px;line-height:1.5}
+  .leaflet-popup-content h3{margin:0 0 3px;font-size:15px}
+  .leaflet-popup-content .pk-el{color:var(--accent);font-weight:800;font-size:13px}
+  .leaflet-popup-content .pk-meta{color:var(--txt-dim);margin-top:6px;line-height:1.5}
+  .leaflet-popup-tip{background:var(--panel-solid);border:1px solid var(--stroke-strong)}
+  .leaflet-popup-close-button{color:var(--txt-dim)!important;font-size:20px!important;width:26px!important;height:26px!important}
+  .leaflet-container a.leaflet-popup-close-button:hover{color:#fff!important}
+  /* peak & POI labels (tooltips) */
+  .leaflet-tooltip.peak-tt{background:rgba(7,17,15,.82);border:1px solid var(--stroke-strong);color:#fff;border-radius:7px;padding:2px 7px;font-size:10.5px;font-weight:600;box-shadow:0 2px 7px rgba(0,0,0,.55);white-space:nowrap}
+  .leaflet-tooltip.peak-tt.major{font-size:11.5px;font-weight:700}
+  .peak-tt .tt-m{color:var(--accent-2);font-weight:800;margin-left:2px}
+  .leaflet-tooltip.poi-tt{background:rgba(7,17,15,.9);border:1px solid var(--stroke);color:#dcebe5;border-radius:5px;padding:1px 6px;font-size:10.5px;font-weight:600;white-space:nowrap}
+  .leaflet-tooltip.peak-tt:before,.leaflet-tooltip.poi-tt:before{display:none}
 
   /* ---------- Header ---------- */
   header{
@@ -97,8 +139,8 @@ window.addEventListener('load',function(){
   .panel .hd{padding:13px 16px 10px;border-bottom:1px solid var(--stroke)}
 
   /* ---------- Story panel (left) ---------- */
-  #story{left:18px;top:74px;width:340px;max-width:calc(100vw - 36px);overflow:hidden}
-  #story .body{padding:16px}
+  #story{left:18px;top:74px;width:300px;max-width:calc(100vw - 36px);overflow:hidden}
+  #story .body{padding:16px;max-height:min(30vh,244px);overflow:auto}
   .chap-eyebrow{font-size:11px;letter-spacing:.5px;color:var(--accent);font-weight:650;text-transform:uppercase}
   #chapTitle{margin:6px 0 8px;font-size:19px;font-weight:750;line-height:1.25}
   #chapBody{margin:0;font-size:13.5px;line-height:1.62;color:#dcebe5}
@@ -138,7 +180,7 @@ window.addEventListener('load',function(){
 
   /* ---------- Legend / controls (bottom-right) ---------- */
   #legend{left:18px;bottom:18px;width:262px;max-width:calc(100vw - 36px);overflow:hidden}
-  #legend .body{padding:12px 15px 14px}
+  #legend .body{padding:12px 15px 14px;max-height:min(42vh,360px);overflow:auto}
   .leg-group+.leg-group{margin-top:12px;padding-top:12px;border-top:1px solid var(--stroke)}
   .leg-row{display:flex;align-items:center;gap:9px;font-size:11.5px;color:#cfe3dc;padding:3px 0}
   .leg-dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff;flex:0 0 auto;box-shadow:0 1px 4px rgba(0,0,0,.5)}
@@ -178,16 +220,7 @@ window.addEventListener('load',function(){
   .peak.minor .lbl{opacity:0;transform:translateY(3px);transition:.15s;pointer-events:none}
   .peak.minor:hover .lbl{opacity:1;transform:none}
   .peak.minor .pin{width:10px;height:10px}
-  .maplibregl-popup{max-width:260px!important}
-  .maplibregl-popup-content{
-    background:var(--panel-solid);color:var(--txt);border:1px solid var(--stroke-strong);
-    border-radius:12px;padding:13px 15px;box-shadow:var(--shadow);font-size:12.5px;
-  }
-  .maplibregl-popup-content h3{margin:0 0 3px;font-size:15px}
-  .maplibregl-popup-content .pk-el{color:var(--accent);font-weight:800;font-size:13px}
-  .maplibregl-popup-content .pk-meta{color:var(--txt-dim);margin-top:6px;line-height:1.5}
-  .maplibregl-popup-tip{border-top-color:var(--panel-solid)!important;border-bottom-color:var(--panel-solid)!important}
-  .maplibregl-popup-close-button{color:var(--txt-dim);font-size:17px;padding:2px 7px}
+  .leaflet-popup{max-width:260px}
 
   /* ---------- Intro overlay ---------- */
   #intro{
@@ -214,27 +247,84 @@ window.addEventListener('load',function(){
   #loading p{position:absolute;margin-top:80px;color:var(--txt-dim);font-size:12.5px;letter-spacing:1px}
   @keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ---------- Mobile ---------- */
+  /* ---------- POI markers ---------- */
+  .poi-mk{width:13px;height:13px;border-radius:50%;border:2px solid #08120f;box-shadow:0 1px 4px rgba(0,0,0,.55);cursor:pointer;transition:transform .12s}
+  .poi-mk:hover{transform:scale(1.35)}
+
+  /* ---------- 3D sub-controls ---------- */
+  .hint{font-size:10.5px;line-height:1.45;color:var(--txt-dim);margin:3px 0 7px}
+  .range-row.disabled,.toggle.disabled{opacity:.4;pointer-events:none}
+
+  /* ---------- Mobile bottom tab bar ---------- */
+  #mobilebar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:16;
+    height:calc(56px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);
+    background:var(--panel-solid);border-top:1px solid var(--stroke-strong);box-shadow:0 -6px 24px rgba(0,0,0,.4)}
+  #mobilebar button{flex:1;background:none;border:0;color:var(--txt-dim);cursor:pointer;font-family:inherit;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    font-size:10.5px;font-weight:650;letter-spacing:.2px}
+  #mobilebar button span{font-size:20px;line-height:1;filter:grayscale(.25);transition:filter .15s}
+  #mobilebar button.on{color:var(--accent)}
+  #mobilebar button.on span{filter:none}
+
+  /* ---------- Mobile layout ---------- */
   @media (max-width:820px){
-    #dash{display:none}
-    #story{width:calc(100vw - 36px);top:auto;bottom:96px;left:18px}
-    #legend{width:calc(100vw - 36px)}
+    header{padding:8px 12px;gap:9px}
+    .brand-mark{width:34px;height:34px;font-size:17px;border-radius:9px}
+    .title-wrap h1{font-size:15px}
+    .title-wrap p{font-size:9.5px}
     .byline{display:none}
+    .viewtoggle{top:auto;bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+    .viewtoggle button{padding:8px 18px;font-size:13px}
+    body.sheet-any .viewtoggle{opacity:0;pointer-events:none;transition:opacity .2s}
+    /* panels become slide-up bottom sheets above the tab bar */
+    #story,#dash,#legend{
+      position:fixed;left:0;right:0;top:auto;
+      bottom:calc(56px + env(safe-area-inset-bottom,0px));
+      width:100%;max-width:100%;margin:0;border-radius:18px 18px 0 0;
+      transform:translateY(118%);transition:transform .26s cubic-bezier(.2,.7,.2,1);
+      z-index:14;max-height:66vh;display:block}
+    #story .body,#dash .body,#legend .body{max-height:calc(66vh - 52px);overflow:auto;-webkit-overflow-scrolling:touch}
+    #story.sheet-open,#dash.sheet-open,#legend.sheet-open{transform:translateY(0)}
+    .collapse{display:none}
+    #mobilebar{display:flex}
+    /* larger touch targets */
+    .btn{padding:11px 15px;font-size:13.5px}
+    .switch{width:46px;height:27px}
+    .slider:before{width:21px;height:21px}
+    .switch input:checked+.slider:before{transform:translateX(19px)}
+    .poi-row{padding:7px 0}
+    .poi-row input{width:18px;height:18px}
+    .peak .pin{width:15px;height:15px}
+    .peak.minor .pin{width:12px;height:12px}
+    .peak .lbl{font-size:11.5px}
+    .leaflet-bottom.leaflet-right{margin-bottom:62px}
+    .leaflet-top.leaflet-right{margin-top:52px}
+    .intro-card{padding:26px 20px;border-radius:18px}
+    .intro-card h1{font-size:23px}
+    .intro-card .sub{font-size:13px}
+    .intro-stats{gap:18px}
   }
-  .maplibregl-ctrl-top-right{margin-top:64px}
+  .leaflet-top.leaflet-right{margin-top:60px}
 </style>
 </head>
 <body>
 <div id="map"></div>
+<div id="cesiumContainer"></div>
 
 <header>
   <div class="brand-mark">⛰️</div>
   <div class="title-wrap">
     <h1>Serra do Mar Paranaense</h1>
-    <p>Visualização Web GIS 3D</p>
+    <p>Atlas do montanhismo · Web GIS</p>
   </div>
-  <div class="byline"><a class="chip pf-link" href="https://avnergomes.github.io/portfolio" target="_blank" rel="noopener" title="Portfólio de Avner Paes Gomes"><img class="pf-logo" src="data:image/png;base64,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" alt="Logo Avner Paes Gomes" /><span>por <b>Avner Paes Gomes</b> · Data &amp; Geo</span><span class="arr">↗</span></a></div>
+  <div class="byline byline-portfolio"><a class="chip pf-link" href="https://avnergomes.github.io/portfolio" target="_blank" rel="noopener" title="Portfólio de Avner Paes Gomes"><img class="pf-logo" src="data:image/png;base64,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" alt="Logo Avner Paes Gomes" /><span>por <b>Avner Paes Gomes</b> · Data &amp; Geo</span><span class="arr">↗</span></a></div>
 </header>
+
+<!-- 2D / 3D VIEW TOGGLE -->
+<div id="viewtoggle" class="viewtoggle" role="group" aria-label="Alternar 2D / 3D">
+  <button data-view="2d" class="on">2D</button>
+  <button data-view="3d">⛰️ 3D</button>
+</div>
 
 <!-- STORY -->
 <section id="story" class="panel">
@@ -282,26 +372,27 @@ window.addEventListener('load',function(){
       <div class="toggle">Unidades de conservação
         <label class="switch"><input type="checkbox" id="tgParks" checked><span class="slider"></span></label>
       </div>
-      <div class="toggle">Relevo sombreado
-        <label class="switch"><input type="checkbox" id="tgHill" checked><span class="slider"></span></label>
-      </div>
       <div class="toggle">Rótulos (cidades)
         <label class="switch"><input type="checkbox" id="tgLabels"><span class="slider"></span></label>
       </div>
-      <div class="range-row">Exagero
-        <input type="range" id="exag" min="1" max="2.4" step="0.1" value="1.5">
-        <span id="exagVal" style="width:26px;text-align:right;color:#fff">1.5×</span>
-      </div>
+      <div class="hint">Clique num cume, trilha ou local para ver os detalhes. Use os controles + / − ou o gesto de pinça para aproximar.</div>
     </div>
   </div>
 </section>
 
+<!-- MOBILE BOTTOM TAB BAR -->
+<nav id="mobilebar">
+  <button data-tab="story"><span>📖</span>História</button>
+  <button data-tab="dash"><span>📊</span>Dados</button>
+  <button data-tab="legend"><span>🗺️</span>Camadas</button>
+</nav>
+
 <!-- INTRO -->
 <div id="intro">
   <div class="intro-card">
-    <div class="kicker">Web GIS · Terreno 3D</div>
-    <h1>A muralha verde do Paraná, em 3D</h1>
-    <p class="sub">Um atlas 3D do montanhismo paranaense: 273 cumes, trilhas reais do OpenStreetMap e locais de interesse (refúgios, água, mirantes), do Pico Paraná ao litoral.</p>
+    <div class="kicker">Web GIS · Atlas do montanhismo</div>
+    <h1>A muralha verde do Paraná</h1>
+    <p class="sub">Um atlas do montanhismo paranaense: 273 cumes, trilhas reais do OpenStreetMap e locais de interesse (refúgios, água, mirantes), do Pico Paraná ao litoral.</p>
     <div class="intro-stats">
       <div class="s"><div class="n" id="isPeaks">–</div><div class="t">Cumes</div></div>
       <div class="s"><div class="n">1.877 m</div><div class="t">Pico Paraná</div></div>
@@ -311,17 +402,16 @@ window.addEventListener('load',function(){
   </div>
 </div>
 
-<div id="loading"><div class="spinner"></div><p>Carregando terreno…</p></div>
+<div id="loading"><div class="spinner"></div><p>Carregando o mapa…</p></div>
+<div id="toast" class="toast"></div>
 
 <script>
 /* ============================================================
    DATA  (seed — reconciled with verified research data)
    ============================================================ */
 const CONFIG = {
-  terrain: { url:'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png', encoding:'terrarium', maxzoom:15 },
   imagery: { url:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}' },
-  labels:  { url:'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}' },
-  glyphs:  'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf'
+  labels:  { url:'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}' }
 };
 
 const MASSIF_COLORS = {
@@ -438,172 +528,97 @@ function trailData(){ return (OSM_TRAILS && OSM_TRAILS.features && OSM_TRAILS.fe
 /* ============================================================
    MAP
    ============================================================ */
-const map = new maplibregl.Map({
-  container:'map',
-  minZoom:8, maxZoom:16, maxPitch:82,
-  center:[-48.865,-25.31], zoom:11.2, pitch:66, bearing:22,
-  hash:true, attributionControl:false,
-  style:{
-    version:8,
-    glyphs:CONFIG.glyphs,
-    sources:{
-      sat:{type:'raster', tiles:[CONFIG.imagery.url], tileSize:256, maxzoom:19,
-           attribution:'Imagem: Esri, Maxar, Earthstar Geographics'},
-      labels:{type:'raster', tiles:[CONFIG.labels.url], tileSize:256, maxzoom:16}
-    },
-    layers:[
-      {id:'bg', type:'background', paint:{'background-color':'#07110f'}},
-      {id:'sat', type:'raster', source:'sat', paint:{'raster-fade-duration':180}},
-      {id:'labels', type:'raster', source:'labels', layout:{visibility:'none'}, paint:{'raster-opacity':.9}}
-    ]
+/* Leaflet: 2D, no WebGL, no workers, no 3D terrain. Renders reliably and fast
+   on any GPU (including Intel integrated), which is exactly what the WebGL/3D
+   stack could not guarantee here. Leaflet uses [lat, lng] order. */
+const map = L.map('map', {
+  center:[-25.31,-48.865], zoom:11,
+  minZoom:8, maxZoom:17,
+  zoomControl:false, attributionControl:true,
+  preferCanvas:true,          // circle markers on canvas -> smooth with 700+ points
+  worldCopyJump:false, tap:true, zoomSnap:0.5
+});
+window.map = map; // expose for console debugging
+map.attributionControl.setPrefix('');
+
+// Satellite basemap (Esri World Imagery) + optional place-name labels overlay
+const satLayer = L.tileLayer(CONFIG.imagery.url, {maxZoom:19, maxNativeZoom:19,
+  attribution:'Imagem: Esri, Maxar, Earthstar Geographics · Picos/rotas: © OpenStreetMap, IBGE · © Avner Paes Gomes'}).addTo(map);
+const labelLayer = L.tileLayer(CONFIG.labels.url, {maxZoom:17, maxNativeZoom:16, opacity:.9});
+
+// Controls: zoom top-right (top-left belongs to the story panel), scale bottom-right
+L.control.zoom({position:'topright'}).addTo(map);
+L.control.scale({position:'bottomright', metric:true, imperial:false, maxWidth:120}).addTo(map);
+satLayer.on('load', hideLoading);
+setTimeout(hideLoading, 2500);   // never hang on the spinner
+
+function hideLoading(){ var l=document.getElementById('loading'); if(l) l.classList.add('hidden'); }
+
+/* ------------------------------------------------------------------
+   LAYERS — all main-thread (SVG/Canvas). No workers, no WebGL, no 3D.
+   ------------------------------------------------------------------ */
+const HERO_MIN = 1650;   // peaks this high (or with a curated note) get a permanent label
+
+// --- Conservation units (polygons) ---
+const parksLayer = L.geoJSON(PARKS_GEO, {
+  style:function(f){ return {color:f.properties.color, weight:1.4, opacity:.8, dashArray:'5,4', fill:true, fillColor:f.properties.color, fillOpacity:.08}; },
+  onEachFeature:function(f,layer){ var p=f.properties; layer.bindPopup('<h3>'+p.name+'</h3><div class="pk-meta">'+p.label+' · '+p.km2+' km² · OpenStreetMap</div>'); }
+});
+
+// --- Trails / roads / rail (lines) ---
+function trailStyle(f){ var k=f.properties.kind, c=k==='estrada'?'#ef476f':k==='ferrovia'?'#4ea8de':'#ffd166'; return {color:c, weight:f.properties.hero?3.4:2, opacity:.92, lineCap:'round', lineJoin:'round'}; }
+const trailsLayer = L.geoJSON(trailData(), {
+  style:trailStyle,
+  onEachFeature:function(f,layer){
+    var p=f.properties, d=TRAIL_DESC[p.name]||'', ic=p.kind==='ferrovia'?'🚂':p.kind==='estrada'?'🛣️':'🥾';
+    layer.bindPopup('<h3>'+(p.name||'Trilha (OSM)')+'</h3><div class="pk-el">'+ic+' '+(p.km||'')+' km</div><div class="pk-meta">'+(d||'Traçado real do OpenStreetMap.')+'</div>');
+    layer.on('mouseover',function(){ layer.setStyle({weight:(f.properties.hero?5:3.5)}); });
+    layer.on('mouseout',function(){ trailsLayer.resetStyle(layer); });
   }
 });
 
-map.addControl(new maplibregl.NavigationControl({visualizePitch:true}), 'top-right');
-map.addControl(new maplibregl.ScaleControl({maxWidth:120, unit:'metric'}), 'bottom-right');
-map.addControl(new maplibregl.FullscreenControl(), 'top-right');
-map.addControl(new maplibregl.AttributionControl({
-  compact:true,
-  customAttribution:'Terreno: AWS Terrain Tiles (Mapzen/USGS/SRTM) · Imagem: Esri, Maxar · Picos/rotas: OSM, IBGE, pt.Wikipedia · © Avner Paes Gomes'
-}), 'bottom-right');
+// --- Peaks (canvas circle markers sized by elevation + labels) ---
+const peaksLayer = L.layerGroup();
+function peakRadius(e){ return e>=1800?9 : e>=1550?7 : e>=1250?5.5 : 4; }
+PEAKS.forEach(function(p){
+  if (typeof p.lat!=='number' || typeof p.lon!=='number') return;
+  var ele = p.elevation_m||700, r = peakRadius(ele);
+  var hero = ele>=HERO_MIN || (p.note && p.note.length>0);
+  var cm = L.circleMarker([p.lat,p.lon], {radius:r, color:'#0a1a12', weight:1.2, fillColor:massifColor(p.massif), fillOpacity:.96});
+  var elTxt = p.elevation_m?('▲ '+p.elevation_m+' m'):'▲ altitude n/d';
+  var note = p.note || HERO_NOTES[p.name] || '';
+  cm.bindPopup('<h3>'+p.name+'</h3><div class="pk-el">'+elTxt+'</div><div class="pk-meta">'+p.massif+(note?'<br>'+note:'')+'</div>');
+  var lbl = p.name + (p.elevation_m?' <span class="tt-m">'+p.elevation_m+'</span>':'');
+  cm.bindTooltip(lbl, {permanent:hero, direction:'top', offset:[0,-r-1], className:'peak-tt'+(hero?' major':''), opacity:1});
+  peaksLayer.addLayer(cm);
+});
 
-/* Robust init: do NOT gate terrain/data setup behind the paint-dependent
-   'load' event (which can stall in a throttled/background tab). Run as soon
-   as the style is loaded, via any of: load, styledata, or a short poll. */
-let didSetup = false;
-function runSetup(){
-  if (didSetup || !map.isStyleLoaded()) return;
-  didSetup = true;
-
-  // --- 3D terrain (optional: if WebGL/terrain fails, degrade to 2D but keep data) ---
-  try {
-    if (!map.getSource('dem')) map.addSource('dem', {type:'raster-dem', tiles:[CONFIG.terrain.url], encoding:CONFIG.terrain.encoding, tileSize:256, maxzoom:CONFIG.terrain.maxzoom,
-      attribution:'Terrain: AWS Terrain Tiles (Mapzen, USGS 3DEP, SRTM/NASA, GMTED2010)'});
-    map.setTerrain({source:'dem', exaggeration:parseFloat(document.getElementById('exag').value)});
-    map.addLayer({id:'hillshade', type:'hillshade', source:'dem',
-      paint:{'hillshade-exaggeration':.45, 'hillshade-shadow-color':'#04140f', 'hillshade-highlight-color':'#eafff6', 'hillshade-accent-color':'#0a2b22'}
-    }, 'labels');
-    map.setSky({'sky-color':'#7fb7e8','horizon-color':'#dfeef5','fog-color':'#cfe3e8',
-      'fog-ground-blend':.5,'horizon-fog-blend':.5,'sky-horizon-blend':.6,'atmosphere-blend':['interpolate',['linear'],['zoom'],8,.7,12,.2,14,0]});
-  } catch(e){ window.__ERR__ && window.__ERR__.push('terrain: '+(e&&e.message||e)); }
-
-  // --- Data layers (trails + peaks + POIs + parks) ---
-  try {
-    const trailColor = ['match',['get','kind'],'trilha','#ffd166','estrada','#ef476f','ferrovia','#4ea8de','#ffd166'];
-    map.addSource('trails', {type:'geojson', data:trailData(),
-      attribution:'Trilhas/rotas: © OpenStreetMap contributors (ODbL)'});
-    map.addLayer({id:'trails-glow', type:'line', source:'trails',
-      layout:{'line-cap':'round','line-join':'round'},
-      paint:{'line-color':trailColor,'line-width':['case',['get','hero'],7,3.5],'line-opacity':['interpolate',['linear'],['zoom'],10,0,12,['case',['get','hero'],.32,.14]],'line-blur':4}});
-    map.addLayer({id:'trails-line', type:'line', source:'trails',
-      layout:{'line-cap':'round','line-join':'round'},
-      paint:{'line-color':trailColor,'line-width':['interpolate',['linear'],['zoom'],11,['case',['get','hero'],1.6,.8],14,['case',['get','hero'],3.2,1.6]],'line-opacity':['case',['get','hero'],.97,.62]}});
-    map.on('click','trails-line', e=>{
-      const p=e.features[0].properties, d=TRAIL_DESC[p.name]||'', ic=p.kind==='ferrovia'?'🚂':p.kind==='estrada'?'🛣️':'🥾';
-      new maplibregl.Popup({offset:8}).setLngLat(e.lngLat)
-        .setHTML(`<h3>${p.name||'Trilha (OSM)'}</h3><div class="pk-el">${ic} ${p.km} km</div>`+
-          `<div class="pk-meta">${d||'Traçado real do OpenStreetMap.'}</div>`).addTo(map);
-    });
-    map.on('mouseenter','trails-line',()=>map.getCanvas().style.cursor='pointer');
-    map.on('mouseleave','trails-line',()=>map.getCanvas().style.cursor='');
-    addAtlasLayers();
-  } catch(e){ window.__ERR__ && window.__ERR__.push('layers: '+(e&&e.message||e)); }
-
-  document.getElementById('loading').classList.add('hidden'); // reveal map (terrain optional)
+// --- POIs (canvas circle markers by category; visible from zoom 11) ---
+const POI_FEATURES = (POIS_GEO && POIS_GEO.features) || [];
+const poiLayer = L.layerGroup();
+let poiOn = new Set(POI_CATS.map(function(c){return c.cat;}));
+let poiVisible = true;
+const poiEntries = POI_FEATURES.map(function(f){
+  var c=f.geometry.coordinates, pr=f.properties;
+  var cm = L.circleMarker([c[1],c[0]], {radius:4, color:'#08120f', weight:.8, fillColor:pr.color, fillOpacity:.92});
+  cm.bindPopup('<h3>'+(pr.emoji||'')+' '+(pr.name||pr.label)+'</h3><div class="pk-meta">'+pr.label+(pr.name?'':' · sem nome')+' · OpenStreetMap</div>');
+  if (pr.name||pr.label) cm.bindTooltip((pr.emoji?pr.emoji+' ':'')+(pr.name||pr.label), {direction:'top', className:'poi-tt'});
+  return {cat:pr.cat, marker:cm};
+});
+function refreshPoiMarkers(){
+  poiLayer.clearLayers();
+  if (!poiVisible || map.getZoom() < 11) return;
+  poiEntries.forEach(function(o){ if (poiOn.has(o.cat)) poiLayer.addLayer(o.marker); });
 }
-// Fire setup through every reliable signal (some stall in background/throttled tabs)
-map.on('load', runSetup);
-map.on('idle', runSetup);
-map.on('styledata', runSetup);
-map.on('sourcedata', runSetup);
-document.addEventListener('visibilitychange', runSetup);
-const _setupPoll = setInterval(() => { runSetup(); if (didSetup) clearInterval(_setupPoll); }, 250);
-// Absolute safety net: try once more, then reveal the map or explain the delay
-setTimeout(() => {
-  try { runSetup(); } catch(e){ window.__ERR__ && window.__ERR__.push('setup: '+(e&&e.message||e)); }
-  const l = document.getElementById('loading');
-  if (didSetup) { l.classList.add('hidden'); }
-  else { const p = l.querySelector('p'); if (p) p.textContent = 'O mapa 3D está demorando a carregar. Recarregue a página; se persistir, ative a aceleração de hardware no navegador.'; }
-}, 6000);
 
-/* Self-heal: browsers throttle the MapLibre worker in background tabs, which can
-   leave GeoJSON sources un-tiled (terrain shows, data doesn't). When the tab
-   returns to the foreground, force the sources to re-tile. */
-function _nudge(){
-  if (!didSetup) { runSetup(); return; }
-  try {
-    map.triggerRepaint && map.triggerRepaint();
-    ['trails','peaks','pois','parks'].forEach(function(s){
-      var src = map.getSource(s);
-      if (src && src._data && map.isSourceLoaded && !map.isSourceLoaded(s)) src.setData(src._data);
-    });
-  } catch(e){}
-}
-document.addEventListener('visibilitychange', function(){ if(!document.hidden) _nudge(); });
-window.addEventListener('focus', _nudge);
-
-/* --------- Atlas layers: peaks + POIs (GPU, scales to hundreds) --------- */
-function massifColorExpr(){
-  const m=['match',['get','massif']];
-  for(const [k,v] of Object.entries(MASSIF_HEX)){ if(k!=='Outros') m.push(k,v); }
-  m.push('#9aa7b0'); return m;
-}
-let poiOn = new Set(POI_CATS.map(c=>c.cat));
-function applyPoiFilter(){
-  if(!map.getLayer('pois-dot')) return;
-  const on=[...poiOn];
-  map.setFilter('pois-dot', on.length ? ['in',['get','cat'],['literal',on]] : ['==',['get','cat'],'__none__']);
-}
-function addAtlasLayers(){
-  // --- Conservation units (fill + dashed outline, under everything) ---
-  map.addSource('parks',{type:'geojson',data:PARKS_GEO,attribution:'Unidades de conservação: © OpenStreetMap'});
-  const parkBefore = map.getLayer('trails-glow') ? 'trails-glow' : undefined;
-  map.addLayer({id:'parks-fill',type:'fill',source:'parks',
-    paint:{'fill-color':['get','color'],'fill-opacity':0.10}}, parkBefore);
-  map.addLayer({id:'parks-outline',type:'line',source:'parks',
-    layout:{'line-join':'round'},
-    paint:{'line-color':['get','color'],'line-width':1.4,'line-opacity':0.75,'line-dasharray':[3,2]}}, parkBefore);
-  map.on('click','parks-fill',e=>{
-    const p=e.features[0].properties;
-    new maplibregl.Popup({offset:6}).setLngLat(e.lngLat)
-      .setHTML(`<h3>${p.name}</h3><div class="pk-meta">${p.label} · ${p.km2} km² · OpenStreetMap</div>`).addTo(map);
-  });
-  // --- Peaks (circle sized by elevation + decluttered labels) ---
-  map.addSource('peaks',{type:'geojson',data:PEAKS_GEO,attribution:'Cumes: © OpenStreetMap / Wikidata'});
-  map.addLayer({id:'peaks-dot',type:'circle',source:'peaks',paint:{
-    'circle-radius':['interpolate',['linear'],['coalesce',['get','ele'],700],700,2.4,1300,4.2,1877,7],
-    'circle-color':massifColorExpr(),'circle-stroke-color':'#0a1a12','circle-stroke-width':1,'circle-opacity':0.96
-  }});
-  map.addLayer({id:'peaks-label',type:'symbol',source:'peaks',layout:{
-    'text-field':['get','name'],'text-font':['Noto Sans Regular'],
-    'text-size':['interpolate',['linear'],['coalesce',['get','ele'],700],700,9.5,1877,13],
-    'text-offset':[0,0.85],'text-anchor':'top','text-allow-overlap':false,'text-optional':true,
-    'symbol-sort-key':['*',['coalesce',['get','ele'],0],-1]
-  },paint:{'text-color':'#eafff6','text-halo-color':'#04140f','text-halo-width':1.5}});
-  // --- POIs (circles by category, from zoom 11) ---
-  map.addSource('pois',{type:'geojson',data:POIS_GEO,attribution:'Locais: © OpenStreetMap'});
-  map.addLayer({id:'pois-dot',type:'circle',source:'pois',minzoom:11,paint:{
-    'circle-radius':['interpolate',['linear'],['zoom'],11,2.2,15,5.5],
-    'circle-color':['get','color'],'circle-stroke-color':'#08120f','circle-stroke-width':0.8,
-    'circle-opacity':['interpolate',['linear'],['zoom'],11,0,12,0.92]
-  }});
-  applyPoiFilter();
-  // --- interactions ---
-  map.on('click','peaks-dot',e=>{
-    const p=e.features[0].properties, el=p.ele?`▲ ${p.ele} m`:'▲ altitude n/d', d=HERO_NOTES[p.name]||'';
-    new maplibregl.Popup({offset:10}).setLngLat(e.lngLat)
-      .setHTML(`<h3>${p.name}</h3><div class="pk-el">${el}</div><div class="pk-meta">${p.massif}${d?'<br>'+d:''}</div>`).addTo(map);
-  });
-  map.on('click','pois-dot',e=>{
-    const p=e.features[0].properties;
-    new maplibregl.Popup({offset:8}).setLngLat(e.lngLat)
-      .setHTML(`<h3>${p.emoji||''} ${p.name||p.label}</h3><div class="pk-meta">${p.label}${p.name?'':' · sem nome'} · OpenStreetMap</div>`).addTo(map);
-  });
-  ['peaks-dot','pois-dot'].forEach(l=>{
-    map.on('mouseenter',l,()=>map.getCanvas().style.cursor='pointer');
-    map.on('mouseleave',l,()=>map.getCanvas().style.cursor='');
-  });
-}
+// Draw order: parks (bottom) -> trails -> POIs -> peaks (top)
+parksLayer.addTo(map);
+trailsLayer.addTo(map);
+poiLayer.addTo(map);
+peaksLayer.addTo(map);
+refreshPoiMarkers();
+map.on('zoomend', refreshPoiMarkers);
+hideLoading();
 
 function trailsGeoJSON(){
   return {type:'FeatureCollection', features:TRAILS.map(t => ({
@@ -626,8 +641,9 @@ function renderChapter(i){
   const nb = document.getElementById('nextBtn');
   nb.textContent = (i===NARRATIVE.chapters.length-1) ? '↺ Recomeçar' : 'Próximo ›';
   [...document.querySelectorAll('#dots .dot')].forEach((d,k)=>d.classList.toggle('active',k===i));
-  const pitch = 68 + (i%2)*6, bearing = [22,-15,35,10,-30,45][i%6];
-  map.flyTo({center:[c.focus_lon,c.focus_lat], zoom:13.1, pitch, bearing, duration:2200, essential:true});
+  map.flyTo([c.focus_lat, c.focus_lon], 13, {duration:1.6});
+  if (document.body.classList.contains('mode-3d')) cesiumFlyTo(c.focus_lon, c.focus_lat, 13);
+  if (window.matchMedia('(max-width:820px)').matches) closeSheet();
 }
 function buildDots(){
   const d = document.getElementById('dots'); d.innerHTML='';
@@ -708,46 +724,162 @@ function renderPoiLegend(){
   el.innerHTML = `<div class="sub" style="margin:0 0 6px">Locais de interesse (OSM)</div>`+
     POI_CATS.map(c=>`<label class="poi-row"><input type="checkbox" data-cat="${c.cat}" ${poiOn.has(c.cat)?'checked':''}><span class="leg-dot" style="background:${c.color};border-color:#0a1a12"></span><span class="poi-l">${c.emoji} ${c.label}</span><b class="poi-n">${counts[c.cat]||0}</b></label>`).join('');
   el.querySelectorAll('input[data-cat]').forEach(inp=>inp.onchange=()=>{
-    if(inp.checked) poiOn.add(inp.dataset.cat); else poiOn.delete(inp.dataset.cat); applyPoiFilter();
+    if(inp.checked) poiOn.add(inp.dataset.cat); else poiOn.delete(inp.dataset.cat); refreshPoiMarkers();
   });
 }
 
-/* --------- Toggles --------- */
-document.getElementById('tgTrails').onchange=e=>{
-  const v=e.target.checked?'visible':'none';
-  ['trails-line','trails-glow'].forEach(l=>map.getLayer(l)&&map.setLayoutProperty(l,'visibility',v));
-};
-document.getElementById('tgPois').onchange=e=>{
-  map.getLayer('pois-dot')&&map.setLayoutProperty('pois-dot','visibility',e.target.checked?'visible':'none');
-};
-document.getElementById('tgParks').onchange=e=>{
-  const v=e.target.checked?'visible':'none';
-  ['parks-fill','parks-outline'].forEach(l=>map.getLayer(l)&&map.setLayoutProperty(l,'visibility',v));
-};
-document.getElementById('tgHill').onchange=e=>{
-  map.getLayer('hillshade')&&map.setLayoutProperty('hillshade','visibility',e.target.checked?'visible':'none');
-};
-document.getElementById('tgLabels').onchange=e=>{
-  map.getLayer('labels')&&map.setLayoutProperty('labels','visibility',e.target.checked?'visible':'none');
-};
-document.getElementById('exag').oninput=e=>{
-  const v=parseFloat(e.target.value);
-  document.getElementById('exagVal').textContent=v.toFixed(1)+'×';
-  if(map.getTerrain()) map.setTerrain({source:'dem', exaggeration:v});
-};
-document.querySelectorAll('.collapse').forEach(c=>c.onclick=()=>{
-  const p=document.getElementById(c.dataset.target);
+/* --------- Layer toggles (Leaflet add/remove) --------- */
+function toggleLayer(layer, on){ if(on){ if(!map.hasLayer(layer)) layer.addTo(map); } else if(map.hasLayer(layer)){ map.removeLayer(layer); } }
+document.getElementById('tgTrails').onchange=function(e){ toggleLayer(trailsLayer, e.target.checked); };
+document.getElementById('tgParks').onchange=function(e){ toggleLayer(parksLayer, e.target.checked); };
+document.getElementById('tgPois').onchange=function(e){ poiVisible=e.target.checked; refreshPoiMarkers(); };
+document.getElementById('tgLabels').onchange=function(e){ toggleLayer(labelLayer, e.target.checked); };
+
+document.querySelectorAll('.collapse').forEach(function(c){ c.onclick=function(){
+  var p=document.getElementById(c.dataset.target);
   p.classList.toggle('collapsed'); c.textContent=p.classList.contains('collapsed')?'+':'–';
-});
+};});
+
+/* ============================================================
+   3D VIEW (Cesium) — opt-in, lazy-loaded on first use.
+   Leaflet 2D stays the default; Cesium only runs when requested,
+   so the reliable map is never slowed by the heavy 3D engine.
+   Terrain + imagery come from free ArcGIS services (no API key).
+   ============================================================ */
+const CESIUM_VER = '1.124';
+let cesiumViewer=null, cesiumReady=false, cesiumLoading=false;
+
+function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); }
+function hideToast(){ document.getElementById('toast').classList.remove('show'); }
+function flashToast(msg){ showToast(msg); setTimeout(hideToast, 4200); }
+
+function loadCesium(){
+  return new Promise(function(resolve, reject){
+    if (window.Cesium) return resolve();
+    window.CESIUM_BASE_URL = 'https://cdn.jsdelivr.net/npm/cesium@'+CESIUM_VER+'/Build/Cesium/';
+    var css=document.createElement('link'); css.rel='stylesheet'; css.href=window.CESIUM_BASE_URL+'Widgets/widgets.css'; document.head.appendChild(css);
+    var s=document.createElement('script'); s.src=window.CESIUM_BASE_URL+'Cesium.js';
+    s.onload=function(){ resolve(); };
+    s.onerror=function(){ reject(new Error('rede indisponível')); };
+    document.head.appendChild(s);
+    setTimeout(function(){ if(!window.Cesium) reject(new Error('tempo esgotado')); }, 20000);
+  });
+}
+
+async function initCesium(){
+  if (cesiumReady) return;
+  var c = map.getCenter();
+  var viewer = new Cesium.Viewer('cesiumContainer', {
+    baseLayerPicker:false, geocoder:false, homeButton:false, sceneModePicker:false,
+    navigationHelpButton:false, animation:false, timeline:false, fullscreenButton:false,
+    infoBox:false, selectionIndicator:false, requestRenderMode:true, maximumRenderTimeChange:Infinity,
+    baseLayer: Cesium.ImageryLayer.fromProviderAsync(
+      Cesium.ArcGisMapServerImageryProvider.fromUrl('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'))
+  });
+  viewer.scene.globe.enableLighting=false;
+  viewer.scene.fog.enabled=true;
+  viewer.scene.skyAtmosphere.show=true;
+  viewer.scene.renderError.addEventListener(function(scene, err){
+    window.__ERR__ && window.__ERR__.push('cesium render: '+(err&&err.message||err));
+    flashToast('O 3D encontrou um erro de vídeo. Voltando ao 2D.'); setView3D(false);
+  });
+  // Free ArcGIS World Terrain (no Ion token)
+  try {
+    viewer.terrainProvider = await Cesium.ArcGISTiledElevationTerrainProvider.fromUrl(
+      'https://elevation3d.arcgis.com/arcgis/rest/services/WorldElevation3D/Terrain3D/ImageServer');
+    viewer.scene.globe.depthTestAgainstTerrain = true;
+  } catch(e){ window.__ERR__ && window.__ERR__.push('cesium terrain: '+(e&&e.message||e)); }
+  // Peaks as 3D points (+ labels for the emblematic summits)
+  PEAKS.forEach(function(p){
+    if (typeof p.lat!=='number' || typeof p.lon!=='number') return;
+    var ele=p.elevation_m||700, hero = ele>=HERO_MIN || (p.note && p.note.length>0);
+    viewer.entities.add({
+      name: p.name,
+      position: Cesium.Cartesian3.fromDegrees(p.lon, p.lat),
+      point:{ pixelSize: ele>=1800?12:ele>=1550?10:8,
+        color: Cesium.Color.fromCssColorString(massifColor(p.massif)),
+        outlineColor: Cesium.Color.fromCssColorString('#0a1a12'), outlineWidth:1.5,
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY },
+      label: hero ? { text: p.name+(p.elevation_m?'\n'+p.elevation_m+' m':''),
+        font:'600 12px system-ui, sans-serif', fillColor: Cesium.Color.WHITE,
+        outlineColor: Cesium.Color.fromCssColorString('#04140f'), outlineWidth:3,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE, verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        pixelOffset: new Cesium.Cartesian2(0,-12), heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        translucencyByDistance: new Cesium.NearFarScalar(4e4, 1.0, 2.2e5, 0.0) } : undefined,
+      description: '<div style="font-size:14px"><b>'+(p.elevation_m?'▲ '+p.elevation_m+' m':'')+'</b><br>'+p.massif+(p.note?'<br><br>'+p.note:'')+'</div>'
+    });
+  });
+  cesiumViewer = viewer; cesiumReady = true;
+  // Initial placement over the Serra do Mar (the fly helper is guarded on cesiumViewer,
+  // so it must be assigned *before* moving the camera — else it stays parked in space).
+  viewer.camera.setView({
+    destination: Cesium.Cartesian3.fromDegrees(c.lng, c.lat-0.045, 9500),
+    orientation:{ heading:0, pitch:Cesium.Math.toRadians(-33), roll:0 }
+  });
+  // Stream terrain/imagery continuously on first reveal, then throttle to spare the GPU.
+  viewer.scene.requestRenderMode = false;
+  setTimeout(function(){ try{ if(!viewer.isDestroyed()) viewer.scene.requestRenderMode = true; }catch(e){} }, 7000);
+}
+
+function cesiumFlyTo(lon, lat, zoom){
+  if (!cesiumViewer) return;
+  var height = zoom>=13 ? 9000 : zoom>=12 ? 16000 : 30000;
+  cesiumViewer.camera.flyTo({
+    destination: Cesium.Cartesian3.fromDegrees(lon, lat-height/220000, height),
+    orientation:{ heading:Cesium.Math.toRadians(0), pitch:Cesium.Math.toRadians(-32), roll:0 },
+    duration: 1.4
+  });
+}
+
+async function setView3D(on){
+  document.querySelectorAll('#viewtoggle button').forEach(function(b){ b.classList.toggle('on', (b.dataset.view==='3d')===on); });
+  if (on){
+    document.body.classList.add('mode-3d');
+    if (!cesiumReady){
+      if (cesiumLoading) return;
+      cesiumLoading = true; showToast('Carregando terreno 3D…');
+      try { await loadCesium(); await initCesium(); hideToast(); }
+      catch(err){
+        hideToast(); flashToast('Não foi possível carregar o 3D ('+(err&&err.message||err)+'). Seguindo em 2D.');
+        cesiumLoading = false; setView3D(false); return;
+      }
+      cesiumLoading = false;
+    }
+    if (cesiumViewer){ cesiumViewer.useDefaultRenderLoop = true; try{ cesiumViewer.resize(); }catch(e){} }
+  } else {
+    document.body.classList.remove('mode-3d');
+    if (cesiumViewer) cesiumViewer.useDefaultRenderLoop = false;   // pause GPU work in 2D
+    setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 60);
+  }
+}
+document.querySelectorAll('#viewtoggle button').forEach(function(b){ b.onclick=function(){ setView3D(b.dataset.view==='3d'); }; });
 
 /* ============================================================
    INTRO / BOOT
    ============================================================ */
+/* --------- Mobile: bottom-sheet panels driven by a bottom tab bar --------- */
+const SHEETS = ['story','dash','legend'];
+let activeSheet = null;
+function closeSheet(){ if(activeSheet) openSheet(activeSheet); }
+function openSheet(name){
+  activeSheet = (activeSheet===name) ? null : name;
+  SHEETS.forEach(function(k){ document.getElementById(k).classList.toggle('sheet-open', k===activeSheet); });
+  document.querySelectorAll('#mobilebar button').forEach(function(b){ b.classList.toggle('on', b.dataset.tab===activeSheet); });
+  document.body.classList.toggle('sheet-any', !!activeSheet);
+}
+function initMobile(){
+  document.querySelectorAll('#mobilebar button').forEach(function(b){ b.onclick=function(){ openSheet(b.dataset.tab); }; });
+  // tapping empty map closes an open sheet (marker/feature clicks stop propagation)
+  map.on('click', function(){ if(window.matchMedia('(max-width:820px)').matches && activeSheet) closeSheet(); });
+}
+
 function boot(){
   document.getElementById('isPeaks').textContent=PEAKS.length;
   const nTrails=(OSM_TRAILS&&OSM_TRAILS.features)?OSM_TRAILS.features.filter(f=>f.properties.name).length:TRAILS.length;
   document.getElementById('isTrails').textContent=nTrails;
-  buildDots(); renderChapter(0); renderDash(); renderLegend(); renderPoiLegend();
+  buildDots(); renderChapter(0); renderDash(); renderLegend(); renderPoiLegend(); initMobile();
 }
 document.getElementById('startBtn').onclick=()=>{
   document.getElementById('intro').classList.add('hidden');
