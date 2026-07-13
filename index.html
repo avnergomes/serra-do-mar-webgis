@@ -526,6 +526,22 @@ setTimeout(() => {
   else { const p = l.querySelector('p'); if (p) p.textContent = 'O mapa 3D está demorando a carregar. Recarregue a página; se persistir, ative a aceleração de hardware no navegador.'; }
 }, 6000);
 
+/* Self-heal: browsers throttle the MapLibre worker in background tabs, which can
+   leave GeoJSON sources un-tiled (terrain shows, data doesn't). When the tab
+   returns to the foreground, force the sources to re-tile. */
+function _nudge(){
+  if (!didSetup) { runSetup(); return; }
+  try {
+    map.triggerRepaint && map.triggerRepaint();
+    ['trails','peaks','pois','parks'].forEach(function(s){
+      var src = map.getSource(s);
+      if (src && src._data && map.isSourceLoaded && !map.isSourceLoaded(s)) src.setData(src._data);
+    });
+  } catch(e){}
+}
+document.addEventListener('visibilitychange', function(){ if(!document.hidden) _nudge(); });
+window.addEventListener('focus', _nudge);
+
 /* --------- Atlas layers: peaks + POIs (GPU, scales to hundreds) --------- */
 function massifColorExpr(){
   const m=['match',['get','massif']];
