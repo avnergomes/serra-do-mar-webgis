@@ -16,6 +16,7 @@ Por **Avner Paes Gomes** (Data & Geo) · [portfólio](https://avnergomes.github.
 - **273 cumes nomeados** da Serra do Mar paranaense (Pico Paraná 1.877 m, Caratuva, Ibitirati, o maciço Marumbi, Anhangava-Baitaca, Serra do Canal, Serra da Prata, Morro dos Perdidos, Serra da Igreja), agrupados por região e rotulados por altitude (declutter automático).
 - **75 trilhas e rotas reais** + segmentos, geometria do **OpenStreetMap**: travessia do Ibitiraquire, vias Frontal/Noroeste/Rochedinho do Marumbi, Caminho do Itupava, Estrada da Graciosa e a ferrovia Curitiba-Paranaguá (Serra Verde Express). Clique numa rota para nome e distância.
 - **462 locais de interesse** (POIs) do OSM, com toggles por categoria: refúgios/abrigos, inícios de trilha, estacionamentos, mirantes, pontos de água, cachoeiras e campings.
+- **36 unidades de conservação** (limites) do OSM: PE Pico do Marumbi, PE Pico Paraná, PE Serra da Baitaca, PE Roberto Ribas Lange, PE da Graciosa, PE do Boguaçu e outras, como contorno tracejado com preenchimento sutil (clique para nome e área).
 - **Painel de dados**: barras de altitude dos cumes e distribuição por região (donut).
 - **História interativa** em 6 capítulos, com câmera que voa a cada tema.
 - **Legenda e camadas**: alternar trilhas, POIs (e por categoria), relevo, rótulos e exagero do terreno.
@@ -37,8 +38,9 @@ A atribuição já aparece no rodapé do mapa. Mantenha-a visível. Cobertura de
 ```bash
 py -3 fetch_peaks.py        # cumes (OSM natural=peak + Wikidata) -> peaks.geojson
 py -3 fetch_pois.py         # POIs (refúgios, água, mirantes, etc.) -> pois.geojson
+py -3 fetch_parks.py        # unidades de conservação (OSM protected_area) -> parks.geojson
 py -3 fetch_osm_trails.py   # trilhas/estradas/ferrovia (Overpass) -> serra_trails.geojson
-py -3 embed_atlas.py        # injeta peaks.geojson + pois.geojson no index.html
+py -3 embed_atlas.py        # injeta peaks + pois + parks no index.html
 py -3 embed_trails.py       # injeta serra_trails.geojson no index.html
 py -3 make_logo.py          # gera e injeta a logo do header (portfólio)
 ```
