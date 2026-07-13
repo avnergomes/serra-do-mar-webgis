@@ -5,8 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>Serra do Mar Paranaense · Web GIS 3D</title>
 <meta name="description" content="Visualização Web GIS 3D da Serra do Mar paranaense: terreno, picos, trilhas e narrativa interativa. Por Avner Paes Gomes." />
-<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+/* Surface any load error in the spinner instead of hanging silently (also aids debugging). */
+window.__ERR__=[];
+window.addEventListener('error',function(e){
+  window.__ERR__.push((e&&(e.message||(e.error&&e.error.message)))||('recurso nao carregou: '+((e&&e.target&&(e.target.src||e.target.href))||'?')));
+},true);
+window.addEventListener('unhandledrejection',function(e){window.__ERR__.push('promise: '+e.reason);});
+/* If MapLibre itself never loads (blocked/offline), say so instead of hanging on the spinner. */
+window.addEventListener('load',function(){
+  if(typeof maplibregl==='undefined'){
+    var l=document.getElementById('loading'); if(l){var p=l.querySelector('p'); if(p){p.style.color='#ff9b9b';p.textContent='Não foi possível carregar a biblioteca do mapa. Recarregue a página ou verifique a conexão.';}}
+  }
+});
+</script>
+<link href="vendor/maplibre-gl.css" rel="stylesheet" />
+<script src="vendor/maplibre-gl.js"></script>
 <style>
   :root{
     --bg:#07110f;
@@ -461,46 +475,41 @@ function runSetup(){
   if (didSetup || !map.isStyleLoaded()) return;
   didSetup = true;
 
-  // --- Terrain DEM ---
-  map.addSource('dem', {type:'raster-dem', tiles:[CONFIG.terrain.url], encoding:CONFIG.terrain.encoding, tileSize:256, maxzoom:CONFIG.terrain.maxzoom,
-    attribution:'Terrain: AWS Terrain Tiles (Mapzen, USGS 3DEP, SRTM/NASA, GMTED2010)'});
-  map.setTerrain({source:'dem', exaggeration:parseFloat(document.getElementById('exag').value)});
-
-  // --- Hillshade (relief emphasis over imagery) ---
-  map.addLayer({id:'hillshade', type:'hillshade', source:'dem',
-    paint:{'hillshade-exaggeration':.45, 'hillshade-shadow-color':'#04140f', 'hillshade-highlight-color':'#eafff6', 'hillshade-accent-color':'#0a2b22'}
-  }, 'labels');
-
-  // --- Sky / atmosphere ---
+  // --- 3D terrain (optional: if WebGL/terrain fails, degrade to 2D but keep data) ---
   try {
+    if (!map.getSource('dem')) map.addSource('dem', {type:'raster-dem', tiles:[CONFIG.terrain.url], encoding:CONFIG.terrain.encoding, tileSize:256, maxzoom:CONFIG.terrain.maxzoom,
+      attribution:'Terrain: AWS Terrain Tiles (Mapzen, USGS 3DEP, SRTM/NASA, GMTED2010)'});
+    map.setTerrain({source:'dem', exaggeration:parseFloat(document.getElementById('exag').value)});
+    map.addLayer({id:'hillshade', type:'hillshade', source:'dem',
+      paint:{'hillshade-exaggeration':.45, 'hillshade-shadow-color':'#04140f', 'hillshade-highlight-color':'#eafff6', 'hillshade-accent-color':'#0a2b22'}
+    }, 'labels');
     map.setSky({'sky-color':'#7fb7e8','horizon-color':'#dfeef5','fog-color':'#cfe3e8',
       'fog-ground-blend':.5,'horizon-fog-blend':.5,'sky-horizon-blend':.6,'atmosphere-blend':['interpolate',['linear'],['zoom'],8,.7,12,.2,14,0]});
-  } catch(e){}
+  } catch(e){ window.__ERR__ && window.__ERR__.push('terrain: '+(e&&e.message||e)); }
 
-  // --- Trails ---
-  const trailColor = ['match',['get','kind'],'trilha','#ffd166','estrada','#ef476f','ferrovia','#4ea8de','#ffd166'];
-  map.addSource('trails', {type:'geojson', data:trailData(),
-    attribution:'Trilhas/rotas: © OpenStreetMap contributors (ODbL)'});
-  map.addLayer({id:'trails-glow', type:'line', source:'trails',
-    layout:{'line-cap':'round','line-join':'round'},
-    paint:{'line-color':trailColor,'line-width':['case',['get','hero'],7,3.5],'line-opacity':['interpolate',['linear'],['zoom'],10,0,12,['case',['get','hero'],.32,.14]],'line-blur':4}});
-  map.addLayer({id:'trails-line', type:'line', source:'trails',
-    layout:{'line-cap':'round','line-join':'round'},
-    paint:{'line-color':trailColor,'line-width':['interpolate',['linear'],['zoom'],11,['case',['get','hero'],1.6,.8],14,['case',['get','hero'],3.2,1.6]],'line-opacity':['case',['get','hero'],.97,.62]}});
+  // --- Data layers (trails + peaks + POIs + parks) ---
+  try {
+    const trailColor = ['match',['get','kind'],'trilha','#ffd166','estrada','#ef476f','ferrovia','#4ea8de','#ffd166'];
+    map.addSource('trails', {type:'geojson', data:trailData(),
+      attribution:'Trilhas/rotas: © OpenStreetMap contributors (ODbL)'});
+    map.addLayer({id:'trails-glow', type:'line', source:'trails',
+      layout:{'line-cap':'round','line-join':'round'},
+      paint:{'line-color':trailColor,'line-width':['case',['get','hero'],7,3.5],'line-opacity':['interpolate',['linear'],['zoom'],10,0,12,['case',['get','hero'],.32,.14]],'line-blur':4}});
+    map.addLayer({id:'trails-line', type:'line', source:'trails',
+      layout:{'line-cap':'round','line-join':'round'},
+      paint:{'line-color':trailColor,'line-width':['interpolate',['linear'],['zoom'],11,['case',['get','hero'],1.6,.8],14,['case',['get','hero'],3.2,1.6]],'line-opacity':['case',['get','hero'],.97,.62]}});
+    map.on('click','trails-line', e=>{
+      const p=e.features[0].properties, d=TRAIL_DESC[p.name]||'', ic=p.kind==='ferrovia'?'🚂':p.kind==='estrada'?'🛣️':'🥾';
+      new maplibregl.Popup({offset:8}).setLngLat(e.lngLat)
+        .setHTML(`<h3>${p.name||'Trilha (OSM)'}</h3><div class="pk-el">${ic} ${p.km} km</div>`+
+          `<div class="pk-meta">${d||'Traçado real do OpenStreetMap.'}</div>`).addTo(map);
+    });
+    map.on('mouseenter','trails-line',()=>map.getCanvas().style.cursor='pointer');
+    map.on('mouseleave','trails-line',()=>map.getCanvas().style.cursor='');
+    addAtlasLayers();
+  } catch(e){ window.__ERR__ && window.__ERR__.push('layers: '+(e&&e.message||e)); }
 
-  // trail interaction: name + distance popup
-  map.on('click','trails-line', e=>{
-    const p=e.features[0].properties, d=TRAIL_DESC[p.name]||'', ic=p.kind==='ferrovia'?'🚂':p.kind==='estrada'?'🛣️':'🥾';
-    new maplibregl.Popup({offset:8}).setLngLat(e.lngLat)
-      .setHTML(`<h3>${p.name||'Trilha (OSM)'}</h3><div class="pk-el">${ic} ${p.km} km</div>`+
-        `<div class="pk-meta">${d||'Traçado real do OpenStreetMap.'}</div>`).addTo(map);
-  });
-  map.on('mouseenter','trails-line',()=>map.getCanvas().style.cursor='pointer');
-  map.on('mouseleave','trails-line',()=>map.getCanvas().style.cursor='');
-
-  addAtlasLayers();
-
-  document.getElementById('loading').classList.add('hidden'); // setup done -> reveal map immediately
+  document.getElementById('loading').classList.add('hidden'); // reveal map (terrain optional)
 }
 // Fire setup through every reliable signal (some stall in background/throttled tabs)
 map.on('load', runSetup);
@@ -509,8 +518,13 @@ map.on('styledata', runSetup);
 map.on('sourcedata', runSetup);
 document.addEventListener('visibilitychange', runSetup);
 const _setupPoll = setInterval(() => { runSetup(); if (didSetup) clearInterval(_setupPoll); }, 250);
-// Absolute safety net: never leave a visitor stuck on the spinner
-setTimeout(() => document.getElementById('loading').classList.add('hidden'), 6000);
+// Absolute safety net: try once more, then reveal the map or explain the delay
+setTimeout(() => {
+  try { runSetup(); } catch(e){ window.__ERR__ && window.__ERR__.push('setup: '+(e&&e.message||e)); }
+  const l = document.getElementById('loading');
+  if (didSetup) { l.classList.add('hidden'); }
+  else { const p = l.querySelector('p'); if (p) p.textContent = 'O mapa 3D está demorando a carregar. Recarregue a página; se persistir, ative a aceleração de hardware no navegador.'; }
+}, 6000);
 
 /* --------- Atlas layers: peaks + POIs (GPU, scales to hundreds) --------- */
 function massifColorExpr(){
