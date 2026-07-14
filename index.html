@@ -174,12 +174,17 @@ window.addEventListener('load',function(){
   .metric .v{font-size:19px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
   .metric .l{font-size:9.5px;color:var(--txt-dim);text-transform:uppercase;letter-spacing:.4px;margin-top:5px}
   .sub{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--txt-dim);margin:6px 0 8px}
-  .bars{display:flex;flex-direction:column;gap:7px}
-  .bar-row{display:grid;grid-template-columns:96px 1fr auto;align-items:center;gap:8px;font-size:11px}
-  .bar-row .nm{color:#cfe3dc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .bar-track{height:9px;background:rgba(255,255,255,.06);border-radius:6px;overflow:hidden}
-  .bar-fill{height:100%;border-radius:6px;transition:width .8s cubic-bezier(.2,.7,.2,1)}
-  .bar-row .vv{color:#fff;font-variant-numeric:tabular-nums;font-weight:600}
+  /* Ridge silhouette (north -> south elevation profile) */
+  .ridge{display:block;width:100%;height:auto;overflow:visible}
+  .ridge .rg-line{fill:none;stroke:rgba(18,214,154,.85);stroke-width:1;stroke-linejoin:round}
+  .ridge .rg-leader{stroke:rgba(255,255,255,.28);stroke-width:.7}
+  .ridge .rg-dot{stroke:#0a1a12;stroke-width:1}
+  .ridge .rg-lbl{font-size:10px;fill:#e8f4ef;font-weight:600}
+  .ridge .rg-lbl .rg-m{fill:var(--txt-dim);font-weight:400;font-variant-numeric:tabular-nums}
+  .ridge .rg-hit{fill:transparent;cursor:pointer}
+  .ridge .rg-pk{transition:opacity .18s}
+  .ridge.dim .rg-pk{opacity:.35}
+  .ridge.dim .rg-pk.on{opacity:1}
   .donut-wrap{display:flex;align-items:center;gap:14px;margin-top:6px}
   .donut-legend{display:flex;flex-direction:column;gap:6px;font-size:11px}
   .donut-legend .row{display:flex;align-items:center;gap:7px;color:#cfe3dc}
@@ -353,8 +358,9 @@ window.addEventListener('load',function(){
   <div class="hd"><h2>📊 Painel de dados</h2><div class="collapse" data-target="dash">–</div></div>
   <div class="body">
     <div class="metrics" id="metrics"></div>
-    <div class="sub">Altitude dos principais cumes (m)</div>
-    <div class="bars" id="bars"></div>
+    <div class="sub">Silhueta dos cumes &middot; norte → sul (m)</div>
+    <svg id="ridge" class="ridge" viewBox="0 0 280 202" preserveAspectRatio="xMidYMid meet"
+         role="img" aria-label="Perfil de altitude dos cumes da Serra do Mar paranaense, de norte a sul"></svg>
     <div class="sub" style="margin-top:16px">Distribuição por maciço</div>
     <div class="donut-wrap">
       <svg id="donut" width="104" height="104" viewBox="0 0 104 104"></svg>
@@ -666,6 +672,93 @@ document.getElementById('nextBtn').onclick=()=>renderChapter(chap>=NARRATIVE.cha
 /* ============================================================
    DASHBOARDS
    ============================================================ */
+/* Elevation profile of the range, drawn as a silhouette from north (left) to
+   south (right). X is real latitude, so the shape is a geographic transect,
+   not a ranking. The eight highest summits get a diagonal label at the top
+   with a leader line down to their own point on the ridge. */
+const RIDGE = { W:280, x0:6, x1:274, yTop:88, yBot:200, lblY:80, lblGap:16, lblRight:62 };
+function renderRidge(eleP){
+  const svg = document.getElementById('ridge'); if(!svg) return;
+  svg.innerHTML='';
+  const R = RIDGE, SVGNS = 'http://www.w3.org/2000/svg';
+  const mk = (tag, attrs) => { const e=document.createElementNS(SVGNS,tag);
+    for(const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+
+  const all = eleP.filter(p=>typeof p.lat==='number').sort((a,b)=>b.lat-a.lat);
+  if(all.length<2) return;
+  // The highest summits sit in a single stretch of the range, so zoom the
+  // profile to that latitude window and drop the rest of the transect.
+  const hi = [...all].sort((a,b)=>b.elevation_m-a.elevation_m).slice(0,8);
+  const hiN = Math.max(...hi.map(p=>p.lat)), hiS = Math.min(...hi.map(p=>p.lat));
+  const pad = Math.max((hiN-hiS)*0.12, 0.004);
+  const latN = hiN+pad, latS = hiS-pad;
+  const pts = all.filter(p=>p.lat<=latN && p.lat>=latS);
+  if(pts.length<2) return;
+  const eles = pts.map(p=>p.elevation_m);
+  const eMax = Math.max(...eles), eMin = Math.min(...eles);
+  const eLo = Math.max(0, eMin-(eMax-eMin)*0.3), eHi = eMax+(eMax-eMin)*0.05;
+  const xOf = lat => latN===latS ? (R.x0+R.x1)/2 : R.x0+(latN-lat)/(latN-latS)*(R.x1-R.x0);
+  const yOf = e => R.yBot-(e-eLo)/(eHi-eLo)*(R.yBot-R.yTop);
+
+  const defs = mk('defs');
+  const grad = mk('linearGradient',{id:'rgGrad',x1:'0',y1:'0',x2:'0',y2:'1'});
+  grad.appendChild(mk('stop',{offset:'0%','stop-color':'#12d69a','stop-opacity':'.45'}));
+  grad.appendChild(mk('stop',{offset:'100%','stop-color':'#12d69a','stop-opacity':'.04'}));
+  defs.appendChild(grad); svg.appendChild(defs);
+
+  const seg = pts.map(p=>xOf(p.lat).toFixed(1)+' '+yOf(p.elevation_m).toFixed(1));
+  const line = 'M'+seg.join(' L');
+  const xa = xOf(pts[0].lat).toFixed(1), xb = xOf(pts[pts.length-1].lat).toFixed(1);
+  svg.appendChild(mk('path',{d:line+` L ${xb} ${R.yBot} L ${xa} ${R.yBot} Z`,fill:'url(#rgGrad)',stroke:'none'}));
+  const ridgeLine = mk('path',{class:'rg-line',d:line});
+  svg.appendChild(ridgeLine);
+
+  // eight highest summits, labelled top-left to bottom-right along the profile
+  const top = [...pts].sort((a,b)=>b.elevation_m-a.elevation_m).slice(0,8)
+    .map(p=>({p, x:xOf(p.lat), y:yOf(p.elevation_m)}))
+    .sort((a,b)=>a.x-b.x);
+  const LMAX = R.W-R.lblRight;
+  top.forEach(t=>{ t.lx = Math.min(Math.max(t.x, R.x0), LMAX); });
+  for(let i=1;i<top.length;i++)
+    if(top[i].lx < top[i-1].lx+R.lblGap) top[i].lx = top[i-1].lx+R.lblGap;
+  // the summits cluster in one massif, so re-centre the whole label block over
+  // them instead of letting the forward pass pin it to the left edge
+  const mean = arr => arr.reduce((s,v)=>s+v,0)/arr.length;
+  let shift = mean(top.map(t=>t.x)) - mean(top.map(t=>t.lx));
+  shift = Math.min(shift, LMAX - top[top.length-1].lx);
+  shift = Math.max(shift, R.x0 - top[0].lx);
+  top.forEach(t=>{ t.lx += shift; });
+
+  top.forEach(t=>{
+    const c = massifColor(t.p.massif), g = mk('g',{class:'rg-pk'});
+    g.appendChild(mk('line',{class:'rg-leader',x1:t.lx,y1:R.lblY+2,x2:t.x,y2:t.y-3.5}));
+    g.appendChild(mk('circle',{class:'rg-dot',cx:t.x,cy:t.y,r:2.8,fill:c}));
+    const lbl = mk('text',{class:'rg-lbl',x:t.lx,y:R.lblY,'text-anchor':'start',
+      transform:`rotate(-58 ${t.lx} ${R.lblY})`});
+    const nm = mk('tspan',{}); nm.textContent = t.p.name.replace(/\s*\(.*\)/,'')+' ';
+    const m = mk('tspan',{class:'rg-m'}); m.textContent = t.p.elevation_m.toLocaleString('pt-BR');
+    lbl.appendChild(nm); lbl.appendChild(m); g.appendChild(lbl);
+    const hit = mk('circle',{class:'rg-hit',cx:t.x,cy:t.y,r:9});
+    const ttl = mk('title',{});
+    ttl.textContent = `${t.p.name} · ${t.p.elevation_m.toLocaleString('pt-BR')} m · ${t.p.massif}`;
+    hit.appendChild(ttl); g.appendChild(hit);
+    const on = ()=>{ svg.classList.add('dim'); g.classList.add('on'); };
+    const off = ()=>{ svg.classList.remove('dim'); g.classList.remove('on'); };
+    g.addEventListener('mouseenter', on); g.addEventListener('mouseleave', off);
+    svg.appendChild(g);
+  });
+
+  try {
+    const len = ridgeLine.getTotalLength();
+    ridgeLine.style.strokeDasharray = len;
+    ridgeLine.style.strokeDashoffset = len;
+    requestAnimationFrame(()=>{
+      ridgeLine.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.2,.7,.2,1)';
+      ridgeLine.style.strokeDashoffset = 0;
+    });
+  } catch(e){ /* profile still renders without the draw-in animation */ }
+}
+
 function renderDash(){
   const eleP = PEAKS.filter(p=>p.elevation_m);
   const maxEl = Math.max(...eleP.map(p=>p.elevation_m));
@@ -677,15 +770,8 @@ function renderDash(){
     <div class="metric"><div class="v">${maxEl}</div><div class="l">Máx (m)</div></div>
     <div class="metric"><div class="v">${massifs.length}</div><div class="l">Regiões</div></div>
     <div class="metric"><div class="v">${nPois}</div><div class="l">POIs</div></div>`;
-  // bars (top 8 by elevation)
-  const top = [...eleP].sort((a,b)=>b.elevation_m-a.elevation_m).slice(0,8);
-  document.getElementById('bars').innerHTML = top.map(p=>`
-    <div class="bar-row">
-      <span class="nm" title="${p.name}">${p.name.replace(/\s*\(.*\)/,'')}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:0%;background:${massifColor(p.massif)}" data-w="${(p.elevation_m/maxEl*100).toFixed(0)}"></div></div>
-      <span class="vv">${p.elevation_m}</span>
-    </div>`).join('');
-  requestAnimationFrame(()=>document.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'));
+  // ridge silhouette: elevation profile from north to south
+  renderRidge(eleP);
   // donut by region (largest first)
   const counts = massifs.map(m=>({m, n:PEAKS.filter(p=>p.massif===m).length})).sort((a,b)=>b.n-a.n);
   const total = PEAKS.length; let a0=-Math.PI/2; const cx=52,cy=52,r=38,sw=15;
