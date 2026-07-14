@@ -72,6 +72,13 @@ window.addEventListener('load',function(){
     color:var(--txt);border:1px solid var(--stroke-strong);border-radius:10px;padding:9px 15px;font-size:12.5px;
     box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .2s;max-width:88vw;text-align:center}
   .toast.show{opacity:1}
+
+  /* Cesium hover/tap tooltip (3D) */
+  .ctooltip{position:fixed;z-index:9;pointer-events:none;background:rgba(7,17,15,.92);border:1px solid var(--stroke-strong);
+    color:#fff;border-radius:7px;padding:5px 9px;font-size:12px;font-weight:600;box-shadow:0 3px 12px rgba(0,0,0,.55);
+    opacity:0;transition:opacity .1s;max-width:220px;line-height:1.4;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  .ctooltip.show{opacity:1}
+  .ctooltip b{color:var(--accent-2)}
   .leaflet-control-attribution{font-size:10px;background:rgba(6,14,12,.62)!important;color:#9db4ac!important}
   .leaflet-control-attribution a{color:#7ee0c2!important}
   /* zoom + scale controls (dark) */
@@ -404,6 +411,7 @@ window.addEventListener('load',function(){
 
 <div id="loading"><div class="spinner"></div><p>Carregando o mapa…</p></div>
 <div id="toast" class="toast"></div>
+<div id="ctooltip" class="ctooltip"></div>
 
 <script>
 /* ============================================================
@@ -724,15 +732,15 @@ function renderPoiLegend(){
   el.innerHTML = `<div class="sub" style="margin:0 0 6px">Locais de interesse (OSM)</div>`+
     POI_CATS.map(c=>`<label class="poi-row"><input type="checkbox" data-cat="${c.cat}" ${poiOn.has(c.cat)?'checked':''}><span class="leg-dot" style="background:${c.color};border-color:#0a1a12"></span><span class="poi-l">${c.emoji} ${c.label}</span><b class="poi-n">${counts[c.cat]||0}</b></label>`).join('');
   el.querySelectorAll('input[data-cat]').forEach(inp=>inp.onchange=()=>{
-    if(inp.checked) poiOn.add(inp.dataset.cat); else poiOn.delete(inp.dataset.cat); refreshPoiMarkers();
+    if(inp.checked) poiOn.add(inp.dataset.cat); else poiOn.delete(inp.dataset.cat); refreshPoiMarkers(); refreshCesiumLayers();
   });
 }
 
 /* --------- Layer toggles (Leaflet add/remove) --------- */
 function toggleLayer(layer, on){ if(on){ if(!map.hasLayer(layer)) layer.addTo(map); } else if(map.hasLayer(layer)){ map.removeLayer(layer); } }
-document.getElementById('tgTrails').onchange=function(e){ toggleLayer(trailsLayer, e.target.checked); };
-document.getElementById('tgParks').onchange=function(e){ toggleLayer(parksLayer, e.target.checked); };
-document.getElementById('tgPois').onchange=function(e){ poiVisible=e.target.checked; refreshPoiMarkers(); };
+document.getElementById('tgTrails').onchange=function(e){ toggleLayer(trailsLayer, e.target.checked); refreshCesiumLayers(); };
+document.getElementById('tgParks').onchange=function(e){ toggleLayer(parksLayer, e.target.checked); refreshCesiumLayers(); };
+document.getElementById('tgPois').onchange=function(e){ poiVisible=e.target.checked; refreshPoiMarkers(); refreshCesiumLayers(); };
 document.getElementById('tgLabels').onchange=function(e){ toggleLayer(labelLayer, e.target.checked); };
 
 document.querySelectorAll('.collapse').forEach(function(c){ c.onclick=function(){
@@ -748,6 +756,19 @@ document.querySelectorAll('.collapse').forEach(function(c){ c.onclick=function()
    ============================================================ */
 const CESIUM_VER = '1.124';
 let cesiumViewer=null, cesiumReady=false, cesiumLoading=false;
+let cesiumTrailEnts=[], cesiumPoiEnts=[], cesiumParkEnts=[];
+
+/* Mirror the 2D layer toggles onto the Cesium entities (safe when 3D is off). */
+function refreshCesiumLayers(){
+  if(!cesiumViewer) return;
+  var trailsOn=document.getElementById('tgTrails').checked;
+  var parksOn=document.getElementById('tgParks').checked;
+  var poisOn=document.getElementById('tgPois').checked;
+  cesiumTrailEnts.forEach(function(e){ e.show=trailsOn; });
+  cesiumParkEnts.forEach(function(e){ e.show=parksOn; });
+  cesiumPoiEnts.forEach(function(e){ e.show=poisOn && poiOn.has(e._cat); });
+  cesiumViewer.scene.requestRender();
+}
 
 function showToast(msg){ var t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); }
 function hideToast(){ document.getElementById('toast').classList.remove('show'); }
@@ -793,7 +814,7 @@ async function initCesium(){
   PEAKS.forEach(function(p){
     if (typeof p.lat!=='number' || typeof p.lon!=='number') return;
     var ele=p.elevation_m||700, hero = ele>=HERO_MIN || (p.note && p.note.length>0);
-    viewer.entities.add({
+    var pk = viewer.entities.add({
       name: p.name,
       position: Cesium.Cartesian3.fromDegrees(p.lon, p.lat),
       point:{ pixelSize: ele>=1800?12:ele>=1550?10:8,
@@ -810,8 +831,77 @@ async function initCesium(){
         translucencyByDistance: new Cesium.NearFarScalar(4e4, 1.0, 2.2e5, 0.0) } : undefined,
       description: '<div style="font-size:14px"><b>'+(p.elevation_m?'▲ '+p.elevation_m+' m':'')+'</b><br>'+p.massif+(p.note?'<br><br>'+p.note:'')+'</div>'
     });
+    pk.ttHtml = '<b>'+p.name+'</b><br>'+(p.elevation_m?'▲ '+p.elevation_m+' m · ':'')+p.massif;
   });
+
+  // Trails / roads / rail — terrain-clamped polylines coloured by kind
+  var trailFC = trailData();
+  (trailFC.features||[]).forEach(function(f){
+    var g=f.geometry, kind=f.properties.kind;
+    var col = kind==='estrada'?'#ef476f':kind==='ferrovia'?'#4ea8de':'#ffd166';
+    var segs = g.type==='MultiLineString'?g.coordinates:(g.type==='LineString'?[g.coordinates]:[]);
+    var ic = kind==='ferrovia'?'🚂':kind==='estrada'?'🛣️':'🥾';
+    segs.forEach(function(coords){
+      var flat=[]; coords.forEach(function(pt){ if(pt.length>=2) flat.push(pt[0],pt[1]); });
+      if(flat.length<4) return;
+      var t = viewer.entities.add({ name:f.properties.name||'Trilha (OSM)',
+        polyline:{ positions:Cesium.Cartesian3.fromDegreesArray(flat), width:f.properties.hero?4:2.5,
+          material:Cesium.Color.fromCssColorString(col), clampToGround:true } });
+      t.ttHtml = '<b>'+(f.properties.name||'Trilha (OSM)')+'</b><br>'+ic+' '+(f.properties.km||'')+' km';
+      cesiumTrailEnts.push(t);
+    });
+  });
+
+  // Conservation units — terrain-draped polygons (translucent fill + dashed outline)
+  ((PARKS_GEO&&PARKS_GEO.features)||[]).forEach(function(f){
+    var g=f.geometry, pr=f.properties, col=Cesium.Color.fromCssColorString(pr.color);
+    var polys = g.type==='MultiPolygon'?g.coordinates:(g.type==='Polygon'?[g.coordinates]:[]);
+    polys.forEach(function(rings){
+      var outer=rings[0]; if(!outer||outer.length<4) return;
+      var flat=[]; outer.forEach(function(pt){ flat.push(pt[0],pt[1]); });
+      var poly = viewer.entities.add({ name:pr.name,
+        polygon:{ hierarchy:Cesium.Cartesian3.fromDegreesArray(flat),
+          material:col.withAlpha(0.12), classificationType:Cesium.ClassificationType.TERRAIN } });
+      var ol = viewer.entities.add({ name:pr.name,
+        polyline:{ positions:Cesium.Cartesian3.fromDegreesArray(flat.concat([outer[0][0],outer[0][1]])),
+          width:1.6, material:new Cesium.PolylineDashMaterialProperty({color:col}), clampToGround:true } });
+      poly.ttHtml = ol.ttHtml = '<b>'+pr.name+'</b><br>'+pr.label+' · '+pr.km2+' km²';
+      cesiumParkEnts.push(poly, ol);
+    });
+  });
+
+  // POIs — terrain-clamped points by category
+  POI_FEATURES.forEach(function(f){
+    var c=f.geometry.coordinates, pr=f.properties;
+    var poi = viewer.entities.add({ name:pr.name||pr.label,
+      position:Cesium.Cartesian3.fromDegrees(c[0], c[1]),
+      point:{ pixelSize:7, color:Cesium.Color.fromCssColorString(pr.color),
+        outlineColor:Cesium.Color.fromCssColorString('#08120f'), outlineWidth:1,
+        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
+        disableDepthTestDistance:Number.POSITIVE_INFINITY,
+        scaleByDistance:new Cesium.NearFarScalar(1e4,1.15,1.6e5,0.45) } });
+    poi._cat = pr.cat;
+    poi.ttHtml = '<b>'+(pr.emoji?pr.emoji+' ':'')+(pr.name||pr.label)+'</b><br>'+pr.label;
+    cesiumPoiEnts.push(poi);
+  });
+
+  // Hover (desktop) + tap (mobile) tooltips for every layer
+  var ctt = document.getElementById('ctooltip');
+  function showCtt(html,x,y){ ctt.innerHTML=html; ctt.style.left=Math.min(x+14, window.innerWidth-200)+'px'; ctt.style.top=(y+16)+'px'; ctt.classList.add('show'); }
+  var tth = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  tth.setInputAction(function(m){
+    var hit=viewer.scene.pick(m.endPosition);
+    if(hit && hit.id && hit.id.ttHtml){ showCtt(hit.id.ttHtml, m.endPosition.x, m.endPosition.y); viewer.scene.canvas.style.cursor='pointer'; }
+    else { ctt.classList.remove('show'); viewer.scene.canvas.style.cursor=''; }
+  }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+  tth.setInputAction(function(m){
+    var hit=viewer.scene.pick(m.position);
+    if(hit && hit.id && hit.id.ttHtml){ showCtt(hit.id.ttHtml, m.position.x, m.position.y); clearTimeout(window.__cttT); window.__cttT=setTimeout(function(){ ctt.classList.remove('show'); },3500); }
+    else ctt.classList.remove('show');
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
   cesiumViewer = viewer; cesiumReady = true;
+  refreshCesiumLayers();
   // Initial placement over the Serra do Mar (the fly helper is guarded on cesiumViewer,
   // so it must be assigned *before* moving the camera — else it stays parked in space).
   viewer.camera.setView({
