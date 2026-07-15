@@ -138,6 +138,29 @@ Ele produz dois arquivos:
 - `make_brand.py` · `favicon.svg` · `favicon-{16,32,180}.png` · `og-image.png` — identidade.
 - `gas/` — backend de contribuições GPX (Google Apps Script + clasp). Ver `gas/README.md`.
 
+## Idiomas
+
+O atlas fala **português e inglês**, com um botão ao lado do 2D/3D. A escolha fica no
+`localStorage`; na primeira visita ele segue o idioma do navegador, para quem chega por um
+link compartilhado não cair em português sem querer.
+
+O português é a língua-fonte e o inglês é a de lançamento. As chaves ficam em `I18N`, no
+topo do bloco de script, e tudo que é gerado lê `tr()` no momento do render: trocar de
+idioma é um **re-render completo**, não um remendo, que é a única forma de não sobrar
+português. Popups ligados como função pegam o idioma novo ao abrir; os ligados como string
+(cumes, POIs) e os tooltips do Cesium guardam uma função construtora para serem reexecutados.
+
+Nomes próprios nunca são traduzidos (Pico Paraná, Ibitiraquire, Serra do Mar), nem as
+escalas de graduação: um VIsup brasileiro é VIsup em qualquer idioma.
+
+> Os rótulos em português assados nos geojson (`label` de POIs, parques e paredões) **não**
+> são regerados: cada um tem uma chave estável (`cat`, `klass`, `band`) e o texto é buscado
+> por ela em tempo de render. Assim os dados seguem numa língua só e a interface fala as duas.
+
+> A função de tradução chama-se `tr()`, não `t()`: o arquivo usa `t` como variável local para
+> elementos de texto, o toast e parâmetros de `forEach`, e um `const t` em `renderDash`
+> sombreava a global, derrubando o painel com erro de zona morta temporal.
+
 ## Painéis
 
 Os dois painéis flutuantes (`#legend` e `#dash`) usam abas, e cada aba cabe inteira: nenhum

@@ -343,6 +343,19 @@ window.addEventListener('load',function(){
     .lyr{padding:6px 7px}
   }
 
+  /* Language switch, beside the 2D/3D pill: one corner for the two global controls. */
+  .langtoggle{position:fixed;top:14px;left:50%;transform:translateX(calc(-50% + 128px));z-index:9}
+  .langtoggle button{
+    cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:700;letter-spacing:.3px;
+    color:var(--txt-dim);background:var(--panel);border:1px solid var(--stroke);
+    border-radius:999px;padding:8px 14px;backdrop-filter:blur(9px);transition:.15s;
+  }
+  .langtoggle button:hover{color:#fff;border-color:var(--accent);background:rgba(18,214,154,.14)}
+  @media (max-width:820px){
+    .langtoggle{top:auto;bottom:calc(112px + env(safe-area-inset-bottom,0px));left:auto;right:14px;transform:none}
+    body.sheet-any .langtoggle{opacity:0;pointer-events:none;transition:opacity .2s}
+  }
+
   /* ---------- Intro overlay ---------- */
   #intro{
     position:absolute;inset:0;z-index:20;display:grid;place-items:center;padding:20px;
@@ -432,26 +445,27 @@ window.addEventListener('load',function(){
   <div class="brand-mark">⛰️</div>
   <div class="title-wrap">
     <h1>Serra do Mar Paranaense</h1>
-    <p>Atlas do montanhismo · Web GIS</p>
+    <p data-i18n="brand.sub">Atlas do montanhismo · Web GIS</p>
   </div>
   <div class="byline byline-portfolio"><a class="chip pf-link" href="https://avnergomes.github.io/portfolio" target="_blank" rel="noopener" title="Portfólio de Avner Paes Gomes"><img class="pf-logo" src="data:image/png;base64,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" alt="Logo Avner Paes Gomes" /><span>por <b>Avner Paes Gomes</b> · Data &amp; Geo</span><span class="arr">↗</span></a></div>
 </header>
 
 <!-- 2D / 3D VIEW TOGGLE -->
-<div id="viewtoggle" class="viewtoggle" role="group" aria-label="Alternar 2D / 3D">
+<div class="langtoggle"><button id="langBtn" type="button"></button></div>
+<div id="viewtoggle" class="viewtoggle" role="group" aria-label="Alternar 2D / 3D" data-i18n-aria="view.aria">
   <button data-view="2d" class="on">2D</button>
   <button data-view="3d">⛰️ 3D</button>
 </div>
 
 <!-- STORY -->
 <section id="story" class="panel">
-  <div class="hd"><h2>📖 História interativa</h2><div class="collapse" data-target="story">–</div></div>
+  <div class="hd"><h2 data-i18n="panel.story">📖 História interativa</h2><div class="collapse" data-target="story">–</div></div>
   <div class="pn-body">
     <div class="chap-eyebrow" id="chapEyebrow">Capítulo 1 de 6</div>
     <h3 id="chapTitle">Carregando…</h3>
     <p id="chapBody"></p>
     <div class="chap-nav">
-      <button class="btn" id="prevBtn">‹ Anterior</button>
+      <button class="btn" id="prevBtn" data-i18n="chap.prev">‹ Anterior</button>
       <button class="btn primary" id="nextBtn">Próximo ›</button>
       <div class="dots" id="dots"></div>
     </div>
@@ -460,12 +474,12 @@ window.addEventListener('load',function(){
 
 <!-- DASHBOARDS -->
 <section id="dash" class="panel">
-  <div class="hd"><h2>📊 Painel de dados</h2><div class="collapse" data-target="dash">–</div></div>
+  <div class="hd"><h2 data-i18n="panel.dash">📊 Painel de dados</h2><div class="collapse" data-target="dash">–</div></div>
   <div class="pn-body">
     <div class="pn-tabs" role="tablist">
-      <button class="pn-tab is-on" role="tab" data-pane="resumo">Resumo</button>
-      <button class="pn-tab" role="tab" data-pane="relevo">Relevo</button>
-      <button class="pn-tab" role="tab" data-pane="regioes">Regiões</button>
+      <button class="pn-tab is-on" role="tab" data-pane="resumo" data-i18n="tab.summary">Resumo</button>
+      <button class="pn-tab" role="tab" data-pane="relevo" data-i18n="tab.relief">Relevo</button>
+      <button class="pn-tab" role="tab" data-pane="regioes" data-i18n="tab.regions">Regiões</button>
     </div>
 
     <div class="pn-pane is-on" id="pane-resumo" role="tabpanel">
@@ -473,13 +487,13 @@ window.addEventListener('load',function(){
     </div>
 
     <div class="pn-pane" id="pane-relevo" role="tabpanel">
-      <div class="sub">Silhueta dos cumes &middot; norte → sul (m)</div>
+      <div class="sub" data-i18n="dash.ridge">Silhueta dos cumes &middot; norte → sul (m)</div>
       <svg id="ridge" class="ridge" viewBox="0 0 280 202" preserveAspectRatio="xMidYMid meet"
            role="img" aria-label="Perfil de altitude dos cumes da Serra do Mar paranaense, de norte a sul"></svg>
     </div>
 
     <div class="pn-pane" id="pane-regioes" role="tabpanel">
-      <div class="sub">Distribuição por maciço</div>
+      <div class="sub" data-i18n="dash.donut">Distribuição por maciço</div>
       <div class="donut-wrap">
         <svg id="donut" width="104" height="104" viewBox="0 0 104 104"></svg>
         <div class="donut-legend" id="donutLegend"></div>
@@ -490,12 +504,12 @@ window.addEventListener('load',function(){
 
 <!-- LEGEND + CONTROLS -->
 <section id="legend" class="panel">
-  <div class="hd"><h2>🗺️ Camadas</h2><div class="collapse" data-target="legend">–</div></div>
+  <div class="hd"><h2 data-i18n="panel.layers">🗺️ Camadas</h2><div class="collapse" data-target="legend">–</div></div>
   <div class="pn-body">
     <div class="pn-tabs" role="tablist">
-      <button class="pn-tab is-on" role="tab" data-pane="camadas">Camadas</button>
-      <button class="pn-tab" role="tab" data-pane="escalada">Escalada</button>
-      <button class="pn-tab" role="tab" data-pane="locais">Locais</button>
+      <button class="pn-tab is-on" role="tab" data-pane="camadas" data-i18n="tab.layers">Camadas</button>
+      <button class="pn-tab" role="tab" data-pane="escalada" data-i18n="tab.climb">Escalada</button>
+      <button class="pn-tab" role="tab" data-pane="locais" data-i18n="tab.places">Locais</button>
       <button class="pn-tab" role="tab" data-pane="gpx">GPX</button>
     </div>
 
@@ -520,27 +534,27 @@ window.addEventListener('load',function(){
 
 <!-- MOBILE BOTTOM TAB BAR -->
 <nav id="mobilebar">
-  <button data-tab="story"><span>📖</span>História</button>
-  <button data-tab="dash"><span>📊</span>Dados</button>
-  <button data-tab="legend"><span>🗺️</span>Camadas</button>
+  <button data-tab="story"><span>📖</span><i data-i18n="sheet.story">História</i></button>
+  <button data-tab="dash"><span>📊</span><i data-i18n="sheet.dash">Dados</i></button>
+  <button data-tab="legend"><span>🗺️</span><i data-i18n="sheet.layers">Camadas</i></button>
 </nav>
 
 <!-- INTRO -->
 <div id="intro">
   <div class="intro-card">
-    <div class="kicker">Web GIS · Atlas do montanhismo</div>
-    <h1>A muralha verde do Paraná</h1>
-    <p class="sub">Um atlas do montanhismo paranaense: 273 cumes, trilhas reais do OpenStreetMap e locais de interesse (refúgios, água, mirantes), do Pico Paraná ao litoral.</p>
+    <div class="kicker" data-i18n="intro.eyebrow">Web GIS · Atlas do montanhismo</div>
+    <h1 data-i18n="intro.title">A muralha verde do Paraná</h1>
+    <p class="sub" data-i18n="intro.sub">Um atlas do montanhismo paranaense: 273 cumes, trilhas reais do OpenStreetMap, vias de escalada e locais de interesse, do Pico Paraná ao litoral.</p>
     <div class="intro-stats">
-      <div class="s"><div class="n" id="isPeaks">–</div><div class="t">Cumes</div></div>
-      <div class="s"><div class="n">1.877 m</div><div class="t">Pico Paraná</div></div>
-      <div class="s"><div class="n" id="isTrails">–</div><div class="t">Rotas</div></div>
+      <div class="s"><div class="n" id="isPeaks">–</div><div class="t" data-i18n="intro.peaks">Cumes</div></div>
+      <div class="s"><div class="n">1.877 m</div><div class="t" data-i18n="intro.stMax">Pico Paraná</div></div>
+      <div class="s"><div class="n" id="isTrails">–</div><div class="t" data-i18n="intro.trails">Rotas</div></div>
     </div>
-    <button class="btn primary" id="startBtn" style="font-size:14px;padding:11px 26px">Explorar o mapa →</button>
+    <button class="btn primary" id="startBtn" style="font-size:14px;padding:11px 26px" data-i18n="intro.cta">Explorar o mapa →</button>
   </div>
 </div>
 
-<div id="loading"><div class="spinner"></div><p>Carregando o mapa…</p></div>
+<div id="loading"><div class="spinner"></div><p data-i18n="loading">Carregando o mapa…</p></div>
 <div id="toast" class="toast"></div>
 <div id="ctooltip" class="ctooltip"></div>
 
@@ -581,18 +595,38 @@ const HERO_NOTES = {
   'Ponta do Tigre':'Marumbi, separada da Esfinge pelo Desfiladeiro das Lágrimas.',
   'Morro do Anhangava':'Principal sítio de escalada em rocha do Paraná.',
   'Morro do Canal':'Um dos morros mais frequentados, a partir de Piraquara.',
-  'Araçatuba':'Cume destacado da Serra da Igreja.',
+  'Araçatuba':'Ponto mais alto do Paraná fora do Ibitiraquire (1.673 m).',
   'Capivari Grande':'Alto cume da porção norte do Ibitiraquire.'
 };
+HERO_NOTES_EN = {
+  'Pico Paraná':'The highest point in all of southern Brazil (1,877 m).',
+  'Pico Caratuva':'The second highest summit in southern Brazil.',
+  'Ibitirati':'One of the giants of the Ibitiraquire massif.',
+  'Ferraria':'The northern end of the Ibitiraquire crest.',
+  'União':'A great Ibitiraquire summit, above 1,800 m.',
+  'Itapiroca':'The classic bivouac on the traverse to Pico Paraná.',
+  'Tupipiá':'A summit on the central Ibitiraquire crest.',
+  'Camapuã':'The westernmost summit of the Ibitiraquire crest.',
+  'Pico Siririca':'Reckoned the most technically difficult peak in Paraná.',
+  'Olimpo':'The main Marumbi summit, taken in 1879; the cradle of Brazilian mountaineering.',
+  'Gigante':'The third summit of the Marumbi group.',
+  'Boa Vista':'The second highest summit of the Marumbi.',
+  'Ponta do Tigre':'Marumbi, split from the Esfinge by the Lágrimas gorge.',
+  'Morro do Anhangava':'The main rock climbing site in Paraná.',
+  'Morro do Canal':'One of the most visited peaks, reached from Piraquara.',
+  'Araçatuba':'The highest point in Paraná outside the Ibitiraquire (1,673 m).',
+  'Capivari Grande':'A high summit in the northern Ibitiraquire.'
+};
+
 // POI categories (colors must match fetch_pois.py)
 const POI_CATS = [
-  {cat:'refugio',  label:'Refúgio / abrigo', emoji:'🏠', color:'#f4a261'},
-  {cat:'trailhead',label:'Início de trilha',  emoji:'🥾', color:'#b5e48c'},
-  {cat:'parking',  label:'Estacionamento',    emoji:'🅿️', color:'#8ecae6'},
-  {cat:'mirante',  label:'Mirante',           emoji:'🔭', color:'#e9c46a'},
-  {cat:'agua',     label:'Água',              emoji:'💧', color:'#48cae4'},
-  {cat:'cachoeira',label:'Cachoeira',         emoji:'💦', color:'#90e0ef'},
-  {cat:'camping',  label:'Camping',           emoji:'⛺', color:'#95d5b2'}
+  {cat:'refugio',  label:'Refúgio / abrigo', label_en:'Hut / shelter', emoji:'🏠', color:'#f4a261'},
+  {cat:'trailhead',label:'Início de trilha', label_en:'Trailhead',  emoji:'🥾', color:'#b5e48c'},
+  {cat:'parking',  label:'Estacionamento', label_en:'Parking',    emoji:'🅿️', color:'#8ecae6'},
+  {cat:'mirante',  label:'Mirante', label_en:'Viewpoint',           emoji:'🔭', color:'#e9c46a'},
+  {cat:'agua',     label:'Água', label_en:'Water',              emoji:'💧', color:'#48cae4'},
+  {cat:'cachoeira',label:'Cachoeira', label_en:'Waterfall',         emoji:'💦', color:'#90e0ef'},
+  {cat:'camping',  label:'Camping', label_en:'Campsite',           emoji:'⛺', color:'#95d5b2'}
 ];
 // Full atlas datasets (OSM + Wikidata), injected by embed_atlas.py
 /*__PEAKS_GEO__*/let PEAKS_GEO={"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"Morro da Vaca","ele":1159,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.770585,-25.633624]}},{"type":"Feature","properties":{"name":"Serra das Canavieiras","ele":1270,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.768682,-25.609547]}},{"type":"Feature","properties":{"name":"Taipabuçu","ele":1734,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.826578,-25.233046]}},{"type":"Feature","properties":{"name":"Torre da Prata","ele":1497,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.688541,-25.627142]}},{"type":"Feature","properties":{"name":"Morro da Moreia","ele":1526,"massif":"Serra do Araçatuba","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.990041,-25.919342]}},{"type":"Feature","properties":{"name":"Morro do Miguel","ele":127,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.310427,-25.564591]}},{"type":"Feature","properties":{"name":"Morro do Meio","ele":82,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.304195,-25.554082]}},{"type":"Feature","properties":{"name":"Pão de Loth","ele":1285,"massif":"Anhangava-Baitaca","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.000109,-25.41302]}},{"type":"Feature","properties":{"name":"Anhangava","ele":1430,"massif":"Anhangava-Baitaca","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.001918,-25.388179]}},{"type":"Feature","properties":{"name":"Tucum","ele":1719,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.849641,-25.256936]}},{"type":"Feature","properties":{"name":"Camapuã","ele":1715,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.856459,-25.255247]}},{"type":"Feature","properties":{"name":"Pico Paraná","ele":1877,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.808779,-25.252744]}},{"type":"Feature","properties":{"name":"Pico Caratuva","ele":1860,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.829832,-25.241173]}},{"type":"Feature","properties":{"name":"Itapiroca","ele":1805,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.835792,-25.24724]}},{"type":"Feature","properties":{"name":"Ibitirati","ele":1846,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.806883,-25.249565]}},{"type":"Feature","properties":{"name":"Morro dos Camelos","ele":1536,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.816522,-25.259617]}},{"type":"Feature","properties":{"name":"Morro do Piolho","ele":null,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.84098,-25.235676]}},{"type":"Feature","properties":{"name":"Morro do Vigia","ele":1357,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.979538,-25.5114]}},{"type":"Feature","properties":{"name":"Morro do Canal","ele":1340,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.981761,-25.515173]}},{"type":"Feature","properties":{"name":"Torre Amarela","ele":1263,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.982644,-25.50895]}},{"type":"Feature","properties":{"name":"Morro Redondo","ele":1288,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.090683,-25.751665]}},{"type":"Feature","properties":{"name":"Pico Siririca","ele":1705,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.832145,-25.282901]}},{"type":"Feature","properties":{"name":"Olimpo","ele":1539,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.920102,-25.453966]}},{"type":"Feature","properties":{"name":"Morro Mãe Catira","ele":1436,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.903782,-25.352029]}},{"type":"Feature","properties":{"name":"Morro do Sete","ele":1375,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.899662,-25.35652]}},{"type":"Feature","properties":{"name":"Morro da Boa Vista","ele":230,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.82693,-26.292331]}},{"type":"Feature","properties":{"name":"Morro da Palha","ele":1080,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.477699,-25.299627]}},{"type":"Feature","properties":{"name":"Morro dos Alemães","ele":1360,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.943804,-26.05037]}},{"type":"Feature","properties":{"name":"Morro da Igrejinha","ele":1390,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.931616,-26.045589]}},{"type":"Feature","properties":{"name":"Pico do Bradador","ele":1527,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.942624,-26.023294]}},{"type":"Feature","properties":{"name":"Pico Garuva","ele":1292,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.90704,-26.044024]}},{"type":"Feature","properties":{"name":"Pico da Jurema","ele":1229,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.902863,-26.048828]}},{"type":"Feature","properties":{"name":"Monte Crista","ele":967,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.917688,-26.081464]}},{"type":"Feature","properties":{"name":"Araçatuba","ele":1673,"massif":"Serra do Araçatuba","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.993803,-25.902299]}},{"type":"Feature","properties":{"name":"Morro dos Perdidos","ele":1440,"massif":"Serra do Araçatuba","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.957259,-25.890756]}},{"type":"Feature","properties":{"name":"Pico Sul","ele":1030,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.008381,-26.272627]}},{"type":"Feature","properties":{"name":"Morro Pelado","ele":1044,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.034924,-26.245697]}},{"type":"Feature","properties":{"name":"Pico Central","ele":1070,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.016221,-26.266605]}},{"type":"Feature","properties":{"name":"Morro do Vestido","ele":1010,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.0233,-26.255692]}},{"type":"Feature","properties":{"name":"Serra Queimada","ele":1325,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.063632,-26.116067]}},{"type":"Feature","properties":{"name":"Pico Jurapê","ele":1149,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.007407,-26.259376]}},{"type":"Feature","properties":{"name":"Castelo dos Bugres","ele":998,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.048246,-26.234534]}},{"type":"Feature","properties":{"name":"Capivari Grande","ele":1664,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.821455,-25.138009]}},{"type":"Feature","properties":{"name":"Pedra Branca do Araraquara","ele":1220,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.870342,-25.941231]}},{"type":"Feature","properties":{"name":"Pilão de Pedra","ele":1363,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.869157,-25.607361]}},{"type":"Feature","properties":{"name":"Corvo","ele":1354,"massif":"Anhangava-Baitaca","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.996863,-25.395798]}},{"type":"Feature","properties":{"name":"Morro da Pedra Branca","ele":442,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.578753,-25.801788]}},{"type":"Feature","properties":{"name":"Morro Escalvado","ele":230,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.547855,-25.819415]}},{"type":"Feature","properties":{"name":"Morro Cabaraquara","ele":455,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.571928,-25.827337]}},{"type":"Feature","properties":{"name":"Morro do Boi","ele":160,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.537247,-25.847282]}},{"type":"Feature","properties":{"name":"Morro do Espia Barco","ele":154,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.566299,-25.870261]}},{"type":"Feature","properties":{"name":"Morro do Pinto","ele":131,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.571216,-25.871421]}},{"type":"Feature","properties":{"name":"Morro Parque Morretes","ele":93,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.579065,-25.879358]}},{"type":"Feature","properties":{"name":"Morro Ubatuba","ele":188,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.535391,-26.195249]}},{"type":"Feature","properties":{"name":"Morro das Laranjeiras","ele":318,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.669175,-26.291389]}},{"type":"Feature","properties":{"name":"Morro do Joaquim","ele":55,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.291997,-25.545423]}},{"type":"Feature","properties":{"name":"Morro do Pico Torto","ele":910,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.563267,-25.402469]}},{"type":"Feature","properties":{"name":"Morro do Feiticeiro","ele":766,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.589416,-25.420523]}},{"type":"Feature","properties":{"name":"Morro da Quatinga","ele":139,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.619701,-25.451107]}},{"type":"Feature","properties":{"name":"Morro da Boa Vista","ele":311,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.708158,-25.455599]}},{"type":"Feature","properties":{"name":"Morro do Cantagalo","ele":404,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.701172,-25.47308]}},{"type":"Feature","properties":{"name":"Morro da Cotinga","ele":128,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.481734,-25.504304]}},{"type":"Feature","properties":{"name":"Morro da Baleia","ele":73,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.314008,-25.511964]}},{"type":"Feature","properties":{"name":"Ponta do Caraguatá","ele":48,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.317952,-25.572983]}},{"type":"Feature","properties":{"name":"Morro das Encantadas","ele":59,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.312931,-25.574129]}},{"type":"Feature","properties":{"name":"Morro das Palmeiras","ele":133,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.678494,-25.830842]}},{"type":"Feature","properties":{"name":"Capivari Médio","ele":1588,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.835063,-25.151282]}},{"type":"Feature","properties":{"name":"Guaricana","ele":1550,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.830031,-25.198294]}},{"type":"Feature","properties":{"name":"Saci","ele":1270,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.796,-25.242302]}},{"type":"Feature","properties":{"name":"Pendurado do Solais","ele":1281,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.004419,-26.004404]}},{"type":"Feature","properties":{"name":"Fradinho","ele":1401,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.979404,-26.02109]}},{"type":"Feature","properties":{"name":"Morro da Rocinha","ele":1136,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.271363,-25.848511]}},{"type":"Feature","properties":{"name":"Morro Schmalz","ele":1456,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.935483,-26.012504]}},{"type":"Feature","properties":{"name":"Pedra da Divisa","ele":1436,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.937981,-25.992309]}},{"type":"Feature","properties":{"name":"Morro das Antenas","ele":1305,"massif":"Serra do Araçatuba","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.956165,-25.884092]}},{"type":"Feature","properties":{"name":"Monte Padre Raulino","ele":1506,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.943136,-26.016519]}},{"type":"Feature","properties":{"name":"Morro da Enseada","ele":124,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.498054,-26.223148]}},{"type":"Feature","properties":{"name":"Rincão Velho","ele":1211,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.983442,-26.000888]}},{"type":"Feature","properties":{"name":"Rincão Bonito","ele":1349,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.975124,-26.000904]}},{"type":"Feature","properties":{"name":"Morro da Lagoinha","ele":1184,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.253396,-25.952408]}},{"type":"Feature","properties":{"name":"Morro da Cruz","ele":250,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.649347,-26.299867]}},{"type":"Feature","properties":{"name":"Morro do Quiriri","ele":1538,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.956119,-26.014039]}},{"type":"Feature","properties":{"name":"Morro Grande","ele":1378,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.982242,-26.026196]}},{"type":"Feature","properties":{"name":"Pico Canhemborá (Pico X)","ele":1381,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.843516,-25.611048]}},{"type":"Feature","properties":{"name":"Mirante da Embratel","ele":950,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.25992,-24.87876]}},{"type":"Feature","properties":{"name":"Tangará","ele":1240,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.844757,-25.309574]}},{"type":"Feature","properties":{"name":"Morro da Cruz","ele":1200,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.223337,-25.268443]}},{"type":"Feature","properties":{"name":"Morro das Pombas","ele":1257,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.388133,-25.230156]}},{"type":"Feature","properties":{"name":"Morro Betara","ele":1190,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.419758,-25.222286]}},{"type":"Feature","properties":{"name":"Abrolhos","ele":1200,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.916226,-25.447402]}},{"type":"Feature","properties":{"name":"Gigante","ele":1487,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.917028,-25.451747]}},{"type":"Feature","properties":{"name":"Ponta do Tigre","ele":1400,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.914488,-25.450151]}},{"type":"Feature","properties":{"name":"Pirapa","ele":1378,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.911227,-25.447916]}},{"type":"Feature","properties":{"name":"Torre dos Sinos","ele":1280,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.9169,-25.448763]}},{"type":"Feature","properties":{"name":"Rochedinho","ele":625,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.921645,-25.43693]}},{"type":"Feature","properties":{"name":"Morro do Cristo","ele":38,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.56157,-25.889443]}},{"type":"Feature","properties":{"name":"Morro do Rolado","ele":811,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.63502,-25.765173]}},{"type":"Feature","properties":{"name":"Morro do Canela","ele":845,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.63717,-25.744548]}},{"type":"Feature","properties":{"name":"Morro Parati","ele":201,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.594017,-25.7863]}},{"type":"Feature","properties":{"name":"Morro do Arrasto","ele":622,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.621032,-25.754625]}},{"type":"Feature","properties":{"name":"Morro Alto","ele":597,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.720848,-25.6093]}},{"type":"Feature","properties":{"name":"Morro Polegar","ele":1382,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.906659,-25.355385]}},{"type":"Feature","properties":{"name":"Pedra da Tartaruga","ele":1357,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.923884,-26.012556]}},{"type":"Feature","properties":{"name":"União","ele":1830,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.808036,-25.251345]}},{"type":"Feature","properties":{"name":"Sacizinho","ele":1220,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.793838,-25.24042]}},{"type":"Feature","properties":{"name":"Cerro Verde","ele":1618,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.836942,-25.2579]}},{"type":"Feature","properties":{"name":"Taquaripoca","ele":1590,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.834836,-25.259907]}},{"type":"Feature","properties":{"name":"Agudo Marmosa","ele":1208,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.8391,-25.305354]}},{"type":"Feature","properties":{"name":"Agudo da Cuíca","ele":1348,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.834717,-25.304736]}},{"type":"Feature","properties":{"name":"Aguda da Cotia","ele":1525,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.829439,-25.303773]}},{"type":"Feature","properties":{"name":"Agudo da Lontra","ele":1416,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.828294,-25.297258]}},{"type":"Feature","properties":{"name":"Capivari Mirim","ele":1522,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.839848,-25.149767]}},{"type":"Feature","properties":{"name":"Pedra Grande","ele":null,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.979751,-25.511004]}},{"type":"Feature","properties":{"name":"Pedra da Lagartixa","ele":1338,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.922656,-25.455717]}},{"type":"Feature","properties":{"name":"Esfinge","ele":1378,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.913291,-25.449045]}},{"type":"Feature","properties":{"name":"Capivari IV","ele":null,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.840299,-25.157469]}},{"type":"Feature","properties":{"name":"Baixo Siri","ele":1515,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.838846,-25.283425]}},{"type":"Feature","properties":{"name":"Tupipiá","ele":1727,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.805842,-25.254521]}},{"type":"Feature","properties":{"name":"Pedra Branca","ele":1393,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.871533,-25.266742]}},{"type":"Feature","properties":{"name":"Amarilis","ele":1619,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.841781,-25.244342]}},{"type":"Feature","properties":{"name":"Luar","ele":1638,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.837814,-25.265754]}},{"type":"Feature","properties":{"name":"Morro da Furna","ele":827,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.635331,-25.729617]}},{"type":"Feature","properties":{"name":"Morro da Subida Grande","ele":582,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.645881,-25.786797]}},{"type":"Feature","properties":{"name":"Morro do Agudinho","ele":593,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.633912,-25.775669]}},{"type":"Feature","properties":{"name":"Morro do Bico Torto","ele":834,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.635728,-25.704449]}},{"type":"Feature","properties":{"name":"1º de Maio","ele":1333,"massif":"Serra da Igreja","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.854787,-25.610332]}},{"type":"Feature","properties":{"name":"Tromba","ele":954,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.957824,-26.211824]}},{"type":"Feature","properties":{"name":"Morro da Glória","ele":1230,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.389017,-25.230282]}},{"type":"Feature","properties":{"name":"Alvorada","ele":1438,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.945194,-25.480299]}},{"type":"Feature","properties":{"name":"Boa Vista","ele":1486,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.929273,-25.457659]}},{"type":"Feature","properties":{"name":"Morro do Cubatão","ele":841,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.953092,-26.140669]}},{"type":"Feature","properties":{"name":"Castelinho","ele":900,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.04188,-26.236352]}},{"type":"Feature","properties":{"name":"Morro do Schmidt","ele":1110,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.19237,-26.203226]}},{"type":"Feature","properties":{"name":"Pirizal","ele":1350,"massif":"Serra do Araçatuba","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.954175,-25.909945]}},{"type":"Feature","properties":{"name":"Morro do Sebo","ele":931,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.919521,-26.000976]}},{"type":"Feature","properties":{"name":"Morro da Pedra","ele":559,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.732192,-26.182216]}},{"type":"Feature","properties":{"name":"Morro do Cantagalo","ele":610,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.723669,-26.17888]}},{"type":"Feature","properties":{"name":"Ferraria","ele":1835,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.819113,-25.223125]}},{"type":"Feature","properties":{"name":"Ferreiro","ele":1540,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.827431,-25.217068]}},{"type":"Feature","properties":{"name":"Mesa","ele":1387,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.963902,-25.492667]}},{"type":"Feature","properties":{"name":"Morro Encantado","ele":1340,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.937376,-26.005142]}},{"type":"Feature","properties":{"name":"Tijuco Preto","ele":1422,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.981209,-26.031247]}},{"type":"Feature","properties":{"name":"Monte CEBV","ele":1483,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.945426,-26.014314]}},{"type":"Feature","properties":{"name":"Cordilheira do Santana","ele":1225,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.16324,-25.111583]}},{"type":"Feature","properties":{"name":"Morro da Gruta","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.281215,-25.298897]}},{"type":"Feature","properties":{"name":"Leão","ele":1563,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.930831,-25.464825]}},{"type":"Feature","properties":{"name":"Pico da Igreja","ele":1340,"massif":"Serra da Igreja","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.867375,-25.649365]}},{"type":"Feature","properties":{"name":"Zenize","ele":701,"massif":"Serra da Igreja","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.791211,-25.80403]}},{"type":"Feature","properties":{"name":"Morro Descalvado","ele":502,"massif":"Serra da Igreja","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.804864,-25.841497]}},{"type":"Feature","properties":{"name":"Morro da Boa Vista","ele":718,"massif":"Serra da Igreja","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.815389,-25.839826]}},{"type":"Feature","properties":{"name":"Morro do Cajati","ele":744,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.029558,-26.180512]}},{"type":"Feature","properties":{"name":"Serra dos campos da Imbira","ele":1414,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.961204,-25.973671]}},{"type":"Feature","properties":{"name":"Morro Cerrinho","ele":1258,"massif":"Serra do Araçatuba","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.023142,-25.926873]}},{"type":"Feature","properties":{"name":"Morro do Meio","ele":522,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.814316,-25.899746]}},{"type":"Feature","properties":{"name":"Morro Parimbê","ele":492,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.818404,-25.927211]}},{"type":"Feature","properties":{"name":"Morro da Onça","ele":662,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.85678,-25.962453]}},{"type":"Feature","properties":{"name":"Morro Feio","ele":552,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.860192,-25.986363]}},{"type":"Feature","properties":{"name":"Morro da Neve","ele":941,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.069104,-26.229856]}},{"type":"Feature","properties":{"name":"Morro Grande","ele":487,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.718867,-25.968038]}},{"type":"Feature","properties":{"name":"Casfrei","ele":1265,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.909402,-25.360748]}},{"type":"Feature","properties":{"name":"Tapapui","ele":1438,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.915768,-25.364435]}},{"type":"Feature","properties":{"name":"Morro Isolado","ele":1116,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.949789,-25.416958]}},{"type":"Feature","properties":{"name":"Pico do Diabo","ele":661,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.930026,-25.420176]}},{"type":"Feature","properties":{"name":"Morro do Cadeado","ele":902,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.943706,-25.440872]}},{"type":"Feature","properties":{"name":"Morro Alto","ele":825,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.636464,-25.683472]}},{"type":"Feature","properties":{"name":"Morro Grande","ele":804,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.674519,-25.579356]}},{"type":"Feature","properties":{"name":"Morro da Craveira","ele":1027,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.780971,-25.646962]}},{"type":"Feature","properties":{"name":"Morro Redondo","ele":614,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.795358,-25.648998]}},{"type":"Feature","properties":{"name":"Morro Cunhaporanga","ele":645,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.547747,-25.321471]}},{"type":"Feature","properties":{"name":"Morro Grande","ele":727,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.642338,-25.246826]}},{"type":"Feature","properties":{"name":"Morro do Cardoso ou Morro do Guarajuva","ele":787,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.675356,-25.190583]}},{"type":"Feature","properties":{"name":"Morro do Fogo","ele":783,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.717102,-25.194796]}},{"type":"Feature","properties":{"name":"Alvorada 4","ele":1453,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.957916,-25.485915]}},{"type":"Feature","properties":{"name":"Alvorada 3","ele":1404,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.94966,-25.482496]}},{"type":"Feature","properties":{"name":"Alvorada 2","ele":1472,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.94899,-25.478113]}},{"type":"Feature","properties":{"name":"Ferradura","ele":1398,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.975173,-25.50872]}},{"type":"Feature","properties":{"name":"Morro do Carvalho","ele":1463,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.970356,-25.50599]}},{"type":"Feature","properties":{"name":"Pelado","ele":1513,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.942574,-25.472268]}},{"type":"Feature","properties":{"name":"Morro do Taquaral","ele":1113,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.930874,-25.448787]}},{"type":"Feature","properties":{"name":"Morro da Farinha Seca","ele":1360,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.918023,-25.375902]}},{"type":"Feature","properties":{"name":"Morro Pelado","ele":1252,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.936764,-25.386866]}},{"type":"Feature","properties":{"name":"Cerro Passaredo","ele":1022,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.947203,-25.422197]}},{"type":"Feature","properties":{"name":"Morro do Munhoz","ele":1423,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.949597,-25.990315]}},{"type":"Feature","properties":{"name":"Morro da Baleia","ele":1556,"massif":"Serra do Araçatuba","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.985988,-25.915439]}},{"type":"Feature","properties":{"name":"Jacutinga","ele":1149,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.784949,-25.251869]}},{"type":"Feature","properties":{"name":"Morro Ambrósios","ele":1485,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.967255,-26.011657]}},{"type":"Feature","properties":{"name":"Mirante do Governador","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.399955,-24.633614]}},{"type":"Feature","properties":{"name":"Morro Balança","ele":null,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.928442,-25.405672]}},{"type":"Feature","properties":{"name":"Morro Klein","ele":1500,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.935958,-26.013228]}},{"type":"Feature","properties":{"name":"Rampa do Bugio","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.240089,-26.113627]}},{"type":"Feature","properties":{"name":"Morro do Pão de Açúcar","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.624313,-26.23663]}},{"type":"Feature","properties":{"name":"Morro do Bom Brinquedo","ele":156,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.717453,-25.425066]}},{"type":"Feature","properties":{"name":"Morro Caovi","ele":null,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.846726,-25.99534]}},{"type":"Feature","properties":{"name":"Morro João Dias","ele":152,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.528568,-26.174254]}},{"type":"Feature","properties":{"name":"Morro Grande","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.627368,-26.280172]}},{"type":"Feature","properties":{"name":"Monte Egon Schultz","ele":1435,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.930611,-26.016214]}},{"type":"Feature","properties":{"name":"Mirante da Compete","ele":1256,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.226877,-24.895354]}},{"type":"Feature","properties":{"name":"Arapongas","ele":1300,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.859455,-25.304261]}},{"type":"Feature","properties":{"name":"Morro do Bruninho","ele":1190,"massif":"Serra do Canal","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.987847,-25.53175]}},{"type":"Feature","properties":{"name":"Pico do Cavalo","ele":1175,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.684943,-25.616955]}},{"type":"Feature","properties":{"name":"Morro do Povoado","ele":432,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.728571,-25.598234]}},{"type":"Feature","properties":{"name":"Morro da Maçã","ele":455,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.732144,-25.60364]}},{"type":"Feature","properties":{"name":"Samamabaia","ele":1345,"massif":"Anhangava-Baitaca","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.001329,-25.384941]}},{"type":"Feature","properties":{"name":"Morro do Mossunguê","ele":1184,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.337861,-25.198127]}},{"type":"Feature","properties":{"name":"Morro das Pacas","ele":89,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.248539,-25.420782]}},{"type":"Feature","properties":{"name":"Morro da Colônia","ele":198,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.239031,-25.413996]}},{"type":"Feature","properties":{"name":"Morro do Barbado","ele":189,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.221311,-25.385778]}},{"type":"Feature","properties":{"name":"Morro da Pedra Branca","ele":89,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.213392,-25.383587]}},{"type":"Feature","properties":{"name":"Morro do Valo","ele":66,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.202347,-25.393509]}},{"type":"Feature","properties":{"name":"Morro do Sebuí","ele":245,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.211089,-25.287563]}},{"type":"Feature","properties":{"name":"Morro da Caixa D'água","ele":165,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.722283,-25.438771]}},{"type":"Feature","properties":{"name":"Serra da Bocaína","ele":1426,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.012703,-25.062422]}},{"type":"Feature","properties":{"name":"pico da Divisa","ele":1280,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.218056,-24.943874]}},{"type":"Feature","properties":{"name":"Morro do Capim","ele":326,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.693407,-25.207693]}},{"type":"Feature","properties":{"name":"Morro Ultra","ele":1096,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.945935,-25.416113]}},{"type":"Feature","properties":{"name":"Morro do Sumidouro","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.275033,-25.297486]}},{"type":"Feature","properties":{"name":"Morro da Cruz","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.265979,-25.943141]}},{"type":"Feature","properties":{"name":"Morro dos Alves","ele":378,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.599246,-25.351562]}},{"type":"Feature","properties":{"name":"Morro da Janelinha","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.55093,-25.385962]}},{"type":"Feature","properties":{"name":"38","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.506792,-25.418647]}},{"type":"Feature","properties":{"name":"Morro Mergulhão","ele":136,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.744906,-25.292392]}},{"type":"Feature","properties":{"name":"722","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.627653,-25.25438]}},{"type":"Feature","properties":{"name":"Morro Agudo","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.652716,-25.194663]}},{"type":"Feature","properties":{"name":"Morro do Cedro","ele":134,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.458768,-25.433056]}},{"type":"Feature","properties":{"name":"Morro Grande","ele":204,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.734334,-25.306105]}},{"type":"Feature","properties":{"name":"Canoa Velha","ele":68,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.484866,-25.336896]}},{"type":"Feature","properties":{"name":"Morro do Sebuí","ele":255,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.210136,-25.286845]}},{"type":"Feature","properties":{"name":"Morro do Poruquara","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.237009,-25.264148]}},{"type":"Feature","properties":{"name":"Morro da Cassindanga","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.234991,-25.246269]}},{"type":"Feature","properties":{"name":"75","ele":null,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.755109,-25.372009]}},{"type":"Feature","properties":{"name":"Morro do Queimado","ele":302,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.693984,-25.391391]}},{"type":"Feature","properties":{"name":"98","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.712984,-25.395297]}},{"type":"Feature","properties":{"name":"58","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.689453,-25.380177]}},{"type":"Feature","properties":{"name":"161","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.708304,-25.444601]}},{"type":"Feature","properties":{"name":"Morro da Boa Vista","ele":272,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.708027,-25.459427]}},{"type":"Feature","properties":{"name":"195","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.704247,-25.458956]}},{"type":"Feature","properties":{"name":"Morro do Corisco","ele":58,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.717662,-25.410146]}},{"type":"Feature","properties":{"name":"23","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.573141,-25.450859]}},{"type":"Feature","properties":{"name":"Morro da Quatinga","ele":222,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.644852,-25.392881]}},{"type":"Feature","properties":{"name":"157","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.640374,-25.392273]}},{"type":"Feature","properties":{"name":"Monte  Hubert Hubener","ele":1173,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.974239,-26.086447]}},{"type":"Feature","properties":{"name":"Morro Moréia","ele":1515,"massif":"Serra do Araçatuba","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.986042,-25.917166]}},{"type":"Feature","properties":{"name":"Morro Campininha","ele":null,"massif":"Serra da Igreja","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.043022,-25.690338]}},{"type":"Feature","properties":{"name":"Chapéu de Sol","ele":933,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.893058,-25.31836]}},{"type":"Feature","properties":{"name":"Morro do Ricardo","ele":66,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.714322,-25.857028]}},{"type":"Feature","properties":{"name":"Morro de Fora","ele":18,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.712756,-25.850791]}},{"type":"Feature","properties":{"name":"636","ele":null,"massif":"Serra da Igreja","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.820657,-25.799082]}},{"type":"Feature","properties":{"name":"Sítio Pampa","ele":41,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.728411,-25.457197]}},{"type":"Feature","properties":{"name":"Fazenda Monte Alegre","ele":41,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.727681,-25.458844]}},{"type":"Feature","properties":{"name":"76","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.740867,-25.453294]}},{"type":"Feature","properties":{"name":"72","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.738013,-25.452674]}},{"type":"Feature","properties":{"name":"52","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.739687,-25.449186]}},{"type":"Feature","properties":{"name":"Rio dos Patos","ele":47,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.759306,-25.505362]}},{"type":"Feature","properties":{"name":"Ceuta Funda","ele":null,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.807094,-25.394409]}},{"type":"Feature","properties":{"name":"Morro dos Três Irmãos","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.418289,-25.089918]}},{"type":"Feature","properties":{"name":"Corocoxó","ele":1210,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.853915,-25.305659]}},{"type":"Feature","properties":{"name":"Agudo Catita","ele":1077,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.840503,-25.313432]}},{"type":"Feature","properties":{"name":"Morro Caraguatá","ele":1455,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.836838,-25.276098]}},{"type":"Feature","properties":{"name":"Agudo Mirim","ele":1120,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.827254,-25.30537]}},{"type":"Feature","properties":{"name":"Minguante","ele":1630,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.839718,-25.264311]}},{"type":"Feature","properties":{"name":"Siri","ele":1455,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.838245,-25.273405]}},{"type":"Feature","properties":{"name":"Meia Lua","ele":1550,"massif":"Ibitiraquire","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.839144,-25.261856]}},{"type":"Feature","properties":{"name":"Morro do Ventania","ele":1305,"massif":"Serra do Quiriri","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.925232,-26.015891]}},{"type":"Feature","properties":{"name":"Morro do Mastro","ele":null,"massif":"Serra da Prata","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.616402,-25.762837]}},{"type":"Feature","properties":{"name":"Morro Parati","ele":203,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.595256,-25.782567]}},{"type":"Feature","properties":{"name":"Morro Itaquá-","ele":341,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.565605,-25.840404]}},{"type":"Feature","properties":{"name":"Morro da Pedra Branca","ele":436,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.579816,-25.80137]}},{"type":"Feature","properties":{"name":"62","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.723477,-25.382846]}},{"type":"Feature","properties":{"name":"35","ele":null,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.720681,-25.383422]}},{"type":"Feature","properties":{"name":"Morro do Formigueiro","ele":1210,"massif":"Graciosa-Capivari","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.925255,-25.355712]}},{"type":"Feature","properties":{"name":"Morro Coroados","ele":792,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.934389,-25.420298]}},{"type":"Feature","properties":{"name":"Cerro Passadiço","ele":1021,"massif":"Marumbi","src":"osm"},"geometry":{"type":"Point","coordinates":[-48.941055,-25.416002]}},{"type":"Feature","properties":{"name":"Morro do Cascalho","ele":1056,"massif":"Serra do Mar (PR)","src":"osm"},"geometry":{"type":"Point","coordinates":[-49.497966,-25.289869]}}]};/*__PEAKS_END__*/
@@ -628,36 +662,335 @@ let TRAILS = [
    coordinates:[[-49.02204,-25.39364],[-49.018,-25.391],[-49.014,-25.389],[-49.011,-25.388],[-49.009,-25.387]]}
 ];
 
+/* ============================================================
+   I18N
+   Portuguese is the source language; English is the launch language. Keys are
+   grouped by where they appear. Proper nouns (Anhangava, Ibitiraquire, Serra do
+   Mar) are never translated, and neither are the grade scales: a Brazilian VIsup
+   is a VIsup wherever it is read.
+   ============================================================ */
+const I18N = {
+  pt: {
+    'brand.sub':'Atlas do montanhismo · Web GIS',
+    'byline.by':'por',
+    'byline.role':'Data & Geo',
+    'byline.pf':'Portfólio de Avner Paes Gomes',
+
+    'panel.story':'📖 História interativa',
+    'panel.dash':'📊 Painel de dados',
+    'panel.layers':'🗺️ Camadas',
+    'sheet.story':'História',
+    'sheet.dash':'Dados',
+    'sheet.layers':'Camadas',
+
+    'chap.of':'Capítulo {0} de {1}',
+    'chap.prev':'‹ Anterior',
+    'chap.next':'Próximo ›',
+    'chap.restart':'↺ Recomeçar',
+
+    'tab.layers':'Camadas',
+    'tab.climb':'Escalada',
+    'tab.places':'Locais',
+    'tab.gpx':'GPX',
+    'tab.summary':'Resumo',
+    'tab.relief':'Relevo',
+    'tab.regions':'Regiões',
+
+    'lyr.routes':'Escalada',
+    'lyr.crags':'Paredões',
+    'lyr.trails':'Trilhas',
+    'lyr.pois':'Locais',
+    'lyr.parks':'Unid. cons.',
+    'lyr.labels':'Rótulos',
+    'lyr.gpx':'GPX enviados',
+
+    'metric.peaks':'Cumes',
+    'metric.max':'Máx (m)',
+    'metric.groups':'Conjuntos',
+    'metric.pois':'POIs',
+    'metric.routes':'Vias de escalada',
+    'metric.areas':'Áreas de escalada',
+    'dash.ridge':'Silhueta dos cumes · norte → sul (m)',
+    'dash.ridgeAlt':'Perfil de altitude dos cumes da Serra do Mar paranaense, de norte a sul',
+    'dash.donut':'Distribuição por maciço',
+
+    'leg.routes':'Rotas',
+    'leg.routesReal':'{0} reais (OSM)',
+    'leg.trail':'Trilha',
+    'leg.road':'Estrada (Graciosa)',
+    'leg.rail':'Ferrovia (Serra Verde)',
+    'leg.peaks':'Cumes',
+    'leg.groupsHint':'{0} conjuntos nomeados.<br>Clique para os detalhes.',
+    'leg.parks':'Unidades de conservação',
+    'leg.parkLine':'Limite de parque / reserva',
+    'leg.pois':'Locais de interesse (OSM)',
+    'leg.climb':'Escalada · {0} vias + {1} boulders',
+    'leg.bandHint':'Faixa mostrada na escala brasileira; agrupa também a francesa e a V (boulder). Marcador colorido pela faixa dominante da montanha.',
+
+    'band.iniciante':'Iniciante',
+    'band.intermediario':'Intermediário',
+    'band.avancado':'Avançado',
+    'band.elite':'Elite',
+
+    'poi.refugio':'Refúgio / abrigo',
+    'poi.trailhead':'Início de trilha',
+    'poi.parking':'Estacionamento',
+    'poi.mirante':'Mirante',
+    'poi.agua':'Água',
+    'poi.cachoeira':'Cachoeira',
+    'poi.camping':'Camping',
+
+    'park.PE':'Parque Estadual',
+    'park.PN':'Parque Nacional',
+    'park.RN':'Reserva Natural',
+    'park.EE':'Estação Ecológica',
+    'park.UC':'Unidade de conservação',
+    'crag.paredao':'Paredão / costão',
+    'crag.unnamed':'sem nome',
+
+    'pop.osmTrail':'Traçado real do OpenStreetMap.',
+    'pop.osm':'OpenStreetMap',
+    'pop.km2':'km²',
+    'pop.vias':'{0} vias',
+    'pop.via1':'1 via',
+    'pop.boulders':'{0} boulders',
+    'pop.boulder1':'1 boulder',
+    'pop.max':'máx {0}',
+    'pop.since':'desde {0}',
+    'pop.noSector':'Sem setor',
+    'pop.routeSrc':'Vias por montanha; a planilha não traz coordenada de setor. Fonte: {0}',
+    'pop.sentTrail':'Trilha enviada',
+    'pop.point':'Ponto',
+
+    'prof.hint':'Passe o mouse no perfil para a altitude',
+    'prof.alt':'Perfil de elevação: {0} a {1} metros',
+    'prof.noEle':'Este GPX não traz altitude (&lt;ele&gt;), então não há perfil.',
+
+    'gpx.send':'Enviar um GPX',
+    'gpx.drop':'Arraste aqui ou clique para escolher.<br>Trilhas e pontos aparecem no mapa na hora.',
+    'gpx.stLocal':'local',
+    'gpx.stSent':'no drive',
+    'gpx.stSending':'enviando',
+    'gpx.center':'Centralizar no mapa',
+    'gpx.pts':'{0} pts',
+    'gpx.noteServer':'Os arquivos vão para o Google Drive do projeto e voltam para todo mundo no próximo acesso. ',
+    'gpx.noteLocal':'Sem servidor configurado: os arquivos ficam só neste navegador e não são compartilhados. ',
+    'gpx.noteSent':'{0} enviado(s) nesta sessão. ',
+    'gpx.noteFmt':'Formato GPX 1.0/1.1, até 8 MB.',
+    'gpx.notGpx':'“{0}” não é um .gpx',
+    'gpx.tooBig':'“{0}” passa de 8 MB',
+    'gpx.unreadable':'Não consegui ler o arquivo',
+    'gpx.onMap':'“{0}” no mapa · {1}',
+    'gpx.failed':'“{0}” ficou só neste navegador: {1}',
+    'gpx.badXml':'XML inválido',
+    'gpx.notGpxFile':'não parece um arquivo GPX',
+    'gpx.empty':'sem trilhas nem pontos',
+    'gpx.noName':'Sem nome',
+
+    'peak.noEle':'altitude n/d',
+    'view.2d':'2D',
+    'view.3d':'3D',
+    'view.3dFail':'Não foi possível carregar o 3D ({0}). Seguindo em 2D.',
+    'intro.eyebrow':'Web GIS · Atlas do montanhismo',
+    'intro.title':'A muralha verde do Paraná',
+    'intro.sub':'Um atlas do montanhismo paranaense: 273 cumes, trilhas reais do OpenStreetMap, vias de escalada e locais de interesse, do Pico Paraná ao litoral.',
+    'intro.stMax':'Pico Paraná',
+    'loading':'Carregando o mapa…',
+    'attr':'Imagem: Esri, Maxar, Earthstar Geographics · Picos/rotas: © OpenStreetMap, IBGE · Vias de escalada: Lista de Rotas de Escalada · © Avner Paes Gomes',
+    'view.aria':'Alternar 2D / 3D',
+    'intro.cta':'Explorar o mapa →',
+    'intro.peaks':'CUMES',
+    'intro.max':'PICO PARANÁ',
+    'intro.trails':'ROTAS',
+    'lang.switch':'English',
+    'lang.aria':'Mudar idioma para inglês'
+  },
+  en: {
+    'brand.sub':'Mountaineering atlas · Web GIS',
+    'byline.by':'by',
+    'byline.role':'Data & Geo',
+    'byline.pf':'Avner Paes Gomes portfolio',
+
+    'panel.story':'📖 Interactive story',
+    'panel.dash':'📊 Data panel',
+    'panel.layers':'🗺️ Layers',
+    'sheet.story':'Story',
+    'sheet.dash':'Data',
+    'sheet.layers':'Layers',
+
+    'chap.of':'Chapter {0} of {1}',
+    'chap.prev':'‹ Previous',
+    'chap.next':'Next ›',
+    'chap.restart':'↺ Start over',
+
+    'tab.layers':'Layers',
+    'tab.climb':'Climbing',
+    'tab.places':'Places',
+    'tab.gpx':'GPX',
+    'tab.summary':'Summary',
+    'tab.relief':'Relief',
+    'tab.regions':'Regions',
+
+    'lyr.routes':'Climbing',
+    'lyr.crags':'Cliffs',
+    'lyr.trails':'Trails',
+    'lyr.pois':'Places',
+    'lyr.parks':'Protected',
+    'lyr.labels':'Labels',
+    'lyr.gpx':'Uploaded GPX',
+
+    'metric.peaks':'Summits',
+    'metric.max':'Highest (m)',
+    'metric.groups':'Ranges',
+    'metric.pois':'POIs',
+    'metric.routes':'Climbing routes',
+    'metric.areas':'Climbing areas',
+    'dash.ridge':'Summit skyline · north → south (m)',
+    'dash.ridgeAlt':'Elevation profile of the Serra do Mar summits, north to south',
+    'dash.donut':'Summits by range',
+
+    'leg.routes':'Routes',
+    'leg.routesReal':'{0} real (OSM)',
+    'leg.trail':'Trail',
+    'leg.road':'Road (Graciosa)',
+    'leg.rail':'Railway (Serra Verde)',
+    'leg.peaks':'Summits',
+    'leg.groupsHint':'{0} named ranges.<br>Click for details.',
+    'leg.parks':'Protected areas',
+    'leg.parkLine':'Park / reserve boundary',
+    'leg.pois':'Points of interest (OSM)',
+    'leg.climb':'Climbing · {0} routes + {1} boulders',
+    'leg.bandHint':'Bands shown on the Brazilian scale; they also group the French and V (boulder) scales. Marker coloured by the range’s dominant band.',
+
+    'band.iniciante':'Beginner',
+    'band.intermediario':'Intermediate',
+    'band.avancado':'Advanced',
+    'band.elite':'Elite',
+
+    'poi.refugio':'Hut / shelter',
+    'poi.trailhead':'Trailhead',
+    'poi.parking':'Parking',
+    'poi.mirante':'Viewpoint',
+    'poi.agua':'Water',
+    'poi.cachoeira':'Waterfall',
+    'poi.camping':'Campsite',
+
+    'park.PE':'State Park',
+    'park.PN':'National Park',
+    'park.RN':'Nature Reserve',
+    'park.EE':'Ecological Station',
+    'park.UC':'Protected area',
+    'crag.paredao':'Cliff / rock face',
+    'crag.unnamed':'unnamed',
+
+    'pop.osmTrail':'Real geometry from OpenStreetMap.',
+    'pop.osm':'OpenStreetMap',
+    'pop.km2':'km²',
+    'pop.vias':'{0} routes',
+    'pop.via1':'1 route',
+    'pop.boulders':'{0} boulders',
+    'pop.boulder1':'1 boulder',
+    'pop.max':'max {0}',
+    'pop.since':'since {0}',
+    'pop.noSector':'No sector',
+    'pop.routeSrc':'Routes grouped by mountain; the workbook carries no sector coordinates. Source: {0}',
+    'pop.sentTrail':'Uploaded track',
+    'pop.point':'Point',
+
+    'prof.hint':'Hover the profile for the altitude',
+    'prof.alt':'Elevation profile: {0} to {1} metres',
+    'prof.noEle':'This GPX carries no altitude (&lt;ele&gt;), so there is no profile.',
+
+    'gpx.send':'Upload a GPX',
+    'gpx.drop':'Drop it here or click to choose.<br>Tracks and points appear on the map at once.',
+    'gpx.stLocal':'local',
+    'gpx.stSent':'on drive',
+    'gpx.stSending':'sending',
+    'gpx.center':'Centre on the map',
+    'gpx.pts':'{0} pts',
+    'gpx.noteServer':'Files go to the project’s Google Drive and come back for everyone on the next visit. ',
+    'gpx.noteLocal':'No server configured: files stay in this browser only and are not shared. ',
+    'gpx.noteSent':'{0} sent this session. ',
+    'gpx.noteFmt':'GPX 1.0/1.1, up to 8 MB.',
+    'gpx.notGpx':'“{0}” is not a .gpx',
+    'gpx.tooBig':'“{0}” is over 8 MB',
+    'gpx.unreadable':'Could not read the file',
+    'gpx.onMap':'“{0}” on the map · {1}',
+    'gpx.failed':'“{0}” stayed in this browser only: {1}',
+    'gpx.badXml':'invalid XML',
+    'gpx.notGpxFile':'does not look like a GPX file',
+    'gpx.empty':'no tracks and no points',
+    'gpx.noName':'Untitled',
+
+    'peak.noEle':'elevation n/a',
+    'view.2d':'2D',
+    'view.3d':'3D',
+    'view.3dFail':'Could not load 3D ({0}). Staying in 2D.',
+    'intro.eyebrow':'Web GIS · Mountaineering atlas',
+    'intro.title':'The green wall of Paraná',
+    'intro.sub':'An atlas of mountaineering in Paraná: 273 summits, real OpenStreetMap trails, climbing routes and points of interest, from Pico Paraná to the coast.',
+    'intro.stMax':'Pico Paraná',
+    'loading':'Loading the map…',
+    'attr':'Imagery: Esri, Maxar, Earthstar Geographics · Peaks/routes: © OpenStreetMap, IBGE · Climbing routes: Lista de Rotas de Escalada · © Avner Paes Gomes',
+    'view.aria':'Switch 2D / 3D',
+    'intro.cta':'Explore the map →',
+    'intro.peaks':'SUMMITS',
+    'intro.max':'PICO PARANÁ',
+    'intro.trails':'ROUTES',
+    'lang.switch':'Português',
+    'lang.aria':'Switch language to Portuguese'
+  }
+};
+
+/* Remembered across visits; first visit follows the browser, so an English speaker
+   who lands on a shared link is not met with Portuguese. */
+let LANG = (function(){
+  try { var s = localStorage.getItem('atlas.lang'); if (s === 'pt' || s === 'en') return s; } catch(e){}
+  return (navigator.language || 'pt').toLowerCase().indexOf('pt') === 0 ? 'pt' : 'en';
+})();
+
+/** tr('chap.of', 3, 13) -> "Capítulo 3 de 13". Missing keys fall back to pt, then to the key. */
+function tr(k){
+  var s = (I18N[LANG] && I18N[LANG][k]) || I18N.pt[k] || k;
+  for (var i = 1; i < arguments.length; i++) s = s.split('{' + (i - 1) + '}').join(arguments[i]);
+  return s;
+}
+/** Pick the localised field off a data record: nm(x,'title') -> x.title_en or x.title. */
+function nm(o, field){
+  if (!o) return '';
+  return (LANG === 'en' && o[field + '_en']) ? o[field + '_en'] : (o[field] || '');
+}
+
 let NARRATIVE = {
   title:'Serra do Mar Paranaense',
   subtitle:'Relevo, floresta e história em um Web GIS 3D da muralha de granito que separa o planalto do litoral do Paraná.',
   chapters:[
-    {id:'visao-geral', title:'O teto do Sul: Pico Paraná e o Ibitiraquire', focus_lon:-48.816, focus_lat:-25.253, zoom:12,
-     body_ptbr:'A Serra do Mar paranaense forma uma muralha entre o Primeiro Planalto e o litoral, e seu ponto culminante é o Pico Paraná, com 1.877 metros, o mais alto de toda a região Sul do Brasil. Ele se ergue na Serra do Ibitiraquire, ao lado de gigantes como o Caratuva, de 1.860 metros, o Ibitirati e a Ferraria. O conjunto foi cartografado pelo pesquisador alemão Reinhard Maack em 1940, reúne 46 cumes mapeados neste atlas e concentra as montanhas mais altas do Sul do país. Do cume, o olhar alcança as baías de Paranaguá e Antonina.'},
-    {id:'graciosa-capivari', title:'Capivari e Graciosa: o degrau do meio', focus_lon:-48.898, focus_lat:-25.357, zoom:12,
-     body_ptbr:'Entre o Ibitiraquire ao norte e o Marumbi ao sul estende-se o setor que este atlas agrupa como Graciosa-Capivari, com 11 cumes mapeados. O Tapapui e o Morro Mãe Catira passam dos 1.430 metros, seguidos pelo Morro Polegar e pelo Morro do Sete. É por este trecho da escarpa que a Serra do Mar deixa passar a estrada mais antiga do estado, e o relevo alterna paredões de granito com vales encaixados cobertos de floresta.'},
-    {id:'baitaca', title:'Baitaca e Anhangava: a escola da escalada paranaense', focus_lon:-49.000, focus_lat:-25.395, zoom:13,
-     body_ptbr:'A Serra da Baitaca é a montanha de fim de semana de Curitiba, a menos de uma hora do centro. O Anhangava, de 1.430 metros, é o paredão onde gerações de escaladores aprenderam: a planilha da comunidade reúne nele 176 vias e 118 boulders, do III ao IXa, e o campo de blocos dos Castelinhos chega ao V12. É o conjunto com mais vias catalogadas de todo o atlas. Ao lado erguem-se o Corvo, a Samambaia e o Pão de Loth.'},
-    {id:'marumbi', title:'Marumbi, o berço do montanhismo brasileiro', focus_lon:-48.931, focus_lat:-25.444, zoom:13,
-     body_ptbr:'Em 21 de agosto de 1879, um grupo liderado por Joaquim Olímpio de Miranda alcançou o cume principal do maciço do Marumbi, marco fundador do montanhismo no Brasil. O ponto conquistado, com 1.539 metros, ganhou o nome de Olimpo em homenagem ao líder. O maciço reúne 23 cumes mapeados, como o Gigante, a Ponta do Tigre e o Abrolhos, cortados por trilhas íngremes e históricas. Suas paredes guardam 77 vias catalogadas, algumas abertas ainda nos anos 1940.'},
-    {id:'canal', title:'Serra do Canal: torres e chaminés sobre Piraquara', focus_lon:-48.963, focus_lat:-25.515, zoom:12,
-     body_ptbr:'A leste de Piraquara, a Serra do Canal alinha 11 cumes mapeados, do Morro do Carvalho, de 1.463 metros, até a Ferradura. O Morro do Canal guarda 57 vias catalogadas e a graduação mais dura de todo o atlas, um Xa. Suas torres e chaminés são destino clássico de quem sai de Curitiba no sábado de manhã.'},
-    {id:'prata', title:'Serra da Prata: do nível do mar ao cume', focus_lon:-48.676, focus_lat:-25.675, zoom:12,
-     body_ptbr:'Destacada do corpo principal da Serra do Mar, a Serra da Prata sobe direto da planície litorânea, entre Morretes, Paranaguá e Guaratuba. A trilha da Torre da Prata resume o conjunto: parte de cerca de 100 metros de altitude e vence mais de 1.400 metros de desnível até o alto, num único esforço. São 16 cumes mapeados, e o gradiente inteiro da Mata Atlântica, do mangue ao campo de altitude, cabe numa só encosta.'},
-    {id:'igreja', title:'Serra da Igreja: a escarpa discreta de Guaratuba', focus_lon:-48.857, focus_lat:-25.748, zoom:12,
-     body_ptbr:'Entre a Serra da Prata e o Araçatuba, a Serra da Igreja reúne 7 cumes mapeados, liderados pelo Pico da Igreja, de 1.340 metros, e pelo 1º de Maio, de 1.333. É um conjunto bem menos percorrido que os vizinhos do norte, com acessos longos sobre a escarpa de Guaratuba.'},
-    {id:'aracatuba', title:'Araçatuba: o teto do Paraná fora do Ibitiraquire', focus_lon:-48.981, focus_lat:-25.908, zoom:12,
-     body_ptbr:'Em Tijucas do Sul, o Pico Araçatuba chega a 1.673 metros e é o ponto mais alto do Paraná fora da Serra do Ibitiraquire. Ao redor dele estão o Morro da Baleia, de 1.556 metros, as duas Moreias e o Morro dos Perdidos, de 1.440. É um dos pontos mais frios do estado, com episódios de neve em alguns invernos, e dali parte a travessia rumo ao Quiriri, na divisa com Santa Catarina. Boa parte dos acessos passa por propriedade particular.'},
-    {id:'quiriri', title:'Quiriri: campos de altitude na divisa', focus_lon:-48.937, focus_lat:-26.018, zoom:12,
-     body_ptbr:'Na divisa entre o Paraná e Santa Catarina, a Serra do Quiriri abre campos de altitude entre 34 cumes mapeados, do Morro do Quiriri, de 1.538 metros, ao Pico do Bradador. No alto está o Marco da Divisa, monumento erguido em 1919 para fixar a fronteira seca dos dois estados. O nome vem do tupi-guarani e significa silêncio noturno. Os campos são em boa parte propriedade particular, e o acesso depende de autorização.'},
-    {id:'mata-atlantica', title:'Mata Atlântica viva: floresta e refúgios', focus_lon:-48.9, focus_lat:-25.4, zoom:11,
-     body_ptbr:'A Serra do Mar guarda um dos trechos mais preservados de Mata Atlântica do país, reconhecido pela UNESCO como Reserva da Biosfera. O relevo abriga um mosaico de unidades de conservação, do Parque Estadual Pico do Marumbi à APA de Guaratuba, com florestas densas, campos de altitude e manguezais. É um santuário de endemismo, com centenas de espécies de aves e minúsculos sapinhos do gênero Brachycephalus.'},
-    {id:'geologia', title:'Granito e tempo profundo: a origem da escarpa', focus_lon:-48.85, focus_lat:-25.3, zoom:11,
-     body_ptbr:'A muralha da Serra do Mar é esculpida em rochas cristalinas, sobretudo granitos e gnaisses pré-cambrianos, entre as mais antigas do continente. Sua feição atual nasceu com a fragmentação do Gondwana e a separação entre América do Sul e África, há mais de 100 milhões de anos, quando a abertura do Atlântico reativou falhas e basculou grandes blocos. Os batólitos graníticos, mais duros, resistiram à erosão e hoje formam os cumes e os paredões que sustentam a escalada.'},
-    {id:'graciosa', title:'Estrada da Graciosa: o caminho ao litoral', focus_lon:-48.87, focus_lat:-25.38, zoom:12,
-     body_ptbr:'Muito antes das rodas, povos indígenas já cruzavam a serra por trilhas usadas na colheita do pinhão, e uma delas deu origem à Graciosa. Rota de tropeiros entre o planalto e o litoral, teve sua construção oficial concluída em 1873, por ordem de Zacarias de Góis e Vasconcelos. Ao longo de cerca de 28 quilômetros ligando Curitiba a Antonina e Morretes, serpenteia por um dos trechos mais íntegros de Mata Atlântica do Brasil.'},
-    {id:'ferrovia', title:'Serra Verde Express: trilhos sobre a floresta', focus_lon:-48.87, focus_lat:-25.47, zoom:12,
-     body_ptbr:'A Estrada de Ferro Paranaguá-Curitiba teve sua pedra fundamental lançada por Dom Pedro II em 1880 e foi inaugurada em 1885, obra tida como impossível pelos engenheiros europeus da época. Erguida com participação dos irmãos Rebouças, vence quase mil metros de desnível com 13 túneis e dezenas de pontes, entre elas o célebre Viaduto Carvalho. Hoje o trem Serra Verde Express refaz o trajeto, uma das viagens ferroviárias mais bonitas do mundo.'}
+    {id:'visao-geral', title:'O teto do Sul: Pico Paraná e o Ibitiraquire', title_en:'The roof of the South: Pico Paraná and the Ibitiraquire', focus_lon:-48.816, focus_lat:-25.253, zoom:12,
+     body_ptbr:'A Serra do Mar paranaense forma uma muralha entre o Primeiro Planalto e o litoral, e seu ponto culminante é o Pico Paraná, com 1.877 metros, o mais alto de toda a região Sul do Brasil. Ele se ergue na Serra do Ibitiraquire, ao lado de gigantes como o Caratuva, de 1.860 metros, o Ibitirati e a Ferraria. O conjunto foi cartografado pelo pesquisador alemão Reinhard Maack em 1940, reúne 46 cumes mapeados neste atlas e concentra as montanhas mais altas do Sul do país. Do cume, o olhar alcança as baías de Paranaguá e Antonina.', body_ptbr_en:'The Paraná stretch of the Serra do Mar forms a wall between the inland plateau and the coast, and its high point is Pico Paraná, at 1,877 metres the tallest mountain in southern Brazil. It rises in the Serra do Ibitiraquire, beside giants such as Caratuva, at 1,860 metres, Ibitirati and Ferraria. The range was surveyed by the German researcher Reinhard Maack in 1940, holds 46 summits mapped in this atlas and gathers the highest mountains in the south of the country. From the top the view reaches the bays of Paranaguá and Antonina.'},
+    {id:'graciosa-capivari', title:'Capivari e Graciosa: o degrau do meio', title_en:'Capivari and Graciosa: the middle step', focus_lon:-48.898, focus_lat:-25.357, zoom:12,
+     body_ptbr:'Entre o Ibitiraquire ao norte e o Marumbi ao sul estende-se o setor que este atlas agrupa como Graciosa-Capivari, com 11 cumes mapeados. O Tapapui e o Morro Mãe Catira passam dos 1.430 metros, seguidos pelo Morro Polegar e pelo Morro do Sete. É por este trecho da escarpa que a Serra do Mar deixa passar a estrada mais antiga do estado, e o relevo alterna paredões de granito com vales encaixados cobertos de floresta.', body_ptbr_en:'Between the Ibitiraquire to the north and the Marumbi to the south runs the stretch this atlas groups as Graciosa-Capivari, with 11 summits mapped. Tapapui and Morro Mãe Catira pass 1,430 metres, followed by Morro Polegar and Morro do Sete. It is through this section of the escarpment that the Serra do Mar lets the oldest road in the state through, and the relief alternates granite walls with deep valleys under forest.'},
+    {id:'baitaca', title:'Baitaca e Anhangava: a escola da escalada paranaense', title_en:'Baitaca and Anhangava: where Paraná learned to climb', focus_lon:-49.000, focus_lat:-25.395, zoom:13,
+     body_ptbr:'A Serra da Baitaca é a montanha de fim de semana de Curitiba, a menos de uma hora do centro. O Anhangava, de 1.430 metros, é o paredão onde gerações de escaladores aprenderam: a planilha da comunidade reúne nele 176 vias e 118 boulders, do III ao IXa, e o campo de blocos dos Castelinhos chega ao V12. É o conjunto com mais vias catalogadas de todo o atlas. Ao lado erguem-se o Corvo, a Samambaia e o Pão de Loth.', body_ptbr_en:'The Serra da Baitaca is Curitiba\'s weekend mountain, less than an hour from the city. Anhangava, at 1,430 metres, is the wall where generations of climbers learned the trade: the community\'s workbook holds 176 routes and 118 boulder problems on this one mountain, from III to IXa, and the Castelinhos boulder field reaches V12. It is the range with the most catalogued routes in the whole atlas. Beside it stand Corvo, Samambaia and Pão de Loth.'},
+    {id:'marumbi', title:'Marumbi, o berço do montanhismo brasileiro', title_en:'Marumbi, the cradle of Brazilian mountaineering', focus_lon:-48.931, focus_lat:-25.444, zoom:13,
+     body_ptbr:'Em 21 de agosto de 1879, um grupo liderado por Joaquim Olímpio de Miranda alcançou o cume principal do maciço do Marumbi, marco fundador do montanhismo no Brasil. O ponto conquistado, com 1.539 metros, ganhou o nome de Olimpo em homenagem ao líder. O maciço reúne 23 cumes mapeados, como o Gigante, a Ponta do Tigre e o Abrolhos, cortados por trilhas íngremes e históricas. Suas paredes guardam 77 vias catalogadas, algumas abertas ainda nos anos 1940.', body_ptbr_en:'On 21 August 1879 a party led by Joaquim Olímpio de Miranda reached the main summit of the Marumbi massif, the founding moment of mountaineering in Brazil. The point they took, at 1,539 metres, was named Olimpo after the leader. The massif holds 23 summits mapped, among them Gigante, Ponta do Tigre and Abrolhos, cut by steep and historic trails. Its walls carry 77 catalogued routes, some opened as early as the 1940s.'},
+    {id:'canal', title:'Serra do Canal: torres e chaminés sobre Piraquara', title_en:'Serra do Canal: towers and chimneys above Piraquara', focus_lon:-48.963, focus_lat:-25.515, zoom:12,
+     body_ptbr:'A leste de Piraquara, a Serra do Canal alinha 11 cumes mapeados, do Morro do Carvalho, de 1.463 metros, até a Ferradura. O Morro do Canal guarda 57 vias catalogadas e a graduação mais dura de todo o atlas, um Xa. Suas torres e chaminés são destino clássico de quem sai de Curitiba no sábado de manhã.', body_ptbr_en:'East of Piraquara, the Serra do Canal lines up 11 summits mapped, from Morro do Carvalho, at 1,463 metres, to Ferradura. Morro do Canal holds 57 catalogued routes and the hardest grade in the atlas, a Xa. Its towers and chimneys are the classic destination for anyone leaving Curitiba on a Saturday morning.'},
+    {id:'prata', title:'Serra da Prata: do nível do mar ao cume', title_en:'Serra da Prata: from sea level to the summit', focus_lon:-48.676, focus_lat:-25.675, zoom:12,
+     body_ptbr:'Destacada do corpo principal da Serra do Mar, a Serra da Prata sobe direto da planície litorânea, entre Morretes, Paranaguá e Guaratuba. A trilha da Torre da Prata resume o conjunto: parte de cerca de 100 metros de altitude e vence mais de 1.400 metros de desnível até o alto, num único esforço. São 16 cumes mapeados, e o gradiente inteiro da Mata Atlântica, do mangue ao campo de altitude, cabe numa só encosta.', body_ptbr_en:'Detached from the main body of the Serra do Mar, the Serra da Prata rises straight off the coastal plain, between Morretes, Paranaguá and Guaratuba. The Torre da Prata trail sums the range up: it starts near 100 metres and climbs more than 1,400 metres of gain to the top in a single push. There are 16 summits mapped, and the full gradient of the Atlantic Forest, from mangrove to high-altitude grassland, fits on one slope.'},
+    {id:'igreja', title:'Serra da Igreja: a escarpa discreta de Guaratuba', title_en:'Serra da Igreja: the quiet escarpment of Guaratuba', focus_lon:-48.857, focus_lat:-25.748, zoom:12,
+     body_ptbr:'Entre a Serra da Prata e o Araçatuba, a Serra da Igreja reúne 7 cumes mapeados, liderados pelo Pico da Igreja, de 1.340 metros, e pelo 1º de Maio, de 1.333. É um conjunto bem menos percorrido que os vizinhos do norte, com acessos longos sobre a escarpa de Guaratuba.', body_ptbr_en:'Between the Serra da Prata and Araçatuba, the Serra da Igreja gathers 7 summits mapped, led by Pico da Igreja, at 1,340 metres, and 1º de Maio, at 1,333. It is a far less travelled range than its neighbours to the north, with long approaches over the Guaratuba escarpment.'},
+    {id:'aracatuba', title:'Araçatuba: o teto do Paraná fora do Ibitiraquire', title_en:'Araçatuba: the roof of Paraná outside the Ibitiraquire', focus_lon:-48.981, focus_lat:-25.908, zoom:12,
+     body_ptbr:'Em Tijucas do Sul, o Pico Araçatuba chega a 1.673 metros e é o ponto mais alto do Paraná fora da Serra do Ibitiraquire. Ao redor dele estão o Morro da Baleia, de 1.556 metros, as duas Moreias e o Morro dos Perdidos, de 1.440. É um dos pontos mais frios do estado, com episódios de neve em alguns invernos, e dali parte a travessia rumo ao Quiriri, na divisa com Santa Catarina. Boa parte dos acessos passa por propriedade particular.', body_ptbr_en:'In Tijucas do Sul, Pico Araçatuba reaches 1,673 metres and is the highest point in Paraná outside the Serra do Ibitiraquire. Around it stand Morro da Baleia, at 1,556 metres, the two Moreias and Morro dos Perdidos, at 1,440. It is one of the coldest places in the state, with snow in some winters, and from here the traverse sets off towards Quiriri, on the Santa Catarina border. Much of the access crosses private land.'},
+    {id:'quiriri', title:'Quiriri: campos de altitude na divisa', title_en:'Quiriri: high grassland on the state line', focus_lon:-48.937, focus_lat:-26.018, zoom:12,
+     body_ptbr:'Na divisa entre o Paraná e Santa Catarina, a Serra do Quiriri abre campos de altitude entre 34 cumes mapeados, do Morro do Quiriri, de 1.538 metros, ao Pico do Bradador. No alto está o Marco da Divisa, monumento erguido em 1919 para fixar a fronteira seca dos dois estados. O nome vem do tupi-guarani e significa silêncio noturno. Os campos são em boa parte propriedade particular, e o acesso depende de autorização.', body_ptbr_en:'On the border between Paraná and Santa Catarina, the Serra do Quiriri opens high-altitude grassland among 34 summits mapped, from Morro do Quiriri, at 1,538 metres, to Pico do Bradador. At the top stands the Marco da Divisa, a monument raised in 1919 to fix the dry border between the two states. The name comes from Tupi-Guarani and means night silence. The grasslands are largely private property, and access depends on permission.'},
+    {id:'mata-atlantica', title:'Mata Atlântica viva: floresta e refúgios', title_en:'Atlantic Forest alive: forest and refuges', focus_lon:-48.9, focus_lat:-25.4, zoom:11,
+     body_ptbr:'A Serra do Mar guarda um dos trechos mais preservados de Mata Atlântica do país, reconhecido pela UNESCO como Reserva da Biosfera. O relevo abriga um mosaico de unidades de conservação, do Parque Estadual Pico do Marumbi à APA de Guaratuba, com florestas densas, campos de altitude e manguezais. É um santuário de endemismo, com centenas de espécies de aves e minúsculos sapinhos do gênero Brachycephalus.', body_ptbr_en:'The Serra do Mar holds one of the best preserved stretches of Atlantic Forest in the country, recognised by UNESCO as a Biosphere Reserve. The relief shelters a mosaic of protected areas, from the Pico do Marumbi State Park to the Guaratuba APA, with dense forest, high-altitude grassland and mangroves. It is a sanctuary of endemism, with hundreds of bird species and the tiny frogs of the genus Brachycephalus.'},
+    {id:'geologia', title:'Granito e tempo profundo: a origem da escarpa', title_en:'Granite and deep time: how the escarpment was born', focus_lon:-48.85, focus_lat:-25.3, zoom:11,
+     body_ptbr:'A muralha da Serra do Mar é esculpida em rochas cristalinas, sobretudo granitos e gnaisses pré-cambrianos, entre as mais antigas do continente. Sua feição atual nasceu com a fragmentação do Gondwana e a separação entre América do Sul e África, há mais de 100 milhões de anos, quando a abertura do Atlântico reativou falhas e basculou grandes blocos. Os batólitos graníticos, mais duros, resistiram à erosão e hoje formam os cumes e os paredões que sustentam a escalada.', body_ptbr_en:'The wall of the Serra do Mar is carved from crystalline rock, mostly Precambrian granite and gneiss, among the oldest on the continent. Its present shape began with the break-up of Gondwana and the parting of South America from Africa, more than 100 million years ago, when the opening of the Atlantic reactivated faults and tilted great blocks. The granite batholiths, being harder, resisted erosion and today form the summits and the walls that hold the climbing.'},
+    {id:'graciosa', title:'Estrada da Graciosa: o caminho ao litoral', title_en:'Estrada da Graciosa: the road to the coast', focus_lon:-48.87, focus_lat:-25.38, zoom:12,
+     body_ptbr:'Muito antes das rodas, povos indígenas já cruzavam a serra por trilhas usadas na colheita do pinhão, e uma delas deu origem à Graciosa. Rota de tropeiros entre o planalto e o litoral, teve sua construção oficial concluída em 1873, por ordem de Zacarias de Góis e Vasconcelos. Ao longo de cerca de 28 quilômetros ligando Curitiba a Antonina e Morretes, serpenteia por um dos trechos mais íntegros de Mata Atlântica do Brasil.', body_ptbr_en:'Long before wheels, indigenous peoples were already crossing the range on trails used for the pinhão harvest, and one of them gave rise to the Graciosa. A muleteers\' route between the plateau and the coast, its official construction was completed in 1873 by order of Zacarias de Góis e Vasconcelos. Along some 28 kilometres linking Curitiba to Antonina and Morretes, it winds through one of the most intact stretches of Atlantic Forest in Brazil.'},
+    {id:'ferrovia', title:'Serra Verde Express: trilhos sobre a floresta', title_en:'Serra Verde Express: rails above the forest', focus_lon:-48.87, focus_lat:-25.47, zoom:12,
+     body_ptbr:'A Estrada de Ferro Paranaguá-Curitiba teve sua pedra fundamental lançada por Dom Pedro II em 1880 e foi inaugurada em 1885, obra tida como impossível pelos engenheiros europeus da época. Erguida com participação dos irmãos Rebouças, vence quase mil metros de desnível com 13 túneis e dezenas de pontes, entre elas o célebre Viaduto Carvalho. Hoje o trem Serra Verde Express refaz o trajeto, uma das viagens ferroviárias mais bonitas do mundo.', body_ptbr_en:'The Paranaguá-Curitiba railway had its foundation stone laid by Dom Pedro II in 1880 and opened in 1885, a work the European engineers of the day called impossible. Built with the Rebouças brothers taking part, it overcomes nearly a thousand metres of elevation with 13 tunnels and dozens of bridges, among them the celebrated Viaduto Carvalho. Today the Serra Verde Express retraces the route, one of the most beautiful railway journeys in the world.'}
   ],
   sources:[]
 };
@@ -679,6 +1012,22 @@ const TRAIL_DESC = {
   'Pico Caratuva':'Acesso ao segundo cume mais alto do Sul do Brasil (1.860 m), no maciço Ibitiraquire.',
   'Trilha Siririca':'Aproximação ao Pico Siririca (Ciririca), reputado o mais técnico do Paraná.'
 };
+TRAIL_DESC_EN = {
+  'Trilha do Pico Paraná':'Climb to the highest point in southern Brazil (1,877 m), from the IAT base to the Ibitiraquire crest; usually done with a night out at Itapiroca.',
+  'Caminho do Itupava':'Old cobbled royal road (18th century) crossing the range beside the Marumbi, from the plateau (Borda do Campo) to the coast (Porto de Cima / Morretes), ~20 km.',
+  'Estrada da Graciosa':'Historic road PR-410 (1873), winding down the range through preserved Atlantic Forest to Morretes.',
+  'Estrada de Ferro Engenheiro Bley':'The Curitiba-Paranaguá railway (1885), built with the Rebouças brothers, with 13 tunnels and dozens of bridges; today the Serra Verde Express route.',
+  'Trilha Frontal (branca)':'The classic and most direct line to Pico Olimpo (1,539 m), opened in 1942; ~1,100 m of gain with steps and iron chains. White markers.',
+  'Trilha Frontal Branca':'The classic and most direct line to Pico Olimpo (1,539 m), opened in 1942; ~1,100 m of gain with steps and iron chains. White markers.',
+  'Trilha Noroeste (vermelha)':'Ridge line linking the four permitted Marumbi summits (Abrolhos, Ponta do Tigre, Gigante, Olimpo), with via ferrata sections and the Lágrimas and Catedral gorges. Red markers.',
+  'Trilha Noroeste Vermelha':'Ridge line linking the four permitted Marumbi summits (Abrolhos, Ponta do Tigre, Gigante, Olimpo), with via ferrata sections. Red markers.',
+  'Trilha Rochedinho (azul)':'Short, panoramic trail to Morro Rochedinho (625 m), with a view of Marumbi station and the tracks; used to acclimatise. Blue markers.',
+  'Acesso ao Circuito Marumbi':'Circuit linking the Noroeste ascent with the Frontal descent, one of the hardest single-day traverses in Brazil (8 to 15 h).',
+  'Anhangava':'Climb into the Serra da Baitaca (Quatro Barras), the main rock climbing site in Paraná; from the summit (~1,420 m) you see Curitiba, the Marumbi and the bay.',
+  'Pico Caratuva':'Access to the second highest summit in southern Brazil (1,860 m), in the Ibitiraquire massif.',
+  'Trilha Siririca':'Approach to Pico Siririca (Ciririca), reckoned the most technical in Paraná.'
+};
+
 function trailData(){ return (OSM_TRAILS && OSM_TRAILS.features && OSM_TRAILS.features.length) ? OSM_TRAILS : trailsGeoJSON(); }
 
 /* ============================================================
@@ -699,7 +1048,7 @@ map.attributionControl.setPrefix('');
 
 // Satellite basemap (Esri World Imagery) + optional place-name labels overlay
 const satLayer = L.tileLayer(CONFIG.imagery.url, {maxZoom:19, maxNativeZoom:19,
-  attribution:'Imagem: Esri, Maxar, Earthstar Geographics · Picos/rotas: © OpenStreetMap, IBGE · Vias de escalada: Lista de Rotas de Escalada · © Avner Paes Gomes'}).addTo(map);
+  attribution:''}).addTo(map);
 const labelLayer = L.tileLayer(CONFIG.labels.url, {maxZoom:17, maxNativeZoom:16, opacity:.9});
 
 // Controls: zoom top-right (top-left belongs to the story panel), scale bottom-right
@@ -718,7 +1067,11 @@ const HERO_MIN = 1650;   // peaks this high (or with a curated note) get a perma
 // --- Conservation units (polygons) ---
 const parksLayer = L.geoJSON(PARKS_GEO, {
   style:function(f){ return {color:f.properties.color, weight:1.4, opacity:.8, dashArray:'5,4', fill:true, fillColor:f.properties.color, fillOpacity:.08}; },
-  onEachFeature:function(f,layer){ var p=f.properties; layer.bindPopup('<h3>'+p.name+'</h3><div class="pk-meta">'+p.label+' · '+p.km2+' km² · OpenStreetMap</div>'); }
+  onEachFeature:function(f,layer){ var p=f.properties;
+    // p.label is Portuguese in the data; p.klass is the stable key, so the popup can speak
+    // either language without regenerating parks.geojson.
+    layer.bindPopup(function(){ return '<h3>'+esc(p.name)+'</h3><div class="pk-meta">'+
+      tr('park.'+(p.klass||'UC'))+' · '+p.km2+' '+tr('pop.km2')+' · '+tr('pop.osm')+'</div>'; }); }
 });
 
 /* ============================================================
@@ -786,7 +1139,7 @@ function profileSVG(prof, markIdx){
     mark = '<circle class="pf-click" cx="'+X(m.d).toFixed(1)+'" cy="'+Y(m.z).toFixed(1)+'" r="3"/>';
   }
   return '<svg class="prof" viewBox="0 0 '+PROF_W+' '+PROF_H+'" preserveAspectRatio="none" '+
-      'role="img" aria-label="Perfil de elevação: '+prof.min+' a '+prof.max+' metros">'+
+      'role="img" aria-label="'+tr('prof.alt', prof.min, prof.max)+'">'+
     '<defs><linearGradient id="pfg" x1="0" y1="0" x2="0" y2="1">'+
       '<stop offset="0" stop-color="rgba(18,214,154,.42)"/><stop offset="1" stop-color="rgba(18,214,154,.03)"/>'+
     '</linearGradient></defs>'+
@@ -807,7 +1160,7 @@ function profileHTML(prof, markIdx){
       '<span>D− <b>'+prof.loss+'</b> m</span>'+
     '</div>'+
     '<div class="prof-wrap">'+profileSVG(prof, markIdx)+'</div>'+
-    '<div class="prof-read"><span class="pr-hint">Passe o mouse no perfil para a altitude</span><span class="pr-d"></span></div>';
+    '<div class="prof-read"><span class="pr-hint">'+tr('prof.hint')+'</span><span class="pr-d"></span></div>';
   return s;
 }
 
@@ -843,7 +1196,7 @@ function bindProfile(popupEl, prof){
   }
   function clear(){
     svg.classList.remove('live');
-    hint.textContent = 'Passe o mouse no perfil para a altitude';
+    hint.textContent = tr('prof.hint');
     dist.textContent = '';
     if(profMarker){ map.removeLayer(profMarker); profMarker = null; }
   }
@@ -872,7 +1225,7 @@ function trailStyle(f){ var k=f.properties.kind, c=k==='estrada'?'#ef476f':k==='
 const trailsLayer = L.geoJSON(trailData(), {
   style:trailStyle,
   onEachFeature:function(f,layer){
-    var p=f.properties, d=TRAIL_DESC[p.name]||'', ic=p.kind==='ferrovia'?'🚂':p.kind==='estrada'?'🛣️':'🥾';
+    var p=f.properties, ic=p.kind==='ferrovia'?'🚂':p.kind==='estrada'?'🛣️':'🥾';
     layer.bindPopup(function(){
       // Built per open so the profile can mark the exact spot that was clicked.
       // The clicked point comes from the popup's own latlng rather than a value
@@ -881,7 +1234,8 @@ const trailsLayer = L.geoJSON(trailData(), {
       var prof = profileOf(asLines(layer.getLatLngs()));
       var head = '<h3>'+esc(p.name||'Trilha (OSM)')+'</h3>'+
                  '<div class="pk-el">'+ic+' '+(p.km||'')+' km</div>';
-      var body = '<div class="pk-meta">'+(d||'Traçado real do OpenStreetMap.')+'</div>';
+      var d = (LANG==='en' && TRAIL_DESC_EN[p.name]) || TRAIL_DESC[p.name] || '';
+      var body = '<div class="pk-meta">'+(d||tr('pop.osmTrail'))+'</div>';
       if(!prof) return head+body;
       layer._prof = prof;
       var pu = layer.getPopup(), ll = pu && pu.getLatLng();
@@ -904,9 +1258,14 @@ PEAKS.forEach(function(p){
   var ele = p.elevation_m||700, r = peakRadius(ele);
   var hero = ele>=HERO_MIN || (p.note && p.note.length>0);
   var cm = L.circleMarker([p.lat,p.lon], {radius:r, color:'#0a1a12', weight:1.2, fillColor:massifColor(p.massif), fillOpacity:.96});
-  var elTxt = p.elevation_m?('▲ '+p.elevation_m+' m'):'▲ altitude n/d';
-  var note = p.note || HERO_NOTES[p.name] || '';
-  cm.bindPopup('<h3>'+p.name+'</h3><div class="pk-el">'+elTxt+'</div><div class="pk-meta">'+p.massif+(note?'<br>'+note:'')+'</div>');
+  // Built through a stored function so a language switch can rewrite it in place.
+  cm._peakHtml = function(){
+    var elTxt = p.elevation_m ? ('▲ '+p.elevation_m+' m') : ('▲ '+tr('peak.noEle'));
+    var note = (LANG==='en' && HERO_NOTES_EN[p.name]) || HERO_NOTES[p.name] || p.note || '';
+    return '<h3>'+esc(p.name)+'</h3><div class="pk-el">'+elTxt+'</div>'+
+           '<div class="pk-meta">'+esc(p.massif)+(note?'<br>'+esc(note):'')+'</div>';
+  };
+  cm.bindPopup(cm._peakHtml());
   var lbl = p.name + (p.elevation_m?' <span class="tt-m">'+p.elevation_m+'</span>':'');
   cm.bindTooltip(lbl, {permanent:hero, direction:'top', offset:[0,-r-1], className:'peak-tt'+(hero?' major':''), opacity:1});
   peaksLayer.addLayer(cm);
@@ -920,8 +1279,14 @@ let poiVisible = true;
 const poiEntries = POI_FEATURES.map(function(f){
   var c=f.geometry.coordinates, pr=f.properties;
   var cm = L.circleMarker([c[1],c[0]], {radius:4, color:'#08120f', weight:.8, fillColor:pr.color, fillOpacity:.92});
-  cm.bindPopup('<h3>'+(pr.emoji||'')+' '+(pr.name||pr.label)+'</h3><div class="pk-meta">'+pr.label+(pr.name?'':' · sem nome')+' · OpenStreetMap</div>');
-  if (pr.name||pr.label) cm.bindTooltip((pr.emoji?pr.emoji+' ':'')+(pr.name||pr.label), {direction:'top', className:'poi-tt'});
+  cm._poiHtml = function(){
+    var lab = tr('poi.'+pr.cat);
+    return '<h3>'+(pr.emoji||'')+' '+esc(pr.name||lab)+'</h3><div class="pk-meta">'+
+           esc(lab)+(pr.name?'':' · '+tr('crag.unnamed'))+' · '+tr('pop.osm')+'</div>';
+  };
+  cm._poiTip = function(){ return (pr.emoji?pr.emoji+' ':'')+(pr.name||tr('poi.'+pr.cat)); };
+  cm.bindPopup(cm._poiHtml());
+  cm.bindTooltip(cm._poiTip(), {direction:'top', className:'poi-tt'});
   return {cat:pr.cat, marker:cm};
 });
 function refreshPoiMarkers(){
@@ -964,20 +1329,20 @@ function routePopup(p){
   var h = '<h3>🧗 '+esc(p.nome)+'</h3>';
   h += '<div class="pk-el">'+(p.ele?'▲ '+p.ele+' m · ':'')+esc(p.massif||'')+'</div>';
   var bits=[];
-  if(p.n_vias) bits.push(p.n_vias+' via'+(p.n_vias>1?'s':''));
-  if(p.n_boulders) bits.push(p.n_boulders+' boulder'+(p.n_boulders>1?'s':''));
+  if(p.n_vias) bits.push(p.n_vias>1 ? tr('pop.vias', p.n_vias) : tr('pop.via1'));
+  if(p.n_boulders) bits.push(p.n_boulders>1 ? tr('pop.boulders', p.n_boulders) : tr('pop.boulder1'));
   var mx=[]; if(p.max_grau) mx.push(p.max_grau); if(p.max_boulder) mx.push(p.max_boulder);
-  if(mx.length) bits.push('máx '+mx.join(' / '));
-  if(p.ano_min) bits.push('desde '+p.ano_min);
+  if(mx.length) bits.push(tr('pop.max', mx.join(' / ')));
+  if(p.ano_min) bits.push(tr('pop.since', p.ano_min));
   h += '<div class="rt-sum">'+bits.join(' · ')+'</div>';
   h += '<div class="rt-bands">'+BANDS_META.filter(function(b){ return p.bandas[b.band]; })
-        .map(function(b){ return '<span class="rt-band" style="border-color:'+b.cor+'"><i style="background:'+b.cor+'"></i>'+b.label+' <b>'+p.bandas[b.band]+'</b></span>'; }).join('')+'</div>';
+        .map(function(b){ return '<span class="rt-band" style="border-color:'+b.cor+'"><i style="background:'+b.cor+'"></i>'+tr('band.'+b.band)+' <b>'+p.bandas[b.band]+'</b></span>'; }).join('')+'</div>';
   h += '<div class="rt-list">';
   crags.forEach(function(crag){
     if(crags.length>1) h += '<div class="rt-crag">'+esc(crag)+'</div>';
     var bySet={};
     vias.filter(function(v){ return v.crag===crag; }).forEach(function(v){
-      var k=v.setor||v.bloco||'Sem setor'; (bySet[k]=bySet[k]||[]).push(v); });
+      var k=v.setor||v.bloco||tr('pop.noSector'); (bySet[k]=bySet[k]||[]).push(v); });
     Object.keys(bySet).sort().forEach(function(s){
       h += '<div class="rt-set">'+esc(s)+' <b>'+bySet[s].length+'</b></div>';
       bySet[s].forEach(function(v){
@@ -990,8 +1355,8 @@ function routePopup(p){
     });
   });
   h += '</div>';
-  h += '<div class="pk-meta" style="font-size:9.5px;margin-top:7px">Vias por montanha; a planilha não traz coordenada de setor. Fonte: '+
-       esc((ROUTES_GEO&&ROUTES_GEO.fonte)||'planilha de rotas')+'</div>';
+  h += '<div class="pk-meta" style="font-size:9.5px;margin-top:7px">'+
+       tr('pop.routeSrc', esc((ROUTES_GEO&&ROUTES_GEO.fonte)||'Lista de Rotas de Escalada'))+'</div>';
   return h;
 }
 
@@ -1011,9 +1376,11 @@ const cragsLayer = L.geoJSON(CRAGS_GEO, {
   style: function(f){ return {color:f.properties.color||'#adb5bd', weight:2, opacity:.8, dashArray:'5 3'}; },
   onEachFeature: function(f, layer){
     var pr=f.properties;
-    layer.bindPopup('<h3>'+(pr.emoji||'🧱')+' '+esc(pr.name||pr.label)+'</h3>'+
-      '<div class="pk-meta">'+esc(pr.label)+(pr.name?'':' · sem nome')+' · OpenStreetMap</div>',
-      popupOpts({maxWidth:260, minWidth:180}));
+    layer.bindPopup(function(){
+      var lab = tr('crag.'+(pr.cat||'paredao'));
+      return '<h3>'+(pr.emoji||'🧱')+' '+esc(pr.name||lab)+'</h3>'+
+        '<div class="pk-meta">'+esc(lab)+(pr.name?'':' · '+tr('crag.unnamed'))+' · '+tr('pop.osm')+'</div>';
+    }, popupOpts({maxWidth:260, minWidth:180}));
     if(pr.name) layer.bindTooltip('🧱 '+pr.name, {direction:'top', className:'poi-tt'});
   }
 });
@@ -1040,8 +1407,8 @@ function haversineKm(a, b){
 /* GPX 1.1: tracks (trk/trkseg/trkpt), routes (rte/rtept) and waypoints (wpt). */
 function parseGPX(text, fallbackName){
   var doc = new DOMParser().parseFromString(text, 'application/xml');
-  if(doc.querySelector('parsererror')) throw new Error('XML inválido');
-  if(!doc.querySelector('gpx')) throw new Error('não parece um arquivo GPX');
+  if(doc.querySelector('parsererror')) throw new Error(tr('gpx.badXml'));
+  if(!doc.querySelector('gpx')) throw new Error(tr('gpx.notGpxFile'));
   // Keep <ele> as a third ordinate when the file carries it: it is what feeds the
   // elevation profile, and GPX from a watch or phone almost always has it.
   var pts = function(nodes){
@@ -1069,11 +1436,11 @@ function parseGPX(text, fallbackName){
     var nm=w.querySelector('name'), el=w.querySelector('ele');
     return {lat:la, lon:lo, name:nm?nm.textContent.trim():'', ele:el?Math.round(parseFloat(el.textContent)):null};
   }).filter(Boolean);
-  if(!tracks.length && !waypoints.length) throw new Error('sem trilhas nem pontos');
+  if(!tracks.length && !waypoints.length) throw new Error(tr('gpx.empty'));
   var mName = doc.querySelector('metadata > name') || doc.querySelector('trk > name');
   var km = 0;
   tracks.forEach(function(t){ for(var i=1;i<t.length;i++) km += haversineKm(t[i-1], t[i]); });
-  return { name: (mName && mName.textContent.trim()) || fallbackName || 'Sem nome',
+  return { name: (mName && mName.textContent.trim()) || fallbackName || tr('gpx.noName'),
            tracks: tracks, waypoints: waypoints, km: Math.round(km*10)/10 };
 }
 
@@ -1086,8 +1453,8 @@ function drawGpx(entry){
     var pl = L.polyline(t, {color:entry.color, weight:3, opacity:1, lineCap:'round', lineJoin:'round'});
     pl.bindPopup(function(){
       var prof = profileOf(asLines(pl.getLatLngs()));
-      var head = '<h3>📍 '+esc(entry.name)+'</h3><div class="pk-meta">Trilha enviada · '+entry.km+' km</div>';
-      if(!prof) return head+'<div class="pk-meta" style="margin-top:5px">Este GPX não traz altitude (&lt;ele&gt;), então não há perfil.</div>';
+      var head = '<h3>📍 '+esc(entry.name)+'</h3><div class="pk-meta">'+tr('pop.sentTrail')+' · '+entry.km+' km</div>';
+      if(!prof) return head+'<div class="pk-meta" style="margin-top:5px">'+tr('prof.noEle')+'</div>';
       pl._prof = prof;
       var pu = pl.getPopup(), ll = pu && pu.getLatLng();
       return head+profileHTML(prof, ll ? nearestIdx(prof, ll) : -1);
@@ -1099,7 +1466,7 @@ function drawGpx(entry){
   });
   entry.waypoints.forEach(function(w){
     var cm = L.circleMarker([w.lat,w.lon], {radius:5, color:'#0a1a12', weight:1.4, fillColor:entry.color, fillOpacity:.95});
-    cm.bindPopup('<h3>📍 '+esc(w.name||'Ponto')+'</h3><div class="pk-meta">'+esc(entry.name)+
+    cm.bindPopup('<h3>📍 '+esc(w.name||tr('pop.point'))+'</h3><div class="pk-meta">'+esc(entry.name)+
       (w.ele?' · ▲ '+w.ele+' m':'')+'</div>', popupOpts({maxWidth:230}));
     if(w.name) cm.bindTooltip('📍 '+w.name, {direction:'top', className:'poi-tt'});
     gpxLayer.addLayer(cm); entry.layers.push(cm);
@@ -1125,27 +1492,27 @@ function renderGpxUi(){
   el.innerHTML =
     '<div class="gpx-drop" id="gpxDrop" tabindex="0" role="button">'+
       '<div class="gd-ico">🗺️</div>'+
-      '<div class="gd-t">Enviar um GPX</div>'+
-      '<div class="gd-s">Arraste aqui ou clique para escolher.<br>Trilhas e pontos aparecem no mapa na hora.</div>'+
+      '<div class="gd-t">'+tr('gpx.send')+'</div>'+
+      '<div class="gd-s">'+tr('gpx.drop')+'</div>'+
     '</div>'+
     '<input type="file" id="gpxInput" accept=".gpx,application/gpx+xml" multiple hidden>'+
     '<div class="gpx-bar" id="gpxBar" style="display:none"><i></i></div>'+
     '<div class="gpx-list" id="gpxList">'+
       (gpxEntries.length ? gpxEntries.map(function(e,i){
-        var st = e.status==='sent'?'<span class="gi-st sent">no drive</span>'
-               : e.status==='error'?'<span class="gi-st err" title="'+esc(e.error||'')+'">local</span>'
-               : e.status==='sending'?'<span class="gi-st local">enviando</span>'
-               : '<span class="gi-st local">local</span>';
+        var st = e.status==='sent'?'<span class="gi-st sent">'+tr('gpx.stSent')+'</span>'
+               : e.status==='error'?'<span class="gi-st err" title="'+esc(e.error||'')+'">'+tr('gpx.stLocal')+'</span>'
+               : e.status==='sending'?'<span class="gi-st local">'+tr('gpx.stSending')+'</span>'
+               : '<span class="gi-st local">'+tr('gpx.stLocal')+'</span>';
         return '<div class="gpx-item"><i class="sw" style="width:8px;height:8px;border-radius:50%;background:'+e.color+';flex:0 0 auto"></i>'+
-          '<span class="gi-n" data-i="'+i+'" title="Centralizar no mapa">'+esc(e.name)+'</span>'+
-          '<span class="gi-m">'+(e.km?e.km+' km':(e.waypoints.length+' pts'))+'</span>'+st+'</div>';
+          '<span class="gi-n" data-i="'+i+'" title="'+tr('gpx.center')+'">'+esc(e.name)+'</span>'+
+          '<span class="gi-m">'+(e.km?e.km+' km':tr('gpx.pts', e.waypoints.length))+'</span>'+st+'</div>';
       }).join('') : '')+
     '</div>'+
     '<div class="gpx-note">'+
       (GPX_ENDPOINT
-        ? 'Os arquivos vão para o Google Drive do projeto e voltam para todo mundo no próximo acesso. '+(sent?sent+' enviado(s) nesta sessão. ':'')
-        : 'Sem servidor configurado: os arquivos ficam só neste navegador e não são compartilhados. ')+
-      'Formato GPX 1.0/1.1, até 8 MB.</div>';
+        ? tr('gpx.noteServer')+(sent?tr('gpx.noteSent', sent):'')
+        : tr('gpx.noteLocal'))+
+      tr('gpx.noteFmt')+'</div>';
 
   var drop=document.getElementById('gpxDrop'), input=document.getElementById('gpxInput');
   drop.onclick=function(){ input.click(); };
@@ -1166,10 +1533,10 @@ async function handleGpxFiles(files){
   var list = Array.prototype.slice.call(files||[]);
   for (var i=0;i<list.length;i++){
     var file = list[i];
-    if(!/\.gpx$/i.test(file.name)){ flashToast('“'+file.name+'” não é um .gpx'); continue; }
-    if(file.size > GPX_MAX){ flashToast('“'+file.name+'” passa de 8 MB'); continue; }
+    if(!/\.gpx$/i.test(file.name)){ flashToast(tr('gpx.notGpx', file.name)); continue; }
+    if(file.size > GPX_MAX){ flashToast(tr('gpx.tooBig', file.name)); continue; }
     var text;
-    try { text = await file.text(); } catch(err){ flashToast('Não consegui ler o arquivo'); continue; }
+    try { text = await file.text(); } catch(err){ flashToast(tr('gpx.unreadable')); continue; }
     var parsed;
     try { parsed = parseGPX(text, file.name.replace(/\.gpx$/i,'')); }
     catch(err){ flashToast('“'+file.name+'”: '+err.message); continue; }
@@ -1185,7 +1552,7 @@ async function handleGpxFiles(files){
     zoomToGpx(entry);
     renderGpxUi();
     addGpxToCesium(entry);
-    flashToast('“'+entry.name+'” no mapa · '+(entry.km?entry.km+' km':entry.waypoints.length+' pontos'));
+    flashToast(tr('gpx.onMap', entry.name, entry.km?entry.km+' km':tr('gpx.pts', entry.waypoints.length)));
     if(GPX_ENDPOINT) sendGpx(entry, text, file.name);
   }
 }
@@ -1205,7 +1572,7 @@ async function sendGpx(entry, text, filename){
     entry.status='sent'; entry.id=out.id||entry.id;
   }catch(err){
     entry.status='error'; entry.error=String(err.message||err);
-    flashToast('“'+entry.name+'” ficou só neste navegador: '+entry.error);
+    flashToast(tr('gpx.failed', entry.name, entry.error));
   }
   if(bar){ bar.firstChild.style.width='100%'; setTimeout(function(){ bar.style.display='none'; bar.firstChild.style.width='0'; }, 500); }
   renderGpxUi();
@@ -1235,7 +1602,7 @@ function addGpxToCesium(entry){
     var e = cesiumViewer.entities.add({ name:entry.name,
       polyline:{ positions:Cesium.Cartesian3.fromDegreesArray(flat), width:3,
         material:col, clampToGround:true } });
-    e.ttHtml='<b>📍 '+entry.name+'</b><br>Trilha enviada · '+entry.km+' km';
+    e.ttHtml='<b>📍 '+entry.name+'</b><br>'+tr('pop.sentTrail')+' · '+entry.km+' km';
     e.show = LAYER_ON.gpx; cesiumGpxEnts.push(e);
   });
   entry.waypoints.forEach(function(w){
@@ -1244,7 +1611,7 @@ function addGpxToCesium(entry){
       point:{ pixelSize:9, color:col, outlineColor:Cesium.Color.fromCssColorString('#0a1a12'), outlineWidth:1.5,
         heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
         disableDepthTestDistance:Number.POSITIVE_INFINITY } });
-    e.ttHtml='<b>📍 '+(w.name||'Ponto')+'</b><br>'+entry.name;
+    e.ttHtml='<b>📍 '+(w.name||tr('pop.point'))+'</b><br>'+entry.name;
     e.show = LAYER_ON.gpx; cesiumGpxEnts.push(e);
   });
   cesiumViewer.scene.requestRender();
@@ -1276,12 +1643,12 @@ let chap = 0;
 function renderChapter(i){
   const c = NARRATIVE.chapters[i]; if(!c) return;
   chap = i;
-  document.getElementById('chapEyebrow').textContent = `Capítulo ${i+1} de ${NARRATIVE.chapters.length}`;
-  document.getElementById('chapTitle').textContent = c.title;
-  document.getElementById('chapBody').textContent = c.body_ptbr;
+  document.getElementById('chapEyebrow').textContent = tr('chap.of', i+1, NARRATIVE.chapters.length);
+  document.getElementById('chapTitle').textContent = nm(c, 'title');
+  document.getElementById('chapBody').textContent = nm(c, 'body_ptbr');
   document.getElementById('prevBtn').disabled = (i===0);
   const nb = document.getElementById('nextBtn');
-  nb.textContent = (i===NARRATIVE.chapters.length-1) ? '↺ Recomeçar' : 'Próximo ›';
+  nb.textContent = (i===NARRATIVE.chapters.length-1) ? tr('chap.restart') : tr('chap.next');
   [...document.querySelectorAll('#dots .dot')].forEach((d,k)=>d.classList.toggle('active',k===i));
   const z = c.zoom || 13;
   // flyTo animates through requestAnimationFrame, which a hidden tab never fires: the
@@ -1403,12 +1770,12 @@ function renderDash(){
   const nVias = ROUTE_FEATURES.reduce((a,f)=>a+(f.properties.total||0),0);
   // metrics
   document.getElementById('metrics').innerHTML = `
-    <div class="metric"><div class="v">${PEAKS.length}</div><div class="l">Cumes</div></div>
-    <div class="metric"><div class="v">${maxEl}</div><div class="l">Máx (m)</div></div>
-    <div class="metric"><div class="v">${conjuntos.length}</div><div class="l">Conjuntos</div></div>
-    <div class="metric"><div class="v">${nPois}</div><div class="l">POIs</div></div>
-    <div class="metric"><div class="v">${nVias}</div><div class="l">Vias de escalada</div></div>
-    <div class="metric"><div class="v">${ROUTE_FEATURES.length}</div><div class="l">Áreas de escalada</div></div>`;
+    <div class="metric"><div class="v">${PEAKS.length}</div><div class="l">${tr('metric.peaks')}</div></div>
+    <div class="metric"><div class="v">${maxEl}</div><div class="l">${tr('metric.max')}</div></div>
+    <div class="metric"><div class="v">${conjuntos.length}</div><div class="l">${tr('metric.groups')}</div></div>
+    <div class="metric"><div class="v">${nPois}</div><div class="l">${tr('metric.pois')}</div></div>
+    <div class="metric"><div class="v">${nVias}</div><div class="l">${tr('metric.routes')}</div></div>
+    <div class="metric"><div class="v">${ROUTE_FEATURES.length}</div><div class="l">${tr('metric.areas')}</div></div>`;
   // ridge silhouette: elevation profile from north to south
   renderRidge(eleP);
   // donut by region (largest first)
@@ -1443,21 +1810,21 @@ function renderLegend(){
   const src=(OSM_TRAILS&&OSM_TRAILS.features)||[];
   const present = src.length ? new Set(src.map(f=>f.properties.kind)) : new Set(TRAILS.map(t=>t.kind));
   const named = src.filter(f=>f.properties.name).length;
-  const kinds=[{k:'trilha',c:'#ffd166',l:'Trilha'},{k:'estrada',c:'#ef476f',l:'Estrada (Graciosa)'},{k:'ferrovia',c:'#4ea8de',l:'Ferrovia (Serra Verde)'}]
+  const kinds=[{k:'trilha',c:'#ffd166',l:tr('leg.trail')},{k:'estrada',c:'#ef476f',l:tr('leg.road')},{k:'ferrovia',c:'#4ea8de',l:tr('leg.rail')}]
     .filter(x=>present.has(x.k));
   const nParks = (PARKS_GEO&&PARKS_GEO.features)?PARKS_GEO.features.length:0;
   // Two columns: the box grows sideways into free map instead of downwards into
   // the story panel, and height is what makes those two collide.
   document.getElementById('legTrails').innerHTML =
     `<div class="lg-col">`+
-      `<div class="sub" style="margin:0 0 6px">Rotas${named?` &middot; ${named} reais (OSM)`:''}</div>` +
+      `<div class="sub" style="margin:0 0 6px">${tr('leg.routes')}${named?` &middot; ${tr('leg.routesReal', named)}`:''}</div>` +
       kinds.map(x=>`<div class="leg-row"><span class="leg-line" style="border-top-color:${x.c}"></span>${x.l}</div>`).join('') +
     `</div>`+
     `<div class="lg-col">`+
-      `<div class="sub" style="margin:0 0 6px">Cumes &middot; ${PEAKS.length}</div>`+
-      `<div class="leg-row" style="color:#8aa;font-size:10px;line-height:1.45;padding:0;display:block">${conjuntosCount()} conjuntos nomeados.<br>Clique para os detalhes.</div>`+
-      `<div class="sub" style="margin:9px 0 5px">Unidades de conservação${nParks?` &middot; ${nParks}`:''}</div>` +
-      `<div class="leg-row"><span class="leg-line" style="border-top-color:#2dd4bf;border-top-style:dashed"></span>Limite de parque / reserva</div>`+
+      `<div class="sub" style="margin:0 0 6px">${tr('leg.peaks')} &middot; ${PEAKS.length}</div>`+
+      `<div class="leg-row" style="color:#8aa;font-size:10px;line-height:1.45;padding:0;display:block">${tr('leg.groupsHint', conjuntosCount())}</div>`+
+      `<div class="sub" style="margin:9px 0 5px">${tr('leg.parks')}${nParks?` &middot; ${nParks}`:''}</div>` +
+      `<div class="leg-row"><span class="leg-line" style="border-top-color:#2dd4bf;border-top-style:dashed"></span>${tr('leg.parkLine')}</div>`+
     `</div>`;
 }
 function renderRouteLegend(){
@@ -1470,22 +1837,21 @@ function renderRouteLegend(){
   });
   var sum = Object.keys(tot).reduce(function(a,b){ return a+tot[b]; },0) || 1;
   el.innerHTML =
-    '<div class="sub" style="margin:9px 0 5px">Escalada &middot; '+n+' vias + '+nb+' boulders</div>'+
+    '<div class="sub" style="margin:9px 0 5px">'+tr('leg.climb', n, nb)+'</div>'+
     '<div class="bandbar">'+BANDS_META.filter(function(b){ return tot[b.band]; })
       .map(function(b){ return '<span style="width:'+(100*tot[b.band]/sum).toFixed(1)+'%;background:'+b.cor+'"></span>'; }).join('')+'</div>'+
     BANDS_META.filter(function(b){ return tot[b.band]; }).map(function(b){
       return '<div class="leg-row"><span class="leg-dot" style="background:'+b.cor+';border-color:#0a1a12"></span>'+
-        b.label+' <span style="color:#8aa;font-size:10px">'+b.br+'</span>'+
+        tr('band.'+b.band)+' <span style="color:#8aa;font-size:10px">'+b.br+'</span>'+
         '<b style="margin-left:auto;color:#fff">'+tot[b.band]+'</b></div>'; }).join('')+
     '<div class="leg-row" style="color:#8aa;font-size:10px;margin-top:3px;line-height:1.45">'+
-      'Faixa mostrada na escala brasileira; agrupa também a francesa e a V (boulder). '+
-      'Marcador colorido pela faixa dominante da montanha.</div>';
+      tr('leg.bandHint')+'</div>';
 }
 function renderPoiLegend(){
   const counts={}; ((POIS_GEO&&POIS_GEO.features)||[]).forEach(f=>counts[f.properties.cat]=(counts[f.properties.cat]||0)+1);
   const el=document.getElementById('legPois');
-  el.innerHTML = `<div class="sub" style="margin:0 0 6px">Locais de interesse (OSM)</div>`+
-    POI_CATS.map(c=>`<label class="poi-row"><input type="checkbox" data-cat="${c.cat}" ${poiOn.has(c.cat)?'checked':''}><span class="leg-dot" style="background:${c.color};border-color:#0a1a12"></span><span class="poi-l">${c.emoji} ${c.label}</span><b class="poi-n">${counts[c.cat]||0}</b></label>`).join('');
+  el.innerHTML = `<div class="sub" style="margin:0 0 6px">${tr('leg.pois')}</div>`+
+    POI_CATS.map(c=>`<label class="poi-row"><input type="checkbox" data-cat="${c.cat}" ${poiOn.has(c.cat)?'checked':''}><span class="leg-dot" style="background:${c.color};border-color:#0a1a12"></span><span class="poi-l">${c.emoji} ${nm(c,'label')}</span><b class="poi-n">${counts[c.cat]||0}</b></label>`).join('');
   el.querySelectorAll('input[data-cat]').forEach(inp=>inp.onchange=()=>{
     if(inp.checked) poiOn.add(inp.dataset.cat); else poiOn.delete(inp.dataset.cat); refreshPoiMarkers(); refreshCesiumLayers();
   });
@@ -1497,13 +1863,13 @@ function renderPoiLegend(){
 function toggleLayer(layer, on){ if(on){ if(!map.hasLayer(layer)) layer.addTo(map); } else if(map.hasLayer(layer)){ map.removeLayer(layer); } }
 
 const LAYER_SPEC = [
-  {k:'routes', l:'Escalada',  on:true},
-  {k:'crags',  l:'Paredões',  on:true},
-  {k:'trails', l:'Trilhas',   on:true},
-  {k:'pois',   l:'Locais',    on:true},
-  {k:'parks',  l:'Unid. cons.', on:true},
-  {k:'labels', l:'Rótulos',   on:false},
-  {k:'gpx',    l:'GPX enviados', on:true}
+  {k:'routes', i18n:'lyr.routes', on:true},
+  {k:'crags',  i18n:'lyr.crags',  on:true},
+  {k:'trails', i18n:'lyr.trails', on:true},
+  {k:'pois',   i18n:'lyr.pois',   on:true},
+  {k:'parks',  i18n:'lyr.parks',  on:true},
+  {k:'labels', i18n:'lyr.labels', on:false},
+  {k:'gpx',    i18n:'lyr.gpx',    on:true}
 ];
 const LAYER_ON = {};
 LAYER_SPEC.forEach(function(s){ LAYER_ON[s.k]=s.on; });
@@ -1523,7 +1889,7 @@ function renderLayerChips(){
   var g=document.getElementById('lyrGrid');
   g.innerHTML = LAYER_SPEC.map(function(s){
     return '<button class="lyr'+(LAYER_ON[s.k]?' is-on':'')+'" data-k="'+s.k+'" role="switch" '+
-           'aria-checked="'+(LAYER_ON[s.k]?'true':'false')+'"><i class="sw"></i><span>'+s.l+'</span></button>';
+           'aria-checked="'+(LAYER_ON[s.k]?'true':'false')+'"><i class="sw"></i><span>'+tr(s.i18n)+'</span></button>';
   }).join('');
   g.querySelectorAll('.lyr').forEach(function(b){
     b.onclick=function(){
@@ -1672,7 +2038,9 @@ async function initCesium(){
       var ol = viewer.entities.add({ name:pr.name,
         polyline:{ positions:Cesium.Cartesian3.fromDegreesArray(flat.concat([outer[0][0],outer[0][1]])),
           width:1.6, material:new Cesium.PolylineDashMaterialProperty({color:col}), clampToGround:true } });
-      poly.ttHtml = ol.ttHtml = '<b>'+pr.name+'</b><br>'+pr.label+' · '+pr.km2+' km²';
+      poly._tt = ol._tt = function(){ return '<b>'+pr.name+'</b><br>'+
+        tr('park.'+(pr.klass||'UC'))+' · '+pr.km2+' '+tr('pop.km2'); };
+      poly.ttHtml = ol.ttHtml = poly._tt();
       cesiumParkEnts.push(poly, ol);
     });
   });
@@ -1688,7 +2056,9 @@ async function initCesium(){
         disableDepthTestDistance:Number.POSITIVE_INFINITY,
         scaleByDistance:new Cesium.NearFarScalar(1e4,1.15,1.6e5,0.45) } });
     poi._cat = pr.cat;
-    poi.ttHtml = '<b>'+(pr.emoji?pr.emoji+' ':'')+(pr.name||pr.label)+'</b><br>'+pr.label;
+    poi._tt = function(){ var lab=tr('poi.'+pr.cat)||pr.label;
+      return '<b>'+(pr.emoji?pr.emoji+' ':'')+(pr.name||lab)+'</b><br>'+lab; };
+    poi.ttHtml = poi._tt();
     cesiumPoiEnts.push(poi);
   });
 
@@ -1701,7 +2071,9 @@ async function initCesium(){
     var e = viewer.entities.add({ name:pr.name||pr.label,
       polyline:{ positions:Cesium.Cartesian3.fromDegreesArray(flat), width:2,
         material:new Cesium.PolylineDashMaterialProperty({color:col}), clampToGround:true } });
-    e.ttHtml = '<b>🧱 '+(pr.name||pr.label)+'</b><br>'+pr.label;
+    e._tt = function(){ var lab=tr('crag.'+(pr.cat||'paredao'));
+      return '<b>🧱 '+(pr.name||lab)+'</b><br>'+lab; };
+    e.ttHtml = e._tt();
     cesiumCragEnts.push(e);
   });
 
@@ -1717,8 +2089,9 @@ async function initCesium(){
         disableDepthTestDistance:Number.POSITIVE_INFINITY,
         scaleByDistance:new Cesium.NearFarScalar(1e4,1.2,1.6e5,0.5) } });
     var mx=[]; if(p.max_grau) mx.push(p.max_grau); if(p.max_boulder) mx.push(p.max_boulder);
-    e.ttHtml = '<b>🧗 '+p.nome+'</b><br>'+p.total+' vias'+(mx.length?' · máx '+mx.join(' / '):'')+
-      (p.ele?'<br>▲ '+p.ele+' m':'');
+    e._tt = function(){ return '<b>🧗 '+p.nome+'</b><br>'+tr('pop.vias', p.total)+
+      (mx.length?' · '+tr('pop.max', mx.join(' / ')):'')+(p.ele?'<br>▲ '+p.ele+' m':''); };
+    e.ttHtml = e._tt();
     cesiumRouteEnts.push(e);
   });
 
@@ -1806,10 +2179,79 @@ function initMobile(){
   map.on('click', function(){ if(window.matchMedia('(max-width:820px)').matches && activeSheet) closeSheet(); });
 }
 
+/* ============================================================
+   LANGUAGE SWITCH
+   Every generated surface reads tr() at render time, so switching is a full re-render
+   rather than a patch: that is the only way to leave no Portuguese behind. Popups bound
+   as content functions pick the new language up on their next open; the ones bound as
+   plain strings (peaks) and the Cesium tooltips keep a builder function to be re-run.
+   ============================================================ */
+let attrShown = null;
+function applyAttribution(){
+  var ac = (typeof map !== 'undefined') && map.attributionControl;
+  if(!ac) return;
+  if(attrShown) ac.removeAttribution(attrShown);
+  attrShown = tr('attr');
+  ac.addAttribution(attrShown);
+}
+
+function applyI18n(){
+  document.documentElement.lang = (LANG === 'en') ? 'en' : 'pt-BR';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.innerHTML = tr(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(function(el){
+    el.setAttribute('aria-label', tr(el.dataset.i18nAria));
+  });
+  var lb = document.getElementById('langBtn');
+  if(lb){ lb.textContent = tr('lang.switch'); lb.setAttribute('aria-label', tr('lang.aria')); }
+  // The attribution is owned by Leaflet's control, not by markup we can tag, and the
+  // layer has no setAttribution: the control only adds and removes strings.
+  applyAttribution();
+  var ridge = document.getElementById('ridge');
+  if(ridge) ridge.setAttribute('aria-label', tr('dash.ridgeAlt'));
+}
+
+function rebuildStaticPopups(){
+  peaksLayer.eachLayer(function(l){ if(l._peakHtml) l.setPopupContent(l._peakHtml()); });
+  // POI markers live in poiEntries, not on the layer: refreshPoiMarkers() only adds and
+  // removes them by category, so the ones currently hidden must be rewritten too.
+  poiEntries.forEach(function(o){
+    var m = o.marker;
+    if(m._poiHtml) m.setPopupContent(m._poiHtml());
+    if(m._poiTip && m.getTooltip()) m.setTooltipContent(m._poiTip());
+  });
+}
+function rebuildCesiumTooltips(){
+  [cesiumPoiEnts, cesiumRouteEnts, cesiumParkEnts, cesiumCragEnts].forEach(function(arr){
+    arr.forEach(function(e){ if(e._tt) e.ttHtml = e._tt(); });
+  });
+  cesiumViewer.scene.requestRender();
+}
+
+function setLang(l){
+  if(l === LANG) return;
+  LANG = l;
+  try { localStorage.setItem('atlas.lang', l); } catch(e){}
+  applyI18n();
+  map.closePopup();          // an open popup would sit there in the old language
+  clearSelection();
+  renderChapter(chap);
+  renderDash(); renderLegend(); renderRouteLegend(); renderPoiLegend();
+  renderLayerChips(); renderGpxUi();
+  refreshPoiMarkers();
+  rebuildStaticPopups();
+  if (cesiumViewer) rebuildCesiumTooltips();
+}
+
+function initLang(){
+  applyI18n();
+  document.getElementById('langBtn').onclick = function(){ setLang(LANG === 'pt' ? 'en' : 'pt'); };
+}
+
 function boot(){
   document.getElementById('isPeaks').textContent=PEAKS.length;
   const nTrails=(OSM_TRAILS&&OSM_TRAILS.features)?OSM_TRAILS.features.filter(f=>f.properties.name).length:TRAILS.length;
   document.getElementById('isTrails').textContent=nTrails;
+  initLang();
   buildDots(); renderChapter(0); renderDash(); renderLegend(); renderRouteLegend(); renderPoiLegend();
   renderLayerChips(); initPanelTabs('legend'); initPanelTabs('dash'); renderGpxUi(); initMobile();
   loadRemoteGpx();
