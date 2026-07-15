@@ -119,11 +119,14 @@ ligar/desligar num grid de duas colunas, com um único objeto de estado (`LAYER_
 os chips, as camadas do Leaflet e o espelho no Cesium, para 2D e 3D nunca discordarem sobre o
 que está ligado.
 
-> **Armadilha ao depurar layout aqui:** alguma extensão do Chrome injeta
-> `margin-bottom:180px` em qualquer elemento com `class="body"`, com origem USER. Ela não
-> aparece em `document.styleSheets` nem no fonte, infla os painéis em 182px e simula uma
-> sobreposição que não existe para os usuários. Antes de investigar altura de painel, anule:
-> `#story .body,#dash .body,#legend .body{margin-bottom:0 !important}`.
+> **Por que a classe se chama `pn-body` e não `body`:** alguma extensão no Chrome do autor
+> injeta `margin-bottom:180px` em todo elemento com `class="body"`, com origem USER. A regra
+> não aparece em `document.styleSheets` nem no fonte (`grep 180px` não acha nada), inflava
+> cada painel em 182px e produzia uma cauda vazia na caixa de camadas mais 268px de
+> sobreposição sobre a História. Renomear a classe resolveu: `.body` é um nome genérico
+> demais para uma página conviver com extensões. Se algum painel voltar a crescer sem
+> motivo, teste com `document.createElement('div')` de classe `body` e compare o
+> `marginBottom` computado com o de uma classe inventada.
 
 ## Stack
 

@@ -205,7 +205,7 @@ window.addEventListener('load',function(){
 
   /* ---------- Story panel (left) ---------- */
   #story{left:18px;top:74px;width:300px;max-width:calc(100vw - 36px);overflow:hidden}
-  #story .body{padding:16px;max-height:min(30vh,244px);overflow:auto}
+  #story .pn-body{padding:16px;max-height:min(30vh,244px);overflow:auto}
   .chap-eyebrow{font-size:11px;letter-spacing:.5px;color:var(--accent);font-weight:650;text-transform:uppercase}
   #chapTitle{margin:6px 0 8px;font-size:19px;font-weight:750;line-height:1.25}
   #chapBody{margin:0;font-size:13.5px;line-height:1.62;color:#dcebe5}
@@ -227,12 +227,12 @@ window.addEventListener('load',function(){
   /* ---------- Dashboards (right) ---------- */
   #dash{right:18px;top:74px;width:308px;max-width:calc(100vw - 36px);overflow:hidden}
   /* Tabbed like #legend: each pane fits, so the panel never needs a scrollbar. */
-  #dash .body{padding:12px 16px 14px}
+  #dash .pn-body{padding:12px 16px 14px}
   .metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
   .metric{background:rgba(255,255,255,.04);border:1px solid var(--stroke);border-radius:12px;padding:10px 8px;text-align:center}
   .metric .v{font-size:19px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
   .metric .l{font-size:9.5px;color:var(--txt-dim);text-transform:uppercase;letter-spacing:.4px;margin-top:5px}
-  .sub{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--txt-dim);margin:6px 0 8px}
+  .sub{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--txt-dim);margin:6px 0 8px;line-height:1.35}
   /* Ridge silhouette (north -> south elevation profile) */
   .ridge{display:block;width:100%;height:auto;overflow:visible}
   .ridge .rg-line{fill:none;stroke:rgba(18,214,154,.85);stroke-width:1;stroke-linejoin:round}
@@ -251,8 +251,8 @@ window.addEventListener('load',function(){
 
   /* ---------- Legend / controls (bottom-right) ---------- */
   /* Tabbed so every pane fits: the panel never scrolls, on desktop or mobile. */
-  #legend{left:18px;bottom:18px;width:288px;max-width:calc(100vw - 36px);overflow:hidden}
-  #legend .body{padding:10px 13px 12px}
+  #legend{left:18px;bottom:18px;width:400px;max-width:calc(100vw - 36px);overflow:hidden}
+  #legend .pn-body{padding:10px 13px 12px}
   .pn-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;background:rgba(255,255,255,.05);
     border:1px solid var(--stroke);border-radius:10px;padding:3px;margin-bottom:10px}
   .pn-tab{cursor:pointer;border:0;background:transparent;color:var(--txt-dim);border-radius:7px;
@@ -262,7 +262,7 @@ window.addEventListener('load',function(){
   .pn-pane{display:none}
   .pn-pane.is-on{display:block}
   /* Layer chips replace the old switch stack: same control, a third of the height. */
-  .lyr-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .lyr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
   .lyr{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:10.5px;color:#cfe3dc;
     border:1px solid var(--stroke);border-radius:9px;padding:7px 7px;background:rgba(255,255,255,.03);
     transition:.15s;text-align:left;font-family:inherit;line-height:1.2}
@@ -271,7 +271,9 @@ window.addEventListener('load',function(){
   .lyr .sw{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);flex:0 0 auto;transition:.15s}
   .lyr.is-on .sw{background:var(--accent);box-shadow:0 0 0 3px rgba(18,214,154,.18)}
   .lyr span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .leg-static{margin-top:11px;padding-top:10px;border-top:1px solid var(--stroke)}
+  .leg-static{margin-top:11px;padding-top:10px;border-top:1px solid var(--stroke);
+    display:grid;grid-template-columns:1fr 1fr;gap:0 16px;align-items:start}
+  .leg-static .lg-col{min-width:0}
   .leg-row{display:flex;align-items:center;gap:9px;font-size:11.5px;color:#cfe3dc;padding:3px 0}
   .leg-dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff;flex:0 0 auto;box-shadow:0 1px 4px rgba(0,0,0,.5)}
   .poi-row{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#cfe3dc;padding:2.5px 0;cursor:pointer}
@@ -288,7 +290,7 @@ window.addEventListener('load',function(){
     background:rgba(255,255,255,.04);color:var(--txt-dim);display:grid;place-items:center;font-size:13px;transition:.15s;
   }
   .collapse:hover{color:var(--txt);border-color:var(--accent)}
-  .panel.collapsed .body,.panel.collapsed .hd + .body{display:none}
+  .panel.collapsed .pn-body,.panel.collapsed .hd + .pn-body{display:none}
 
   /* ---------- Peak markers ---------- */
   .peak{display:flex;flex-direction:column;align-items:center;cursor:pointer;filter:drop-shadow(0 3px 6px rgba(0,0,0,.6))}
@@ -307,6 +309,16 @@ window.addEventListener('load',function(){
      overrode every popup's maxWidth/minWidth option -- Leaflet sized the content
      correctly and the box stayed at the capped width, so wide content spilled out. */
   .leaflet-popup{max-width:calc(100vw - 28px)}
+
+  /* Short desktop screens (a 1366x768 laptop leaves ~660px of viewport, and the
+     mobile sheet only kicks in by WIDTH) would put the layers box back on top of the
+     story. Drop the reference legend there and keep the toggles, which are the part
+     you actually operate; the same counts stay in the data panel. */
+  @media (min-width:821px) and (max-height:800px){
+    .leg-static{display:none}
+    #legend .pn-body{padding:9px 12px 10px}
+    .lyr{padding:6px 7px}
+  }
 
   /* ---------- Intro overlay ---------- */
   #intro{
@@ -368,7 +380,7 @@ window.addEventListener('load',function(){
       width:100%;max-width:100%;margin:0;border-radius:18px 18px 0 0;
       transform:translateY(118%);transition:transform .26s cubic-bezier(.2,.7,.2,1);
       z-index:14;max-height:66vh;display:block}
-    #story .body,#dash .body,#legend .body{max-height:calc(66vh - 52px);overflow:auto;-webkit-overflow-scrolling:touch}
+    #story .pn-body,#dash .pn-body,#legend .pn-body{max-height:calc(66vh - 52px);overflow:auto;-webkit-overflow-scrolling:touch}
     #story.sheet-open,#dash.sheet-open,#legend.sheet-open{transform:translateY(0)}
     .collapse{display:none}
     #mobilebar{display:flex}
@@ -411,7 +423,7 @@ window.addEventListener('load',function(){
 <!-- STORY -->
 <section id="story" class="panel">
   <div class="hd"><h2>📖 História interativa</h2><div class="collapse" data-target="story">–</div></div>
-  <div class="body">
+  <div class="pn-body">
     <div class="chap-eyebrow" id="chapEyebrow">Capítulo 1 de 6</div>
     <h3 id="chapTitle">Carregando…</h3>
     <p id="chapBody"></p>
@@ -426,7 +438,7 @@ window.addEventListener('load',function(){
 <!-- DASHBOARDS -->
 <section id="dash" class="panel">
   <div class="hd"><h2>📊 Painel de dados</h2><div class="collapse" data-target="dash">–</div></div>
-  <div class="body">
+  <div class="pn-body">
     <div class="pn-tabs" role="tablist">
       <button class="pn-tab is-on" role="tab" data-pane="resumo">Resumo</button>
       <button class="pn-tab" role="tab" data-pane="relevo">Relevo</button>
@@ -456,7 +468,7 @@ window.addEventListener('load',function(){
 <!-- LEGEND + CONTROLS -->
 <section id="legend" class="panel">
   <div class="hd"><h2>🗺️ Camadas</h2><div class="collapse" data-target="legend">–</div></div>
-  <div class="body">
+  <div class="pn-body">
     <div class="pn-tabs" role="tablist">
       <button class="pn-tab is-on" role="tab" data-pane="camadas">Camadas</button>
       <button class="pn-tab" role="tab" data-pane="escalada">Escalada</button>
@@ -1361,13 +1373,16 @@ function renderDash(){
   const eleP = PEAKS.filter(p=>p.elevation_m);
   const maxEl = Math.max(...eleP.map(p=>p.elevation_m));
   const massifs = [...new Set(PEAKS.map(p=>p.massif))];
+  // 'Serra do Mar (PR)' is the catch-all for peaks outside every named range, not a
+  // range itself: counting it made the panel claim one conjunto more than exists.
+  const conjuntos = massifs.filter(m => m !== 'Serra do Mar (PR)');
   const nPois = (POIS_GEO&&POIS_GEO.features)?POIS_GEO.features.length:0;
   const nVias = ROUTE_FEATURES.reduce((a,f)=>a+(f.properties.total||0),0);
   // metrics
   document.getElementById('metrics').innerHTML = `
     <div class="metric"><div class="v">${PEAKS.length}</div><div class="l">Cumes</div></div>
     <div class="metric"><div class="v">${maxEl}</div><div class="l">Máx (m)</div></div>
-    <div class="metric"><div class="v">${massifs.length}</div><div class="l">Regiões</div></div>
+    <div class="metric"><div class="v">${conjuntos.length}</div><div class="l">Conjuntos</div></div>
     <div class="metric"><div class="v">${nPois}</div><div class="l">POIs</div></div>
     <div class="metric"><div class="v">${nVias}</div><div class="l">Vias de escalada</div></div>
     <div class="metric"><div class="v">${ROUTE_FEATURES.length}</div><div class="l">Áreas de escalada</div></div>`;
@@ -1398,6 +1413,9 @@ function renderDash(){
 /* ============================================================
    LEGEND
    ============================================================ */
+function conjuntosCount(){
+  return new Set(PEAKS.map(p=>p.massif).filter(m=>m!=='Serra do Mar (PR)')).size;
+}
 function renderLegend(){
   const src=(OSM_TRAILS&&OSM_TRAILS.features)||[];
   const present = src.length ? new Set(src.map(f=>f.properties.kind)) : new Set(TRAILS.map(t=>t.kind));
@@ -1405,13 +1423,19 @@ function renderLegend(){
   const kinds=[{k:'trilha',c:'#ffd166',l:'Trilha'},{k:'estrada',c:'#ef476f',l:'Estrada (Graciosa)'},{k:'ferrovia',c:'#4ea8de',l:'Ferrovia (Serra Verde)'}]
     .filter(x=>present.has(x.k));
   const nParks = (PARKS_GEO&&PARKS_GEO.features)?PARKS_GEO.features.length:0;
+  // Two columns: the box grows sideways into free map instead of downwards into
+  // the story panel, and height is what makes those two collide.
   document.getElementById('legTrails').innerHTML =
-    `<div class="sub" style="margin:0 0 5px">Cumes por região &middot; ${PEAKS.length}</div>`+
-    `<div class="leg-row" style="color:#8aa;font-size:10px;margin:-2px 0 9px">Clique num cume ou local para detalhes</div>`+
-    `<div class="sub" style="margin:0 0 6px">Rotas${named?` &middot; ${named} reais (OSM)`:''}</div>` +
-    kinds.map(x=>`<div class="leg-row"><span class="leg-line" style="border-top-color:${x.c}"></span>${x.l}</div>`).join('') +
-    `<div class="sub" style="margin:9px 0 5px">Unidades de conservação${nParks?` &middot; ${nParks}`:''}</div>` +
-    `<div class="leg-row"><span class="leg-line" style="border-top-color:#2dd4bf;border-top-style:dashed"></span>Limite de parque / reserva</div>`;
+    `<div class="lg-col">`+
+      `<div class="sub" style="margin:0 0 6px">Rotas${named?` &middot; ${named} reais (OSM)`:''}</div>` +
+      kinds.map(x=>`<div class="leg-row"><span class="leg-line" style="border-top-color:${x.c}"></span>${x.l}</div>`).join('') +
+    `</div>`+
+    `<div class="lg-col">`+
+      `<div class="sub" style="margin:0 0 6px">Cumes &middot; ${PEAKS.length}</div>`+
+      `<div class="leg-row" style="color:#8aa;font-size:10px;line-height:1.45;padding:0;display:block">${conjuntosCount()} conjuntos nomeados.<br>Clique para os detalhes.</div>`+
+      `<div class="sub" style="margin:9px 0 5px">Unidades de conservação${nParks?` &middot; ${nParks}`:''}</div>` +
+      `<div class="leg-row"><span class="leg-line" style="border-top-color:#2dd4bf;border-top-style:dashed"></span>Limite de parque / reserva</div>`+
+    `</div>`;
 }
 function renderRouteLegend(){
   var el=document.getElementById('legRoutes');
