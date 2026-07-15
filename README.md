@@ -22,6 +22,7 @@ O mapa abre em **2D (Leaflet)** — leve, sem WebGL nem workers, renderiza de fo
 - **36 unidades de conservação** (limites) do OSM, como contorno tracejado com preenchimento sutil (clique para nome e área).
 - **440 vias de escalada** (322 vias + 118 boulders) em **11 montanhas**, vindas da planilha `Lista de Rotas de Escalada.xlsx`: Anhangava (com os boulders do Castelinhos), Morro do Canal, o maciço Marumbi (Abrolhos, Esfinge, Torre dos Sinos, Ponta do Tigre, Gigante, Olimpo) e o Ibitiraquire (Ferraria, Ibitirati, Itapiroca). Clique numa área para a lista completa, agrupada por setor, com grau, altura e ano de conquista. Marcador colorido pela faixa de dificuldade dominante.
 - **27 paredões / costões naturais** (`natural=cliff`) do OSM, como linha tracejada de contexto.
+- **Envio de GPX**: qualquer visitante arrasta um `.gpx` na aba GPX e vê a trilha e os pontos no mapa na hora, com distância calculada. Com o backend publicado (`gas/`), o arquivo vai para o Google Drive e volta para todo mundo depois de aprovado; sem backend, tudo continua funcionando só no navegador dele.
 - **Painel de dados**: barras de altitude dos cumes e distribuição por região (donut).
 - **História interativa** em 6 capítulos, com a câmera voando a cada tema (2D e 3D).
 - **Modo 3D (Cesium)**: terreno real ArcGIS + satélite Esri, com os 273 cumes posicionados sobre o relevo.
@@ -79,6 +80,21 @@ Ele produz dois arquivos:
 - `embed_atlas.py` · `embed_trails.py` · `make_logo.py` — injetores.
 - `peaks.geojson` · `pois.geojson` · `parks.geojson` · `serra_trails.geojson` · `crags.geojson` · `routes.geojson` · `routes.json` — dados curados (também embutidos no HTML).
 - `Lista de Rotas de Escalada.xlsx` — planilha-fonte das vias de escalada.
+- `gas/` — backend de contribuições GPX (Google Apps Script + clasp). Ver `gas/README.md`.
+
+## Painéis
+
+Os dois painéis flutuantes (`#legend` e `#dash`) usam abas, e cada aba cabe inteira: nenhum
+dos dois precisa de barra de rolagem, no desktop ou no celular. As camadas são chips de
+ligar/desligar num grid de duas colunas, com um único objeto de estado (`LAYER_ON`) governando
+os chips, as camadas do Leaflet e o espelho no Cesium, para 2D e 3D nunca discordarem sobre o
+que está ligado.
+
+> **Armadilha ao depurar layout aqui:** alguma extensão do Chrome injeta
+> `margin-bottom:180px` em qualquer elemento com `class="body"`, com origem USER. Ela não
+> aparece em `document.styleSheets` nem no fonte, infla os painéis em 182px e simula uma
+> sobreposição que não existe para os usuários. Antes de investigar altura de painel, anule:
+> `#story .body,#dash .body,#legend .body{margin-bottom:0 !important}`.
 
 ## Stack
 

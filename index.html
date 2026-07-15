@@ -110,6 +110,26 @@ window.addEventListener('load',function(){
   /* dashboard band bar */
   .bandbar{display:flex;height:9px;border-radius:5px;overflow:hidden;margin:2px 0 7px;background:rgba(255,255,255,.05)}
   .bandbar span{display:block;height:100%}
+  /* ---------- GPX contribution ---------- */
+  .gpx-drop{border:1.5px dashed var(--stroke-strong);border-radius:12px;padding:16px 12px;text-align:center;
+    cursor:pointer;transition:.15s;background:rgba(255,255,255,.02)}
+  .gpx-drop:hover,.gpx-drop.over{border-color:var(--accent);background:rgba(18,214,154,.08)}
+  .gpx-drop .gd-ico{font-size:22px;line-height:1}
+  .gpx-drop .gd-t{font-size:12px;font-weight:700;color:#eafff8;margin-top:6px}
+  .gpx-drop .gd-s{font-size:10px;color:var(--txt-dim);margin-top:3px;line-height:1.45}
+  .gpx-list{margin-top:9px;display:flex;flex-direction:column;gap:5px}
+  .gpx-item{display:flex;align-items:center;gap:7px;font-size:10.5px;color:#cfe3dc;
+    border:1px solid var(--stroke);border-radius:8px;padding:6px 8px;background:rgba(255,255,255,.03)}
+  .gpx-item .gi-n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+  .gpx-item .gi-n:hover{color:var(--accent)}
+  .gpx-item .gi-m{color:var(--txt-dim);font-size:9.5px;font-variant-numeric:tabular-nums;flex:0 0 auto}
+  .gpx-item .gi-st{font-size:9px;font-weight:800;padding:1px 5px;border-radius:20px;flex:0 0 auto;text-transform:uppercase;letter-spacing:.3px}
+  .gi-st.local{background:rgba(255,183,3,.18);color:#ffb703}
+  .gi-st.sent{background:rgba(18,214,154,.18);color:var(--accent)}
+  .gi-st.err{background:rgba(231,111,81,.18);color:#e76f51}
+  .gpx-note{font-size:9.5px;color:var(--txt-dim);margin-top:8px;line-height:1.5}
+  .gpx-bar{height:3px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:7px}
+  .gpx-bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
   .leaflet-popup-tip{background:var(--panel-solid);border:1px solid var(--stroke-strong)}
   .leaflet-popup-close-button{color:var(--txt-dim)!important;font-size:20px!important;width:26px!important;height:26px!important}
   .leaflet-container a.leaflet-popup-close-button:hover{color:#fff!important}
@@ -186,7 +206,8 @@ window.addEventListener('load',function(){
 
   /* ---------- Dashboards (right) ---------- */
   #dash{right:18px;top:74px;width:308px;max-width:calc(100vw - 36px);overflow:hidden}
-  #dash .body{padding:14px 16px 16px;max-height:min(62vh,560px);overflow:auto}
+  /* Tabbed like #legend: each pane fits, so the panel never needs a scrollbar. */
+  #dash .body{padding:12px 16px 14px}
   .metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px}
   .metric{background:rgba(255,255,255,.04);border:1px solid var(--stroke);border-radius:12px;padding:10px 8px;text-align:center}
   .metric .v{font-size:19px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
@@ -209,9 +230,28 @@ window.addEventListener('load',function(){
   .swatch{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
 
   /* ---------- Legend / controls (bottom-right) ---------- */
-  #legend{left:18px;bottom:18px;width:262px;max-width:calc(100vw - 36px);overflow:hidden}
-  #legend .body{padding:12px 15px 14px;max-height:min(42vh,360px);overflow:auto}
-  .leg-group+.leg-group{margin-top:12px;padding-top:12px;border-top:1px solid var(--stroke)}
+  /* Tabbed so every pane fits: the panel never scrolls, on desktop or mobile. */
+  #legend{left:18px;bottom:18px;width:288px;max-width:calc(100vw - 36px);overflow:hidden}
+  #legend .body{padding:10px 13px 12px}
+  .pn-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;background:rgba(255,255,255,.05);
+    border:1px solid var(--stroke);border-radius:10px;padding:3px;margin-bottom:10px}
+  .pn-tab{cursor:pointer;border:0;background:transparent;color:var(--txt-dim);border-radius:7px;
+    padding:6px 2px;font-size:10.5px;font-weight:700;letter-spacing:.2px;transition:.15s;font-family:inherit}
+  .pn-tab:hover{color:var(--txt)}
+  .pn-tab.is-on{background:var(--accent);color:#04231b}
+  .pn-pane{display:none}
+  .pn-pane.is-on{display:block}
+  /* Layer chips replace the old switch stack: same control, a third of the height. */
+  .lyr-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .lyr{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:10.5px;color:#cfe3dc;
+    border:1px solid var(--stroke);border-radius:9px;padding:7px 7px;background:rgba(255,255,255,.03);
+    transition:.15s;text-align:left;font-family:inherit;line-height:1.2}
+  .lyr:hover{border-color:var(--stroke-strong)}
+  .lyr.is-on{border-color:var(--accent);background:rgba(18,214,154,.10);color:#eafff8}
+  .lyr .sw{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.22);flex:0 0 auto;transition:.15s}
+  .lyr.is-on .sw{background:var(--accent);box-shadow:0 0 0 3px rgba(18,214,154,.18)}
+  .lyr span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .leg-static{margin-top:11px;padding-top:10px;border-top:1px solid var(--stroke)}
   .leg-row{display:flex;align-items:center;gap:9px;font-size:11.5px;color:#cfe3dc;padding:3px 0}
   .leg-dot{width:12px;height:12px;border-radius:50%;border:2px solid #fff;flex:0 0 auto;box-shadow:0 1px 4px rgba(0,0,0,.5)}
   .poi-row{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#cfe3dc;padding:2.5px 0;cursor:pointer}
@@ -219,13 +259,6 @@ window.addEventListener('load',function(){
   .poi-row .poi-l{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .poi-row .poi-n{color:#fff;font-variant-numeric:tabular-nums}
   .leg-line{width:20px;height:0;border-top-width:3px;border-top-style:solid;flex:0 0 auto}
-  .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;color:#dcebe5;padding:5px 0}
-  .switch{position:relative;width:38px;height:21px;flex:0 0 auto}
-  .switch input{opacity:0;width:0;height:0}
-  .slider{position:absolute;inset:0;background:rgba(255,255,255,.14);border-radius:999px;cursor:pointer;transition:.2s}
-  .slider:before{content:"";position:absolute;width:15px;height:15px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
-  .switch input:checked+.slider{background:var(--accent)}
-  .switch input:checked+.slider:before{transform:translateX(17px)}
   .range-row{display:flex;align-items:center;gap:9px;font-size:11.5px;color:#dcebe5;padding:6px 0}
   input[type=range]{flex:1;accent-color:var(--accent);height:3px}
 
@@ -282,7 +315,6 @@ window.addEventListener('load',function(){
   .poi-mk:hover{transform:scale(1.35)}
 
   /* ---------- 3D sub-controls ---------- */
-  .hint{font-size:10.5px;line-height:1.45;color:var(--txt-dim);margin:3px 0 7px}
   .range-row.disabled,.toggle.disabled{opacity:.4;pointer-events:none}
 
   /* ---------- Mobile bottom tab bar ---------- */
@@ -319,9 +351,6 @@ window.addEventListener('load',function(){
     #mobilebar{display:flex}
     /* larger touch targets */
     .btn{padding:11px 15px;font-size:13.5px}
-    .switch{width:46px;height:27px}
-    .slider:before{width:21px;height:21px}
-    .switch input:checked+.slider:before{transform:translateX(19px)}
     .poi-row{padding:7px 0}
     .poi-row input{width:18px;height:18px}
     .peak .pin{width:15px;height:15px}
@@ -375,45 +404,58 @@ window.addEventListener('load',function(){
 <section id="dash" class="panel">
   <div class="hd"><h2>📊 Painel de dados</h2><div class="collapse" data-target="dash">–</div></div>
   <div class="body">
-    <div class="metrics" id="metrics"></div>
-    <div class="sub">Silhueta dos cumes &middot; norte → sul (m)</div>
-    <svg id="ridge" class="ridge" viewBox="0 0 280 202" preserveAspectRatio="xMidYMid meet"
-         role="img" aria-label="Perfil de altitude dos cumes da Serra do Mar paranaense, de norte a sul"></svg>
-    <div class="sub" style="margin-top:16px">Distribuição por maciço</div>
-    <div class="donut-wrap">
-      <svg id="donut" width="104" height="104" viewBox="0 0 104 104"></svg>
-      <div class="donut-legend" id="donutLegend"></div>
+    <div class="pn-tabs" role="tablist">
+      <button class="pn-tab is-on" role="tab" data-pane="resumo">Resumo</button>
+      <button class="pn-tab" role="tab" data-pane="relevo">Relevo</button>
+      <button class="pn-tab" role="tab" data-pane="regioes">Regiões</button>
+    </div>
+
+    <div class="pn-pane is-on" id="pane-resumo" role="tabpanel">
+      <div class="metrics" id="metrics"></div>
+    </div>
+
+    <div class="pn-pane" id="pane-relevo" role="tabpanel">
+      <div class="sub">Silhueta dos cumes &middot; norte → sul (m)</div>
+      <svg id="ridge" class="ridge" viewBox="0 0 280 202" preserveAspectRatio="xMidYMid meet"
+           role="img" aria-label="Perfil de altitude dos cumes da Serra do Mar paranaense, de norte a sul"></svg>
+    </div>
+
+    <div class="pn-pane" id="pane-regioes" role="tabpanel">
+      <div class="sub">Distribuição por maciço</div>
+      <div class="donut-wrap">
+        <svg id="donut" width="104" height="104" viewBox="0 0 104 104"></svg>
+        <div class="donut-legend" id="donutLegend"></div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- LEGEND + CONTROLS -->
 <section id="legend" class="panel">
-  <div class="hd"><h2>🗺️ Legenda &amp; camadas</h2><div class="collapse" data-target="legend">–</div></div>
+  <div class="hd"><h2>🗺️ Camadas</h2><div class="collapse" data-target="legend">–</div></div>
   <div class="body">
-    <div class="leg-group" id="legTrails"></div>
-    <div class="leg-group" id="legRoutes"></div>
-    <div class="leg-group" id="legPois"></div>
-    <div class="leg-group">
-      <div class="toggle">Escalada (vias)
-        <label class="switch"><input type="checkbox" id="tgRoutes" checked><span class="slider"></span></label>
-      </div>
-      <div class="toggle">Paredões (OSM)
-        <label class="switch"><input type="checkbox" id="tgCrags" checked><span class="slider"></span></label>
-      </div>
-      <div class="toggle">Trilhas &amp; rotas
-        <label class="switch"><input type="checkbox" id="tgTrails" checked><span class="slider"></span></label>
-      </div>
-      <div class="toggle">Locais de interesse
-        <label class="switch"><input type="checkbox" id="tgPois" checked><span class="slider"></span></label>
-      </div>
-      <div class="toggle">Unidades de conservação
-        <label class="switch"><input type="checkbox" id="tgParks" checked><span class="slider"></span></label>
-      </div>
-      <div class="toggle">Rótulos (cidades)
-        <label class="switch"><input type="checkbox" id="tgLabels"><span class="slider"></span></label>
-      </div>
-      <div class="hint">Clique num cume, trilha ou local para ver os detalhes. Use os controles + / − ou o gesto de pinça para aproximar.</div>
+    <div class="pn-tabs" role="tablist">
+      <button class="pn-tab is-on" role="tab" data-pane="camadas">Camadas</button>
+      <button class="pn-tab" role="tab" data-pane="escalada">Escalada</button>
+      <button class="pn-tab" role="tab" data-pane="locais">Locais</button>
+      <button class="pn-tab" role="tab" data-pane="gpx">GPX</button>
+    </div>
+
+    <div class="pn-pane is-on" id="pane-camadas" role="tabpanel">
+      <div class="lyr-grid" id="lyrGrid"></div>
+      <div class="leg-static" id="legTrails"></div>
+    </div>
+
+    <div class="pn-pane" id="pane-escalada" role="tabpanel">
+      <div id="legRoutes"></div>
+    </div>
+
+    <div class="pn-pane" id="pane-locais" role="tabpanel">
+      <div id="legPois"></div>
+    </div>
+
+    <div class="pn-pane" id="pane-gpx" role="tabpanel">
+      <div id="gpxUi"></div>
     </div>
   </div>
 </section>
@@ -740,13 +782,233 @@ const cragsLayer = L.geoJSON(CRAGS_GEO, {
   }
 });
 
-// Draw order: parks (bottom) -> cliffs -> trails -> POIs -> peaks -> climbing (top)
+/* ============================================================
+   GPX CONTRIBUTIONS
+   A visitor drops a .gpx, it is parsed and drawn immediately (no round-trip),
+   then shipped to a Google Apps Script Web App that files it in Drive. Contributions
+   already in Drive are fetched on load. With no endpoint configured the whole
+   feature still works locally, it just keeps everything in this browser.
+   ============================================================ */
+const GPX_ENDPOINT = '';   // <- Apps Script Web App /exec URL (see gas/README.md)
+const GPX_COLORS = ['#4cc9f0','#f72585','#b5179e','#4895ef','#ffd166','#06d6a0','#ef476f'];
+const gpxLayer = L.layerGroup();
+let gpxEntries = [];       // {id, name, tracks, waypoints, km, status, color, layers[]}
+
+function haversineKm(a, b){
+  var R=6371, dLat=(b[0]-a[0])*Math.PI/180, dLon=(b[1]-a[1])*Math.PI/180;
+  var la1=a[0]*Math.PI/180, la2=b[0]*Math.PI/180;
+  var h=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.sin(dLon/2)*Math.sin(dLon/2)*Math.cos(la1)*Math.cos(la2);
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+
+/* GPX 1.1: tracks (trk/trkseg/trkpt), routes (rte/rtept) and waypoints (wpt). */
+function parseGPX(text, fallbackName){
+  var doc = new DOMParser().parseFromString(text, 'application/xml');
+  if(doc.querySelector('parsererror')) throw new Error('XML inválido');
+  if(!doc.querySelector('gpx')) throw new Error('não parece um arquivo GPX');
+  var pts = function(nodes){
+    return Array.prototype.map.call(nodes, function(p){
+      var la=parseFloat(p.getAttribute('lat')), lo=parseFloat(p.getAttribute('lon'));
+      return (isFinite(la)&&isFinite(lo)) ? [la,lo] : null;
+    }).filter(Boolean);
+  };
+  var tracks = [];
+  Array.prototype.forEach.call(doc.querySelectorAll('trk'), function(trk){
+    Array.prototype.forEach.call(trk.querySelectorAll('trkseg'), function(seg){
+      var p = pts(seg.querySelectorAll('trkpt'));
+      if(p.length>1) tracks.push(p);
+    });
+  });
+  Array.prototype.forEach.call(doc.querySelectorAll('rte'), function(rte){
+    var p = pts(rte.querySelectorAll('rtept'));
+    if(p.length>1) tracks.push(p);
+  });
+  var waypoints = Array.prototype.map.call(doc.querySelectorAll('wpt'), function(w){
+    var la=parseFloat(w.getAttribute('lat')), lo=parseFloat(w.getAttribute('lon'));
+    if(!isFinite(la)||!isFinite(lo)) return null;
+    var nm=w.querySelector('name'), el=w.querySelector('ele');
+    return {lat:la, lon:lo, name:nm?nm.textContent.trim():'', ele:el?Math.round(parseFloat(el.textContent)):null};
+  }).filter(Boolean);
+  if(!tracks.length && !waypoints.length) throw new Error('sem trilhas nem pontos');
+  var mName = doc.querySelector('metadata > name') || doc.querySelector('trk > name');
+  var km = 0;
+  tracks.forEach(function(t){ for(var i=1;i<t.length;i++) km += haversineKm(t[i-1], t[i]); });
+  return { name: (mName && mName.textContent.trim()) || fallbackName || 'Sem nome',
+           tracks: tracks, waypoints: waypoints, km: Math.round(km*10)/10 };
+}
+
+function drawGpx(entry){
+  entry.layers = [];
+  entry.tracks.forEach(function(t){
+    // Dark casing under a solid line: contributed tracks have to read over satellite
+    // imagery and stay distinct from the dashed cyan park boundaries.
+    var casing = L.polyline(t, {color:'#08120f', weight:6, opacity:.55, lineCap:'round', lineJoin:'round', interactive:false});
+    var pl = L.polyline(t, {color:entry.color, weight:3, opacity:1, lineCap:'round', lineJoin:'round'});
+    pl.bindPopup('<h3>📍 '+esc(entry.name)+'</h3><div class="pk-meta">Trilha enviada · '+entry.km+' km</div>', popupOpts({maxWidth:250}));
+    gpxLayer.addLayer(casing); gpxLayer.addLayer(pl);
+    entry.layers.push(casing, pl);
+  });
+  entry.waypoints.forEach(function(w){
+    var cm = L.circleMarker([w.lat,w.lon], {radius:5, color:'#0a1a12', weight:1.4, fillColor:entry.color, fillOpacity:.95});
+    cm.bindPopup('<h3>📍 '+esc(w.name||'Ponto')+'</h3><div class="pk-meta">'+esc(entry.name)+
+      (w.ele?' · ▲ '+w.ele+' m':'')+'</div>', popupOpts({maxWidth:230}));
+    if(w.name) cm.bindTooltip('📍 '+w.name, {direction:'top', className:'poi-tt'});
+    gpxLayer.addLayer(cm); entry.layers.push(cm);
+  });
+}
+
+function gpxBounds(entry){
+  var all=[];
+  entry.tracks.forEach(function(t){ all=all.concat(t); });
+  entry.waypoints.forEach(function(w){ all.push([w.lat,w.lon]); });
+  return all.length ? L.latLngBounds(all) : null;
+}
+function zoomToGpx(entry){
+  var b=gpxBounds(entry);
+  if(!b) return;
+  var wide=window.innerWidth>820;
+  map.fitBounds(b, {padding: wide?[340,80]:[24,24], maxZoom:15});
+}
+
+function renderGpxUi(){
+  var el=document.getElementById('gpxUi');
+  var sent = gpxEntries.filter(function(e){ return e.status==='sent'; }).length;
+  el.innerHTML =
+    '<div class="gpx-drop" id="gpxDrop" tabindex="0" role="button">'+
+      '<div class="gd-ico">🗺️</div>'+
+      '<div class="gd-t">Enviar um GPX</div>'+
+      '<div class="gd-s">Arraste aqui ou clique para escolher.<br>Trilhas e pontos aparecem no mapa na hora.</div>'+
+    '</div>'+
+    '<input type="file" id="gpxInput" accept=".gpx,application/gpx+xml" multiple hidden>'+
+    '<div class="gpx-bar" id="gpxBar" style="display:none"><i></i></div>'+
+    '<div class="gpx-list" id="gpxList">'+
+      (gpxEntries.length ? gpxEntries.map(function(e,i){
+        var st = e.status==='sent'?'<span class="gi-st sent">no drive</span>'
+               : e.status==='error'?'<span class="gi-st err" title="'+esc(e.error||'')+'">local</span>'
+               : e.status==='sending'?'<span class="gi-st local">enviando</span>'
+               : '<span class="gi-st local">local</span>';
+        return '<div class="gpx-item"><i class="sw" style="width:8px;height:8px;border-radius:50%;background:'+e.color+';flex:0 0 auto"></i>'+
+          '<span class="gi-n" data-i="'+i+'" title="Centralizar no mapa">'+esc(e.name)+'</span>'+
+          '<span class="gi-m">'+(e.km?e.km+' km':(e.waypoints.length+' pts'))+'</span>'+st+'</div>';
+      }).join('') : '')+
+    '</div>'+
+    '<div class="gpx-note">'+
+      (GPX_ENDPOINT
+        ? 'Os arquivos vão para o Google Drive do projeto e voltam para todo mundo no próximo acesso. '+(sent?sent+' enviado(s) nesta sessão. ':'')
+        : 'Sem servidor configurado: os arquivos ficam só neste navegador e não são compartilhados. ')+
+      'Formato GPX 1.0/1.1, até 8 MB.</div>';
+
+  var drop=document.getElementById('gpxDrop'), input=document.getElementById('gpxInput');
+  drop.onclick=function(){ input.click(); };
+  drop.onkeydown=function(ev){ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); input.click(); } };
+  input.onchange=function(){ handleGpxFiles(input.files); input.value=''; };
+  ['dragenter','dragover'].forEach(function(t){ drop.addEventListener(t, function(ev){
+    ev.preventDefault(); ev.stopPropagation(); drop.classList.add('over'); }); });
+  ['dragleave','drop'].forEach(function(t){ drop.addEventListener(t, function(ev){
+    ev.preventDefault(); ev.stopPropagation(); drop.classList.remove('over'); }); });
+  drop.addEventListener('drop', function(ev){ handleGpxFiles(ev.dataTransfer.files); });
+  el.querySelectorAll('.gi-n').forEach(function(n){
+    n.onclick=function(){ zoomToGpx(gpxEntries[+n.dataset.i]); };
+  });
+}
+
+const GPX_MAX = 8*1024*1024;
+async function handleGpxFiles(files){
+  var list = Array.prototype.slice.call(files||[]);
+  for (var i=0;i<list.length;i++){
+    var file = list[i];
+    if(!/\.gpx$/i.test(file.name)){ flashToast('“'+file.name+'” não é um .gpx'); continue; }
+    if(file.size > GPX_MAX){ flashToast('“'+file.name+'” passa de 8 MB'); continue; }
+    var text;
+    try { text = await file.text(); } catch(err){ flashToast('Não consegui ler o arquivo'); continue; }
+    var parsed;
+    try { parsed = parseGPX(text, file.name.replace(/\.gpx$/i,'')); }
+    catch(err){ flashToast('“'+file.name+'”: '+err.message); continue; }
+
+    var entry = Object.assign({}, parsed, {
+      id: 'local-'+Date.now()+'-'+i,
+      color: GPX_COLORS[gpxEntries.length % GPX_COLORS.length],
+      status: GPX_ENDPOINT ? 'sending' : 'local'
+    });
+    gpxEntries.push(entry);
+    drawGpx(entry);                 // draw first: the map reacts before the network does
+    if(!LAYER_ON.gpx){ LAYER_ON.gpx=true; applyLayer('gpx'); renderLayerChips(); }
+    zoomToGpx(entry);
+    renderGpxUi();
+    addGpxToCesium(entry);
+    flashToast('“'+entry.name+'” no mapa · '+(entry.km?entry.km+' km':entry.waypoints.length+' pontos'));
+    if(GPX_ENDPOINT) sendGpx(entry, text, file.name);
+  }
+}
+
+async function sendGpx(entry, text, filename){
+  var bar=document.getElementById('gpxBar');
+  if(bar){ bar.style.display='block'; bar.firstChild.style.width='35%'; }
+  try{
+    // text/plain keeps this a CORS "simple request": Apps Script does not answer preflight.
+    var res = await fetch(GPX_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({filename:filename, name:entry.name, km:entry.km,
+        tracks:entry.tracks.length, waypoints:entry.waypoints.length, gpx:text})
+    });
+    var out = await res.json();
+    if(!out || !out.ok) throw new Error((out&&out.error)||'resposta inesperada');
+    entry.status='sent'; entry.id=out.id||entry.id;
+  }catch(err){
+    entry.status='error'; entry.error=String(err.message||err);
+    flashToast('“'+entry.name+'” ficou só neste navegador: '+entry.error);
+  }
+  if(bar){ bar.firstChild.style.width='100%'; setTimeout(function(){ bar.style.display='none'; bar.firstChild.style.width='0'; }, 500); }
+  renderGpxUi();
+}
+
+async function loadRemoteGpx(){
+  if(!GPX_ENDPOINT) return;
+  try{
+    var res = await fetch(GPX_ENDPOINT+'?action=list');
+    var out = await res.json();
+    (out.items||[]).forEach(function(it){
+      var parsed;
+      try { parsed = parseGPX(it.gpx, it.name); } catch(e){ return; }
+      var entry = Object.assign({}, parsed, {id:it.id, color:GPX_COLORS[gpxEntries.length % GPX_COLORS.length], status:'sent'});
+      gpxEntries.push(entry); drawGpx(entry); addGpxToCesium(entry);
+    });
+    if(out.items && out.items.length) renderGpxUi();
+  }catch(err){ /* the atlas must not depend on the contribution backend */ }
+}
+
+function addGpxToCesium(entry){
+  if(!cesiumViewer) return;
+  var col = Cesium.Color.fromCssColorString(entry.color);
+  entry.tracks.forEach(function(t){
+    var flat=[]; t.forEach(function(p){ flat.push(p[1], p[0]); });
+    if(flat.length<4) return;
+    var e = cesiumViewer.entities.add({ name:entry.name,
+      polyline:{ positions:Cesium.Cartesian3.fromDegreesArray(flat), width:3,
+        material:col, clampToGround:true } });
+    e.ttHtml='<b>📍 '+entry.name+'</b><br>Trilha enviada · '+entry.km+' km';
+    e.show = LAYER_ON.gpx; cesiumGpxEnts.push(e);
+  });
+  entry.waypoints.forEach(function(w){
+    var e = cesiumViewer.entities.add({ name:w.name||entry.name,
+      position:Cesium.Cartesian3.fromDegrees(w.lon, w.lat),
+      point:{ pixelSize:9, color:col, outlineColor:Cesium.Color.fromCssColorString('#0a1a12'), outlineWidth:1.5,
+        heightReference:Cesium.HeightReference.CLAMP_TO_GROUND,
+        disableDepthTestDistance:Number.POSITIVE_INFINITY } });
+    e.ttHtml='<b>📍 '+(w.name||'Ponto')+'</b><br>'+entry.name;
+    e.show = LAYER_ON.gpx; cesiumGpxEnts.push(e);
+  });
+  cesiumViewer.scene.requestRender();
+}
+
+// Draw order: parks (bottom) -> cliffs -> trails -> POIs -> peaks -> climbing -> GPX (top)
 parksLayer.addTo(map);
 cragsLayer.addTo(map);
 trailsLayer.addTo(map);
 poiLayer.addTo(map);
 peaksLayer.addTo(map);
 routesLayer.addTo(map);
+gpxLayer.addTo(map);
 refreshPoiMarkers();
 map.on('zoomend', refreshPoiMarkers);
 hideLoading();
@@ -963,14 +1225,63 @@ function renderPoiLegend(){
   });
 }
 
-/* --------- Layer toggles (Leaflet add/remove) --------- */
+/* --------- Layer toggles (chips -> Leaflet add/remove) ---------
+   One state object drives the chips, the Leaflet layers and the Cesium mirror,
+   so 2D and 3D can never disagree about what is switched on. */
 function toggleLayer(layer, on){ if(on){ if(!map.hasLayer(layer)) layer.addTo(map); } else if(map.hasLayer(layer)){ map.removeLayer(layer); } }
-document.getElementById('tgRoutes').onchange=function(e){ toggleLayer(routesLayer, e.target.checked); refreshCesiumLayers(); };
-document.getElementById('tgCrags').onchange=function(e){ toggleLayer(cragsLayer, e.target.checked); refreshCesiumLayers(); };
-document.getElementById('tgTrails').onchange=function(e){ toggleLayer(trailsLayer, e.target.checked); refreshCesiumLayers(); };
-document.getElementById('tgParks').onchange=function(e){ toggleLayer(parksLayer, e.target.checked); refreshCesiumLayers(); };
-document.getElementById('tgPois').onchange=function(e){ poiVisible=e.target.checked; refreshPoiMarkers(); refreshCesiumLayers(); };
-document.getElementById('tgLabels').onchange=function(e){ toggleLayer(labelLayer, e.target.checked); };
+
+const LAYER_SPEC = [
+  {k:'routes', l:'Escalada',  on:true},
+  {k:'crags',  l:'Paredões',  on:true},
+  {k:'trails', l:'Trilhas',   on:true},
+  {k:'pois',   l:'Locais',    on:true},
+  {k:'parks',  l:'Unid. cons.', on:true},
+  {k:'labels', l:'Rótulos',   on:false},
+  {k:'gpx',    l:'GPX enviados', on:true}
+];
+const LAYER_ON = {};
+LAYER_SPEC.forEach(function(s){ LAYER_ON[s.k]=s.on; });
+
+function applyLayer(k){
+  var on = LAYER_ON[k];
+  if(k==='routes') toggleLayer(routesLayer, on);
+  else if(k==='crags')  toggleLayer(cragsLayer, on);
+  else if(k==='trails') toggleLayer(trailsLayer, on);
+  else if(k==='parks')  toggleLayer(parksLayer, on);
+  else if(k==='labels') toggleLayer(labelLayer, on);
+  else if(k==='gpx')    toggleLayer(gpxLayer, on);
+  else if(k==='pois'){ poiVisible=on; refreshPoiMarkers(); }
+  refreshCesiumLayers();
+}
+function renderLayerChips(){
+  var g=document.getElementById('lyrGrid');
+  g.innerHTML = LAYER_SPEC.map(function(s){
+    return '<button class="lyr'+(LAYER_ON[s.k]?' is-on':'')+'" data-k="'+s.k+'" role="switch" '+
+           'aria-checked="'+(LAYER_ON[s.k]?'true':'false')+'"><i class="sw"></i><span>'+s.l+'</span></button>';
+  }).join('');
+  g.querySelectorAll('.lyr').forEach(function(b){
+    b.onclick=function(){
+      var k=b.dataset.k;
+      LAYER_ON[k]=!LAYER_ON[k];
+      b.classList.toggle('is-on', LAYER_ON[k]);
+      b.setAttribute('aria-checked', LAYER_ON[k]?'true':'false');
+      applyLayer(k);
+    };
+  });
+}
+/* Panel tabs. Scoped to one panel: #legend and #dash each own a tab set, and a
+   global querySelectorAll would let a click in one panel blank the other. */
+function initPanelTabs(rootId){
+  var root=document.getElementById(rootId);
+  var tabs=root.querySelectorAll('.pn-tab');
+  var panes=root.querySelectorAll('.pn-pane');
+  tabs.forEach(function(t){
+    t.onclick=function(){
+      tabs.forEach(function(x){ x.classList.toggle('is-on', x===t); });
+      panes.forEach(function(p){ p.classList.toggle('is-on', p.id==='pane-'+t.dataset.pane); });
+    };
+  });
+}
 
 document.querySelectorAll('.collapse').forEach(function(c){ c.onclick=function(){
   var p=document.getElementById(c.dataset.target);
@@ -986,21 +1297,17 @@ document.querySelectorAll('.collapse').forEach(function(c){ c.onclick=function()
 const CESIUM_VER = '1.124';
 let cesiumViewer=null, cesiumReady=false, cesiumLoading=false;
 let cesiumTrailEnts=[], cesiumPoiEnts=[], cesiumParkEnts=[];
-let cesiumRouteEnts=[], cesiumCragEnts=[];
+let cesiumRouteEnts=[], cesiumCragEnts=[], cesiumGpxEnts=[];
 
 /* Mirror the 2D layer toggles onto the Cesium entities (safe when 3D is off). */
 function refreshCesiumLayers(){
   if(!cesiumViewer) return;
-  var trailsOn=document.getElementById('tgTrails').checked;
-  var parksOn=document.getElementById('tgParks').checked;
-  var poisOn=document.getElementById('tgPois').checked;
-  var routesOn=document.getElementById('tgRoutes').checked;
-  var cragsOn=document.getElementById('tgCrags').checked;
-  cesiumTrailEnts.forEach(function(e){ e.show=trailsOn; });
-  cesiumParkEnts.forEach(function(e){ e.show=parksOn; });
-  cesiumPoiEnts.forEach(function(e){ e.show=poisOn && poiOn.has(e._cat); });
-  cesiumRouteEnts.forEach(function(e){ e.show=routesOn; });
-  cesiumCragEnts.forEach(function(e){ e.show=cragsOn; });
+  cesiumTrailEnts.forEach(function(e){ e.show=LAYER_ON.trails; });
+  cesiumParkEnts.forEach(function(e){ e.show=LAYER_ON.parks; });
+  cesiumPoiEnts.forEach(function(e){ e.show=LAYER_ON.pois && poiOn.has(e._cat); });
+  cesiumRouteEnts.forEach(function(e){ e.show=LAYER_ON.routes; });
+  cesiumCragEnts.forEach(function(e){ e.show=LAYER_ON.crags; });
+  cesiumGpxEnts.forEach(function(e){ e.show=LAYER_ON.gpx; });
   cesiumViewer.scene.requestRender();
 }
 
@@ -1149,6 +1456,10 @@ async function initCesium(){
     cesiumRouteEnts.push(e);
   });
 
+  // Anything the visitor already dropped before opening 3D
+  cesiumViewer = viewer;
+  gpxEntries.forEach(addGpxToCesium);
+
   // Hover (desktop) + tap (mobile) tooltips for every layer
   var ctt = document.getElementById('ctooltip');
   function showCtt(html,x,y){ ctt.innerHTML=html; ctt.style.left=Math.min(x+14, window.innerWidth-200)+'px'; ctt.style.top=(y+16)+'px'; ctt.classList.add('show'); }
@@ -1233,7 +1544,9 @@ function boot(){
   document.getElementById('isPeaks').textContent=PEAKS.length;
   const nTrails=(OSM_TRAILS&&OSM_TRAILS.features)?OSM_TRAILS.features.filter(f=>f.properties.name).length:TRAILS.length;
   document.getElementById('isTrails').textContent=nTrails;
-  buildDots(); renderChapter(0); renderDash(); renderLegend(); renderRouteLegend(); renderPoiLegend(); initMobile();
+  buildDots(); renderChapter(0); renderDash(); renderLegend(); renderRouteLegend(); renderPoiLegend();
+  renderLayerChips(); initPanelTabs('legend'); initPanelTabs('dash'); renderGpxUi(); initMobile();
+  loadRemoteGpx();
 }
 document.getElementById('startBtn').onclick=()=>{
   document.getElementById('intro').classList.add('hidden');

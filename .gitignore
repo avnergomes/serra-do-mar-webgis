@@ -12,3 +12,7 @@ __pycache__/
 
 # Local working notes / session logs
 notes/
+
+# clasp: account-specific, created by `clasp create-script` (see gas/README.md)
+gas/.clasp.json
+.clasprc.json
