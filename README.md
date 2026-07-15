@@ -18,6 +18,7 @@ O mapa abre em **2D (Leaflet)** — leve, sem WebGL nem workers, renderiza de fo
 
 - **273 cumes nomeados** da Serra do Mar paranaense (Pico Paraná 1.877 m, Caratuva, Ibitirati, o maciço Marumbi, Anhangava-Baitaca, Serra do Canal, Serra da Prata, Morro dos Perdidos, Serra da Igreja), coloridos por região e rotulados por altitude (cumes emblemáticos com rótulo fixo; demais ao passar o mouse ou tocar).
 - **75 trilhas e rotas reais** + segmentos, geometria do **OpenStreetMap**: travessia do Ibitiraquire, vias Frontal/Noroeste/Rochedinho do Marumbi, Caminho do Itupava, Estrada da Graciosa e a ferrovia Curitiba-Paranaguá (Serra Verde Express). Clique numa rota para nome e distância.
+- **Perfil de elevação ao clicar num caminho**: a trilha clicada é destacada e o popup traz o perfil (altitude máxima, mínima, D+ e D−), com o ponto exato do clique marcado. Passar o mouse pelo perfil mostra a altitude e a distância naquele ponto, e um marcador acompanha no mapa. Vale para as trilhas do OSM e para os GPX enviados.
 - **462 locais de interesse** (POIs) do OSM, com toggles por categoria: refúgios/abrigos, inícios de trilha, estacionamentos, mirantes, pontos de água, cachoeiras e campings.
 - **36 unidades de conservação** (limites) do OSM, como contorno tracejado com preenchimento sutil (clique para nome e área).
 - **440 vias de escalada** (322 vias + 118 boulders) em **11 montanhas**, vindas da planilha `Lista de Rotas de Escalada.xlsx`: Anhangava (com os boulders do Castelinhos), Morro do Canal, o maciço Marumbi (Abrolhos, Esfinge, Torre dos Sinos, Ponta do Tigre, Gigante, Olimpo) e o Ibitiraquire (Ferraria, Ibitirati, Itapiroca). Clique numa área para a lista completa, agrupada por setor, com grau, altura e ano de conquista. Marcador colorido pela faixa de dificuldade dominante.
@@ -35,6 +36,7 @@ O mapa abre em **2D (Leaflet)** — leve, sem WebGL nem workers, renderiza de fo
 | Imagem de satélite (2D e 3D) | Esri World Imagery (Maxar, Earthstar) | ToS Esri (uso leve / atribuição) |
 | Terreno 3D (modo Cesium) | ArcGIS World Elevation 3D (Terrain3D) | ToS Esri, sem chave |
 | Cumes, trilhas, POIs, parques, paredões | © OpenStreetMap contributors (Overpass) | ODbL |
+| Altitude das trilhas (perfil) | SRTM 30m via OpenTopoData | CC BY 4.0 (NASA/USGS) |
 | Cumes (enriquecimento) | Wikidata | CC0 |
 | Vias de escalada | `Lista de Rotas de Escalada.xlsx` (compilação da comunidade) | uso interno do projeto |
 | Motor 2D | Leaflet 1.9.4 | BSD |
@@ -50,6 +52,7 @@ py -3 fetch_pois.py         # POIs (refúgios, água, mirantes, etc.) -> pois.ge
 py -3 fetch_parks.py        # unidades de conservação (OSM protected_area) -> parks.geojson
 py -3 fetch_osm_trails.py   # trilhas/estradas/ferrovia (Overpass) -> serra_trails.geojson
 py -3 fetch_crags.py        # paredões naturais (OSM natural=cliff) -> crags.geojson
+py -3 fetch_elevation.py    # altitude (SRTM 30m) -> grava Z em serra_trails.geojson
 py -3 parse_routes.py       # vias da planilha -> routes.geojson (mapa) + routes.json (completo)
 py -3 embed_atlas.py        # injeta peaks + pois + parks + routes + crags no index.html
 py -3 embed_trails.py       # injeta serra_trails.geojson no index.html
@@ -75,7 +78,7 @@ Ele produz dois arquivos:
 
 - `index.html` — a aplicação completa (todos os dados embutidos).
 - `vendor/leaflet.js` · `vendor/leaflet.css` · `vendor/images/` — Leaflet auto-hospedado (motor 2D).
-- `fetch_peaks.py` · `fetch_pois.py` · `fetch_parks.py` · `fetch_osm_trails.py` · `fetch_crags.py` — coletores OSM/Wikidata.
+- `fetch_peaks.py` · `fetch_pois.py` · `fetch_parks.py` · `fetch_osm_trails.py` · `fetch_crags.py` · `fetch_elevation.py` — coletores OSM/Wikidata/SRTM.
 - `parse_routes.py` — parser da planilha de escalada.
 - `embed_atlas.py` · `embed_trails.py` · `make_logo.py` — injetores.
 - `peaks.geojson` · `pois.geojson` · `parks.geojson` · `serra_trails.geojson` · `crags.geojson` · `routes.geojson` · `routes.json` — dados curados (também embutidos no HTML).
