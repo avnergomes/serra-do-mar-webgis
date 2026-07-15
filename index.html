@@ -789,7 +789,7 @@ const cragsLayer = L.geoJSON(CRAGS_GEO, {
    already in Drive are fetched on load. With no endpoint configured the whole
    feature still works locally, it just keeps everything in this browser.
    ============================================================ */
-const GPX_ENDPOINT = '';   // <- Apps Script Web App /exec URL (see gas/README.md)
+const GPX_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwQnG0C-T4NmkHYnIIevbGXz9BB3rz0F2G6A42oFvbEDS3YaU9BuBrhKKTCcAYpPsre/exec';   // Apps Script Web App (see gas/README.md)
 const GPX_COLORS = ['#4cc9f0','#f72585','#b5179e','#4895ef','#ffd166','#06d6a0','#ef476f'];
 const gpxLayer = L.layerGroup();
 let gpxEntries = [];       // {id, name, tracks, waypoints, km, status, color, layers[]}
