@@ -224,12 +224,14 @@ window.addEventListener('load',function(){
   .panel .hd{padding:13px 16px 10px;border-bottom:1px solid var(--stroke)}
 
   /* ---------- Story panel (left) ---------- */
-  #story{left:18px;top:74px;width:300px;max-width:calc(100vw - 36px);overflow:hidden}
-  #story .pn-body{padding:16px;max-height:min(30vh,244px);overflow:auto}
+  #story{left:18px;top:74px;width:420px;max-width:calc(100vw - 36px);overflow:hidden}
+  /* No scrollbar on a desktop screen: 400px clears the tallest chapter (393px at this
+     width), and the calc stops the panel from ever reaching the layers box below it. */
+  #story .pn-body{padding:16px;max-height:min(400px, calc(100vh - 529px));overflow:auto}
   .chap-eyebrow{font-size:11px;letter-spacing:.5px;color:var(--accent);font-weight:650;text-transform:uppercase}
   #chapTitle{margin:6px 0 8px;font-size:19px;font-weight:750;line-height:1.25}
   #chapBody{margin:0;font-size:13.5px;line-height:1.62;color:#dcebe5}
-  .chap-nav{display:flex;align-items:center;gap:10px;margin-top:16px}
+  .chap-nav{display:flex;align-items:center;gap:10px 8px;margin-top:16px;flex-wrap:wrap}
   .btn{
     cursor:pointer;border:1px solid var(--stroke-strong);background:rgba(18,214,154,.08);
     color:var(--txt);border-radius:10px;padding:8px 12px;font-size:12.5px;font-weight:600;
@@ -239,7 +241,7 @@ window.addEventListener('load',function(){
   .btn.primary{background:var(--accent);color:#04231b;border-color:var(--accent)}
   .btn.primary:hover{background:var(--accent-2)}
   .btn[disabled]{opacity:.35;cursor:not-allowed}
-  .dots{display:flex;gap:6px;margin-left:auto}
+  .dots{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
   .dot{width:8px;height:8px;border-radius:50%;background:rgba(200,230,220,.25);cursor:pointer;transition:.15s}
   .dot.active{background:var(--accent);transform:scale(1.25)}
   .counter{font-size:11.5px;color:var(--txt-dim);font-variant-numeric:tabular-nums}
@@ -271,7 +273,7 @@ window.addEventListener('load',function(){
 
   /* ---------- Legend / controls (bottom-right) ---------- */
   /* Tabbed so every pane fits: the panel never scrolls, on desktop or mobile. */
-  #legend{left:18px;bottom:18px;width:400px;max-width:calc(100vw - 36px);overflow:hidden}
+  #legend{left:18px;bottom:18px;width:420px;max-width:calc(100vw - 36px);overflow:hidden}
   #legend .pn-body{padding:10px 13px 12px}
   .pn-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;background:rgba(255,255,255,.05);
     border:1px solid var(--stroke);border-radius:10px;padding:3px;margin-bottom:10px}
@@ -334,8 +336,9 @@ window.addEventListener('load',function(){
      mobile sheet only kicks in by WIDTH) would put the layers box back on top of the
      story. Drop the reference legend there and keep the toggles, which are the part
      you actually operate; the same counts stay in the data panel. */
-  @media (min-width:821px) and (max-height:800px){
+  @media (min-width:821px) and (max-height:880px){
     .leg-static{display:none}
+    #story .pn-body{max-height:calc(100vh - 386px)}
     #legend .pn-body{padding:9px 12px 10px}
     .lyr{padding:6px 7px}
   }
