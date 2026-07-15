@@ -57,7 +57,8 @@ py -3 parse_routes.py       # vias da planilha -> routes.geojson (mapa) + routes
 py -3 embed_atlas.py        # injeta peaks + pois + parks + routes + crags no index.html
 py -3 embed_trails.py       # injeta serra_trails.geojson no index.html
 py -3 make_logo.py          # gera e injeta a logo do header (portfólio)
-py -3 make_brand.py         # favicon + og-image + tags do <head> (idempotente)
+py -3 make_brand.py         # favicon + og-image (pt e en) + tags do <head>
+py -3 make_en.py            # gera en/index.html a partir do index.html
 ```
 
 `make_brand.py` desenha a og-image a partir do `peaks.geojson`, então o preview de compartilhamento acompanha o dado: rode depois de mexer nos cumes e a silhueta e os números se atualizam sozinhos. O favicon **não** usa o dado, e isso é deliberado: a crista real dos 273 cumes vira um borrão verde a 16px, onde cabem umas cinco formas. Ícone é marca, não gráfico, então ele é um pico desenhado; a história dos dados fica na og-image, que tem 1200px para contá-la.
@@ -135,10 +136,28 @@ Ele produz dois arquivos:
 - `embed_atlas.py` · `embed_trails.py` · `make_logo.py` — injetores.
 - `peaks.geojson` · `pois.geojson` · `parks.geojson` · `serra_trails.geojson` · `crags.geojson` · `routes.geojson` · `routes.json` — dados curados (também embutidos no HTML).
 - `Lista de Rotas de Escalada.xlsx` — planilha-fonte das vias de escalada.
-- `make_brand.py` · `favicon.svg` · `favicon-{16,32,180}.png` · `og-image.png` — identidade.
+- `make_brand.py` · `favicon.svg` · `favicon-{16,32,180}.png` · `og-image.png` · `og-image-en.png` — identidade.
+- `make_en.py` · `en/index.html` — a página em inglês (gerada; não edite à mão).
 - `gas/` — backend de contribuições GPX (Google Apps Script + clasp). Ver `gas/README.md`.
 
 ## Idiomas
+
+**Duas URLs, uma base de código.** A raiz é o português e `/en/` é o inglês. Rode
+`make_en.py` depois de qualquer mudança no `index.html`: ele regenera `en/index.html`,
+que **nunca deve ser editado à mão**.
+
+Por que uma página separada, e não só o botão: as tags Open Graph e o `<title>` são lidos
+pelo Facebook, LinkedIn, WhatsApp e Google **antes de qualquer JavaScript rodar**. Uma
+página só, por mais que o botão traduza tudo, sempre apareceria em português no preview de
+um link compartilhado. Então o inglês ganhou URL própria, com head e card próprios
+(`og-image-en.png`), e as duas se apontam por `hreflang` (`pt-BR`, `en`, `x-default`), o que
+faz o Google tratá-las como traduções em vez de conteúdo duplicado.
+
+É uma cópia completa, não um stub que redireciona: assim `/en/` é uma página real e
+indexável. O `make_en.py` remapeia os caminhos relativos (`vendor/`, favicons) para `../` e
+força o padrão de idioma da página; uma escolha explícita no `localStorage` continua tendo
+precedência, porque quem escolheu português quis português, mesmo chegando por um link `/en/`.
+
 
 O atlas fala **português e inglês**, com um botão ao lado do 2D/3D. A escolha fica no
 `localStorage`; na primeira visita ele segue o idioma do navegador, para quem chega por um

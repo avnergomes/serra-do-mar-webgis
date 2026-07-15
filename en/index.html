@@ -1,37 +1,35 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Serra do Mar Paranaense · Web GIS</title>
+<title>Serra do Mar Paranaense · Mountaineering Atlas</title>
   <!--__BRAND__-->
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png" />
-  <link rel="apple-touch-icon" href="favicon-180.png" />
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="../favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="../favicon-180.png" />
   <meta name="theme-color" content="#07110f" />
-  <link rel="canonical" href="https://avnergomes.github.io/serra-do-mar-webgis/" />
+  <link rel="canonical" href="https://avnergomes.github.io/serra-do-mar-webgis/en/" />
   <link rel="alternate" hreflang="pt-BR" href="https://avnergomes.github.io/serra-do-mar-webgis/" />
   <link rel="alternate" hreflang="en" href="https://avnergomes.github.io/serra-do-mar-webgis/en/" />
   <link rel="alternate" hreflang="x-default" href="https://avnergomes.github.io/serra-do-mar-webgis/" />
   <meta property="og:type" content="website" />
-  <meta property="og:site_name" content="Atlas do Montanhismo Paranaense" />
-  <meta property="og:title" content="Serra do Mar Paranaense · Atlas do Montanhismo" />
-  <meta property="og:description" content="Web GIS da Serra do Mar paranaense: 273 cumes, trilhas reais do OpenStreetMap, vias de escalada, perfis de elevação e narrativa interativa em 13 capítulos." />
-  <meta property="og:url" content="https://avnergomes.github.io/serra-do-mar-webgis/" />
-  <meta property="og:image" content="https://avnergomes.github.io/serra-do-mar-webgis/og-image.png" />
+  <meta property="og:site_name" content="Serra do Mar Mountaineering Atlas" />
+  <meta property="og:title" content="Serra do Mar Paranaense · Mountaineering Atlas" />
+  <meta property="og:description" content="Web GIS of the Serra do Mar in Paraná, Brazil: 273 summits, real OpenStreetMap trails, climbing routes, elevation profiles and an interactive story in 13 chapters." />
+  <meta property="og:url" content="https://avnergomes.github.io/serra-do-mar-webgis/en/" />
+  <meta property="og:image" content="https://avnergomes.github.io/serra-do-mar-webgis/og-image-en.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Silhueta da Serra do Mar paranaense de norte a sul, com o Pico Paraná destacado a 1.877 metros." />
-  <meta property="og:locale" content="pt_BR" />
-  <meta property="og:locale:alternate" content="en_US" />
-  <meta property="og:locale:alternate" content="en_US" />
-  <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:image:alt" content="Skyline of the Serra do Mar in Paraná from north to south, with Pico Paraná marked at 1,877 metres." />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="pt_BR" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Serra do Mar Paranaense · Atlas do Montanhismo" />
-  <meta name="twitter:description" content="273 cumes, trilhas reais, vias de escalada e perfis de elevação num Web GIS autocontido." />
-  <meta name="twitter:image" content="https://avnergomes.github.io/serra-do-mar-webgis/og-image.png" />
+  <meta name="twitter:title" content="Serra do Mar Paranaense · Mountaineering Atlas" />
+  <meta name="twitter:description" content="273 summits, real trails, climbing routes and elevation profiles in a self-contained Web GIS." />
+  <meta name="twitter:image" content="https://avnergomes.github.io/serra-do-mar-webgis/og-image-en.png" />
   <!--__BRAND_END__-->
-<meta name="description" content="Web GIS da Serra do Mar paranaense: picos, trilhas, locais de interesse e narrativa interativa. Por Avner Paes Gomes." />
+<meta name="description" content="Web GIS of the Serra do Mar in Paraná, Brazil: 273 summits, real OpenStreetMap trails, climbing routes, elevation profiles and an interactive story in 13 chapters." />
 <script>
 /* Surface any load error in the spinner instead of hanging silently (also aids debugging). */
 window.__ERR__=[];
@@ -46,8 +44,8 @@ window.addEventListener('load',function(){
   }
 });
 </script>
-<link href="vendor/leaflet.css" rel="stylesheet" />
-<script src="vendor/leaflet.js"></script>
+<link href="../vendor/leaflet.css" rel="stylesheet" />
+<script src="../vendor/leaflet.js"></script>
 <style>
   :root{
     --bg:#07110f;
@@ -955,7 +953,7 @@ const I18N = {
    who lands on a shared link is not met with Portuguese. */
 let LANG = (function(){
   try { var s = localStorage.getItem('atlas.lang'); if (s === 'pt' || s === 'en') return s; } catch(e){}
-  return (navigator.language || 'pt').toLowerCase().indexOf('pt') === 0 ? 'pt' : 'en';
+  return 'en';   // generated page: /en/ is the English entry point
 })();
 
 /** tr('chap.of', 3, 13) -> "Capítulo 3 de 13". Missing keys fall back to pt, then to the key. */

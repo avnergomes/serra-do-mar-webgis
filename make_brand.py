@@ -35,6 +35,31 @@ F_REG  = r"C:\Windows\Fonts\segoeui.ttf"
 
 SS = 3   # supersample: draw big, downscale, get anti-aliasing for free
 
+# The share preview has to speak the language of the page it belongs to: a Portuguese
+# card under an English link is the whole reason /en/ exists.
+STR = {
+    "pt": {
+        "eyebrow": "ATLAS DO MONTANHISMO  ·  WEB GIS",
+        "l1": "Serra do Mar", "l2": "Paranaense",
+        "sub1": "A muralha de granito entre o planalto e o litoral,",
+        "sub2": "mapeada cume a cume.",
+        "apex1": "Pico Paraná", "apex2": "1.877 m  ·  o teto do Sul",
+        "role": "·  Data & Geo",
+        "stats": ["CUMES", "VIAS DE ESCALADA", "TRILHAS REAIS", "CONJUNTOS"],
+        "out": "og-image.png",
+    },
+    "en": {
+        "eyebrow": "MOUNTAINEERING ATLAS  ·  WEB GIS",
+        "l1": "Serra do Mar", "l2": "Paranaense",
+        "sub1": "The granite wall between the plateau and the coast,",
+        "sub2": "mapped summit by summit.",
+        "apex1": "Pico Paraná", "apex2": "1,877 m  ·  the roof of the South",
+        "role": "·  Data & Geo",
+        "stats": ["SUMMITS", "CLIMBING ROUTES", "REAL TRAILS", "RANGES"],
+        "out": "og-image-en.png",
+    },
+}
+
 
 def font(path, size):
     return ImageFont.truetype(path, size)
@@ -183,7 +208,8 @@ def make_favicon_svg():
 
 
 # -------------------------------------------------------------------------- og-image
-def make_og(stats):
+def make_og(stats, lang='pt'):
+    S = STR[lang]
     W, H = 1200, 630
     w, h = W * SS, H * SS
     im = Image.new("RGBA", (w, h), BG + (255,))
@@ -233,21 +259,19 @@ def make_og(stats):
         d.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], fill=ACCENT + (a,))
     rr = 7 * SS
     d.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], fill=(255, 255, 255, 255))
-    d.text((cx + 40 * SS, cy - 21 * SS), "Pico Paraná",
+    d.text((cx + 40 * SS, cy - 21 * SS), S["apex1"],
            font=font(F_SEMI, int(18 * SS)), fill=TXT + (255,))
-    d.text((cx + 40 * SS, cy + 2 * SS), "1.877 m  ·  o teto do Sul",
+    d.text((cx + 40 * SS, cy + 2 * SS), S["apex2"],
            font=font(F_BOLD, int(18 * SS)), fill=ACCENT + (255,))
 
     # Type lives in the top ~62%, the range in the bottom ~38%. They never meet.
     x = 66 * SS
-    d.text((x, 54 * SS), "ATLAS DO MONTANHISMO  ·  WEB GIS",
+    d.text((x, 54 * SS), S["eyebrow"],
            font=font(F_BOLD, int(16 * SS)), fill=ACCENT + (255,))
-    d.text((x, 86 * SS),  "Serra do Mar", font=font(F_BOLD, int(74 * SS)), fill=TXT + (255,))
-    d.text((x, 166 * SS), "Paranaense",   font=font(F_BOLD, int(74 * SS)), fill=ACCENT_2 + (255,))
-    d.text((x, 262 * SS), "A muralha de granito entre o planalto e o litoral,",
-           font=font(F_REG, int(22 * SS)), fill=TXT_DIM + (255,))
-    d.text((x, 292 * SS), "mapeada cume a cume.",
-           font=font(F_REG, int(22 * SS)), fill=TXT_DIM + (255,))
+    d.text((x, 86 * SS),  S["l1"], font=font(F_BOLD, int(74 * SS)), fill=TXT + (255,))
+    d.text((x, 166 * SS), S["l2"], font=font(F_BOLD, int(74 * SS)), fill=ACCENT_2 + (255,))
+    d.text((x, 262 * SS), S["sub1"], font=font(F_REG, int(22 * SS)), fill=TXT_DIM + (255,))
+    d.text((x, 292 * SS), S["sub2"], font=font(F_REG, int(22 * SS)), fill=TXT_DIM + (255,))
 
     y = 348 * SS
     f_v, f_l = font(F_BOLD, int(34 * SS)), font(F_SEMI, int(12 * SS))
@@ -261,32 +285,33 @@ def make_og(stats):
 
     # Byline top-right: the bottom belongs to the silhouette.
     fb, fr = font(F_BOLD, int(17 * SS)), font(F_REG, int(17 * SS))
-    tail = "·  Data & Geo"
+    tail = S["role"]
     tw = d.textlength(tail, font=fr)
     nw = d.textlength("Avner Paes Gomes", font=fb)
     rx = w - 66 * SS - tw - 10 * SS - nw
     d.text((rx, 58 * SS), "Avner Paes Gomes", font=fb, fill=TXT + (255,))
     d.text((rx + nw + 10 * SS, 58 * SS), tail, font=fr, fill=TXT_DIM + (255,))
 
-    im.convert("RGB").resize((W, H), Image.LANCZOS).save("og-image.png", optimize=True)
-    print("  og-image.png     %d x %d, %.0f KB" % (W, H, os.path.getsize("og-image.png") / 1024))
+    im.convert("RGB").resize((W, H), Image.LANCZOS).save(S["out"], optimize=True)
+    print("  %-16s %d x %d, %.0f KB" % (S["out"], W, H, os.path.getsize(S["out"]) / 1024))
 
 
-def stats_from_data():
+def stats_from_data(lang="pt"):
+    L = STR[lang]["stats"]
     peaks = json.load(open(PEAKS, encoding="utf-8"))["features"]
-    out = [("%d" % len(peaks), "CUMES")]
+    out = [("%d" % len(peaks), L[0])]
     try:
         r = json.load(open("routes.geojson", encoding="utf-8"))["features"]
-        out.append(("%d" % sum(f["properties"]["total"] for f in r), "VIAS DE ESCALADA"))
+        out.append(("%d" % sum(f["properties"]["total"] for f in r), L[1]))
     except Exception:
         pass
     try:
         t = json.load(open("serra_trails.geojson", encoding="utf-8"))["features"]
-        out.append(("%d" % sum(1 for f in t if f["properties"].get("name")), "TRILHAS REAIS"))
+        out.append(("%d" % sum(1 for f in t if f["properties"].get("name")), L[2]))
     except Exception:
         pass
     massifs = {f["properties"].get("massif") for f in peaks} - {"Serra do Mar (PR)", None}
-    out.append(("%d" % len(massifs), "CONJUNTOS"))
+    out.append(("%d" % len(massifs), L[3]))
     return out
 
 
@@ -340,9 +365,10 @@ def main():
     make_favicon()
     make_favicon_svg()
     print("og-image:")
-    st = stats_from_data()
-    print("  stats:", ", ".join("%s %s" % (v, l) for v, l in st))
-    make_og(st)
+    for lang in ("pt", "en"):
+        st = stats_from_data(lang)
+        print("  [%s] %s" % (lang, ", ".join("%s %s" % (v, l) for v, l in st)))
+        make_og(st, lang)
     print("html:")
     wire_html()
 
