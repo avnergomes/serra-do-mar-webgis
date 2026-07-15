@@ -17,11 +17,11 @@ O mapa abre em **2D (Leaflet)** — leve, sem WebGL nem workers, renderiza de fo
 ## O que o atlas mostra
 
 - **273 cumes nomeados** da Serra do Mar paranaense, agrupados em 9 conjuntos nomeados (Ibitiraquire, Marumbi, Anhangava-Baitaca, Graciosa-Capivari, Serra do Canal, Serra da Prata, Serra da Igreja, Serra do Araçatuba e Serra do Quiriri) mais um balde genérico, coloridos por região e rotulados por altitude (cumes emblemáticos com rótulo fixo; demais ao passar o mouse ou tocar).
-- **127 trilhas e rotas reais** nomeadas (326 feições no total), geometria do **OpenStreetMap**, cobrindo os nove conjuntos: travessia do Ibitiraquire, vias Frontal/Noroeste/Rochedinho do Marumbi, Caminho do Itupava, Torre da Prata, a travessia Araçatuba-Monte Crista, a Estrada da Graciosa e a ferrovia Curitiba-Paranaguá (Serra Verde Express).
+- **127 trilhas e rotas reais** nomeadas (326 feições no total), geometria do **OpenStreetMap**, cobrindo os nove conjuntos: travessia do Ibitiraquire, vias Frontal/Noroeste/Rochedinho do Marumbi, Caminho do Itupava, Torre da Prata, a travessia Araçatuba-Monte Crista, a Estrada da Graciosa e a ferrovia Curitiba-Paranaguá (Serra Verde Express). A camada soma **707,7 km**, mas só `kind=trilha` é trilha: **583,6 km** em 300 feições. O resto é a ferrovia (81,2 km em 25 feições) e a Estrada da Graciosa (42,9 km), que são as duas feições mais longas do conjunto. Quem for citar "km de trilha" em texto público usa 584, não 708. As 127 nomeadas somam 469,0 km; as 199 sem nome, 238,7 km.
 - **Perfil de elevação ao clicar num caminho**: a trilha clicada é destacada e o popup traz o perfil (altitude máxima, mínima, D+ e D−), com o ponto exato do clique marcado. Passar o mouse pelo perfil mostra a altitude e a distância naquele ponto, e um marcador acompanha no mapa. Vale para as trilhas do OSM e para os GPX enviados.
 - **462 locais de interesse** (POIs) do OSM, com toggles por categoria: refúgios/abrigos, inícios de trilha, estacionamentos, mirantes, pontos de água, cachoeiras e campings.
-- **36 unidades de conservação** (limites) do OSM, como contorno tracejado com preenchimento sutil (clique para nome e área).
-- **440 vias de escalada** (322 vias + 118 boulders) em **11 montanhas**, vindas da planilha `Lista de Rotas de Escalada.xlsx`: Anhangava (com os boulders do Castelinhos), Morro do Canal, o maciço Marumbi (Abrolhos, Esfinge, Torre dos Sinos, Ponta do Tigre, Gigante, Olimpo) e o Ibitiraquire (Ferraria, Ibitirati, Itapiroca). Clique numa área para a lista completa, agrupada por setor, com grau, altura e ano de conquista. Marcador colorido pela faixa de dificuldade dominante.
+- **35 unidades de conservação** (limites) do OSM, como contorno tracejado com preenchimento sutil (clique para nome e área).
+- **440 vias de escalada** (322 vias + 118 boulders) em **11 montanhas**, vindas da planilha `Lista de Rotas de Escalada.xlsx`: Anhangava (com os boulders do Castelinhos), Morro do Canal, o maciço Marumbi (Abrolhos, Esfinge, Torre dos Sinos, Ponta do Tigre, Gigante, Olimpo) e o Ibitiraquire (Ferraria, Ibitirati, Itapiroca). Clique numa área para a lista completa, agrupada por setor, com o grau e, quando a planilha traz, a altura. Marcador colorido pela faixa de dificuldade dominante. Cobertura dos atributos sobre as 440 linhas: grau 438 (99,5%, contando `grau` das vias e `vscale` dos boulders), setor 428 (97,3%), altura 208 (47,3%, ou 65% se contar só as vias), **ano de conquista 13 (3,0%)**. O ano é esparso demais para ser anunciado como atributo do conjunto: o Anhangava, que sozinho é 294 das 440 linhas, não tem ano em nenhuma.
 - **27 paredões / costões naturais** (`natural=cliff`) do OSM, como linha tracejada de contexto.
 - **Envio de GPX**: qualquer visitante arrasta um `.gpx` na aba GPX e vê a trilha e os pontos no mapa na hora, com distância calculada. Com o backend publicado (`gas/`), o arquivo vai para o Google Drive e volta para todo mundo depois de aprovado; sem backend, tudo continua funcionando só no navegador dele.
 - **Painel de dados**: barras de altitude dos cumes e distribuição por região (donut).
@@ -57,7 +57,10 @@ py -3 parse_routes.py       # vias da planilha -> routes.geojson (mapa) + routes
 py -3 embed_atlas.py        # injeta peaks + pois + parks + routes + crags no index.html
 py -3 embed_trails.py       # injeta serra_trails.geojson no index.html
 py -3 make_logo.py          # gera e injeta a logo do header (portfólio)
+py -3 make_brand.py         # favicon + og-image + tags do <head> (idempotente)
 ```
+
+`make_brand.py` desenha a og-image a partir do `peaks.geojson`, então o preview de compartilhamento acompanha o dado: rode depois de mexer nos cumes e a silhueta e os números se atualizam sozinhos. O favicon **não** usa o dado, e isso é deliberado: a crista real dos 273 cumes vira um borrão verde a 16px, onde cabem umas cinco formas. Ícone é marca, não gráfico, então ele é um pico desenhado; a história dos dados fica na og-image, que tem 1200px para contá-la.
 
 Os coletores cacheam o resultado bruto do Overpass/Wikidata (arquivos `*_raw.json`, ignorados no git). Ajuste bboxes e regras de curadoria no topo de cada `fetch_*.py`. Para reconsultar o Overpass, apague o cache antes: os coletores usam o `*_raw.json` sem revalidar.
 
@@ -87,6 +90,29 @@ Nome não prova que a via foi traçada: o OSM tem tocos de poucos metros com nom
 (`MIN_KM_ANY`), não o nome. A travessia de verdade está lá, como `Trilha Araçatuba - Monte
 Crista`, com 21,8 km.
 
+### Sobre `fetch_parks.py`: nome não identifica unidade
+
+O dedup era por `name.lower()`, e isso conta a mesma unidade duas vezes quando o OSM a
+carrega em duas relações com grafias diferentes. Era o caso do Graciosa:
+`Parque Estadual Serra da Graciosa` (relação 19559823, 11,4 km²) e
+`Parque Estadual da Graciosa` (relação 19559853, 11,0 km²) são a **mesma** unidade. A prova
+não é geométrica, é registral: as duas carregam `ref:CNUC=0000.41.0541` e
+`start_date=1990-09-24`, que batem com o Decreto Estadual 7.302 de 24/09/1990
+(1.189,58 ha, Morretes). Os bboxes coincidem dentro de ~300 m (IoU 0,74).
+
+Agora o dedup usa **`ref:CNUC` além do nome**: código igual prova unidade igual, seja qual
+for a grafia. É exato e não precisa de limiar, ao contrário de um teste de sobreposição.
+O `ref:CNUC` só existe em 12 dos elementos brutos, então o nome continua valendo como chave
+para o resto (e é ele que pega `Caverna do Diabo`, `Refúgio do Bugio`, `Parque Iguaçu` e
+`Campinhos`, cada um duplicado com nome idêntico). Depois das duas chaves, nenhum par
+sobrevive com IoU > 0,1: o conjunto tem **35 unidades distintas**, não 36. As duplicatas
+descartadas agora aparecem no contador `dropped["dupe"]`, em vez de sumirem caladas.
+
+Sobrevive a relação vista primeiro, que aqui também é a mais bem etiquetada (tem `wikidata`
+e o operador atual, o Instituto Água e Terra, contra o antigo IAP) e o polígono maior, mais
+perto dos 11,9 km² do decreto. Só o nome exibido fica menos canônico: o rótulo oficial e o
+do Wikidata (Q10344994) são `Parque Estadual da Graciosa`.
+
 ### Sobre `parse_routes.py`
 
 A planilha é mantida à mão e cada aba tem um formato próprio, então o parser trata: graus esparsos (a célula é preenchida uma vez e vale para as linhas abaixo), setores lado a lado em blocos de colunas (Purunã, Macarrão), linhas de soma e cabeçalhos repetidos no meio da tabela, e grafias variantes do mesmo setor.
@@ -109,6 +135,7 @@ Ele produz dois arquivos:
 - `embed_atlas.py` · `embed_trails.py` · `make_logo.py` — injetores.
 - `peaks.geojson` · `pois.geojson` · `parks.geojson` · `serra_trails.geojson` · `crags.geojson` · `routes.geojson` · `routes.json` — dados curados (também embutidos no HTML).
 - `Lista de Rotas de Escalada.xlsx` — planilha-fonte das vias de escalada.
+- `make_brand.py` · `favicon.svg` · `favicon-{16,32,180}.png` · `og-image.png` — identidade.
 - `gas/` — backend de contribuições GPX (Google Apps Script + clasp). Ver `gas/README.md`.
 
 ## Painéis

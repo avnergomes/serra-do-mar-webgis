@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><clipPath id="r"><rect width="64" height="64" rx="14"/></clipPath></defs>
+  <rect width="64" height="64" rx="14" fill="#07110f"/>
+  <polygon points="-2.56,57.60 12.16,39.68 19.20,45.44 35.20,14.72 46.08,35.20 52.48,30.08 66.56,57.60 66.56,64.00 -2.56,64.00" fill="#12d69a" clip-path="url(#r)"/>
+  <circle cx="35.20" cy="14.72" r="3.3" fill="#07110f"/>
+  <circle cx="35.20" cy="14.72" r="1.9" fill="#fff"/>
+</svg>

@@ -101,7 +101,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     print("Fetching protected areas ...", file=sys.stderr)
     d = overpass(QUERY)
-    feats, dropped = [], {"apa_or_big": 0, "no_geom": 0, "unnamed": 0, "other": 0}
+    feats, dropped = [], {"apa_or_big": 0, "no_geom": 0, "unnamed": 0, "dupe": 0, "other": 0}
     seen = set()
     for el in d["elements"]:
         t = el.get("tags", {})
@@ -121,10 +121,19 @@ def main():
         if km2 > CAP_KM2:
             dropped["apa_or_big"] += 1
             continue
-        key = name.lower()
-        if key in seen:
+        # The name alone does not identify a unit: OSM carries the Graciosa park as two
+        # relations spelled differently ("Parque Estadual Serra da Graciosa" and "Parque
+        # Estadual da Graciosa"), so a name-only key kept both and inflated the count.
+        # ref:CNUC is the federal registry id of the unit, so an equal code proves an
+        # equal unit whatever the spelling. Both keys keep first-seen, and here every
+        # tie-break agrees: the survivor is also the richer-tagged and larger polygon.
+        keys = {name.lower()}
+        if t.get("ref:CNUC"):
+            keys.add(("cnuc", t["ref:CNUC"]))
+        if keys & seen:
+            dropped["dupe"] += 1
             continue
-        seen.add(key)
+        seen |= keys
         feats.append({"type": "Feature",
             "properties": {"name": name, "klass": klass, "label": label, "color": color, "km2": round(km2, 1)},
             "geometry": mapping(geom)})
