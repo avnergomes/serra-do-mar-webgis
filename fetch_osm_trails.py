@@ -17,31 +17,56 @@ ENDPOINTS = [
 RAW_CACHE = "osm_raw.json"
 
 # Per-statement bboxes: (S, W, N, E)
-REGION   = (-25.60, -49.15, -25.20, -48.70)   # whole Serra do Mar PR core
+# REGION spans the same extent as fetch_peaks.py. It used to stop at -25.20/-25.60,
+# which silently excluded every range south of the core -- Serra da Prata, Serra da
+# Igreja, Araçatuba and Quiriri, 41% of the peaks, had no trails at all.
+REGION   = (-26.30, -49.50, -24.60, -48.20)   # whole Serra do Mar PR, as in fetch_peaks.py
 RAIL     = (-25.56, -49.12, -25.40, -48.80)   # escarpment railway descent
-MARUMBI  = (-25.48, -48.95, -25.42, -48.89)   # Conjunto Marumbi
-IBITIRAQ = (-25.30, -48.90, -25.21, -48.78)   # Serra do Ibitiraquire / Pico Parana
-BAITACA  = (-25.42, -49.05, -25.36, -48.96)   # Serra da Baitaca / Anhangava
-CANAL    = (-25.535, -49.00, -25.485, -48.945) # Serra do Canal / Vigia / Torre Amarela (Piraquara)
+PEAKS_GEOJSON = "peaks.geojson"
+BUFFER_DEG = 0.02      # ~2 km around a massif's peaks, to catch trailheads and approaches
 
 def bb(x):
     return "%f,%f,%f,%f" % x
 
-QUERY = f"""
-[out:json][timeout:180];
-(
-  way["name"="Estrada da Graciosa"]({bb(REGION)});
-  way["name"~"Caminho do Itupava",i]({bb(REGION)});
-  relation["name"~"Itupava",i]({bb(REGION)});
-  relation["route"="hiking"]({bb(REGION)});
-  way["railway"="rail"]({bb(RAIL)});
-  way["highway"~"^(path|footway|track|steps)$"]({bb(MARUMBI)});
-  way["highway"~"^(path|footway|track|steps)$"]({bb(IBITIRAQ)});
-  way["highway"~"^(path|footway|track|steps)$"]({bb(BAITACA)});
-  way["highway"~"^(path|footway|track|steps)$"]({bb(CANAL)});
-);
-out geom;
-"""
+def massif_boxes(path=PEAKS_GEOJSON):
+    """Search boxes for footpaths, derived from where each named massif's peaks actually are.
+
+    Hand-written boxes go stale the moment a massif is added or re-anchored, and a
+    single region-wide footpath query would drag in every urban sidewalk in Curitiba.
+    The generic 'Serra do Mar (PR)' bucket is skipped for exactly that reason: it is a
+    catch-all spread across the whole state, not a place.
+    """
+    if not os.path.exists(path):
+        print("  %s ausente: sem caixas por maciço" % path, file=sys.stderr)
+        return []
+    geo = json.load(open(path, encoding="utf-8"))
+    groups = {}
+    for f in geo["features"]:
+        m = f["properties"].get("massif")
+        if not m or m == "Serra do Mar (PR)":
+            continue
+        lon, lat = f["geometry"]["coordinates"][:2]
+        g = groups.setdefault(m, [lat, lon, lat, lon])
+        g[0] = min(g[0], lat); g[1] = min(g[1], lon)
+        g[2] = max(g[2], lat); g[3] = max(g[3], lon)
+    out = []
+    for m in sorted(groups):
+        s, w, n, e = groups[m]
+        out.append((m, (s-BUFFER_DEG, w-BUFFER_DEG, n+BUFFER_DEG, e+BUFFER_DEG)))
+    return out
+
+MASSIF_BOXES = massif_boxes()
+
+QUERY = "[out:json][timeout:240];\n(\n" + "".join([
+    '  way["name"="Estrada da Graciosa"](%s);\n' % bb(REGION),
+    '  way["name"~"Caminho do Itupava",i](%s);\n' % bb(REGION),
+    '  relation["name"~"Itupava",i](%s);\n' % bb(REGION),
+    '  relation["route"="hiking"](%s);\n' % bb(REGION),
+    '  way["railway"="rail"](%s);\n' % bb(RAIL),
+]) + "".join(
+    '  way["highway"~"^(path|footway|track|steps)$"](%s);  // %s\n' % (bb(box), m)
+    for m, box in MASSIF_BOXES
+) + ");\nout geom;\n"
 
 # ---- curation rules ----
 EXCLUDE_WAY_NAME = re.compile(
@@ -50,6 +75,10 @@ EXCLUDE_WAY_NAME = re.compile(
 EXCLUDE_REL_NAME = re.compile(r"^Caminho da Mata Atl", re.I)   # regional mega-trails
 MAX_KM = 50.0     # drop regional through-trails
 MIN_KM_UNNAMED = 0.15  # drop tiny unnamed fragments
+# A name is no proof a way was actually traced: OSM carries stubs of a couple of metres
+# with grand names ("Rota Quiriri - Monte Crista" is 3 nodes spanning 1.5 m). They draw
+# as an invisible dot and inflate the "named trails" count, so length decides, not the name.
+MIN_KM_ANY = 0.05
 
 HERO = {
     "Trilha do Pico Paraná","Trilha Pico Paraná","Caminho do Itupava","Estrada da Graciosa",
@@ -202,6 +231,11 @@ def build(d):
 
     for nm, e in named.items():
         km = multi_km(e["segs"])
+        # Judged on the merged total, not per segment: a real trail may legitimately have
+        # a short piece, but a name whose every segment adds up to a couple of metres is a stub.
+        if km < MIN_KM_ANY:
+            dropped["stub"] = dropped.get("stub", 0) + 1
+            continue
         feats.append({"type":"Feature",
             "properties":{"name": nm, "kind": e["kind"], "km": round(km,1), "hero": (nm in HERO)},
             "geometry":{"type":"MultiLineString","coordinates":e["segs"]}})

@@ -16,8 +16,8 @@ O mapa abre em **2D (Leaflet)** — leve, sem WebGL nem workers, renderiza de fo
 
 ## O que o atlas mostra
 
-- **273 cumes nomeados** da Serra do Mar paranaense (Pico Paraná 1.877 m, Caratuva, Ibitirati, o maciço Marumbi, Anhangava-Baitaca, Serra do Canal, Serra da Prata, Morro dos Perdidos, Serra da Igreja), coloridos por região e rotulados por altitude (cumes emblemáticos com rótulo fixo; demais ao passar o mouse ou tocar).
-- **75 trilhas e rotas reais** + segmentos, geometria do **OpenStreetMap**: travessia do Ibitiraquire, vias Frontal/Noroeste/Rochedinho do Marumbi, Caminho do Itupava, Estrada da Graciosa e a ferrovia Curitiba-Paranaguá (Serra Verde Express). Clique numa rota para nome e distância.
+- **273 cumes nomeados** da Serra do Mar paranaense, agrupados em 9 conjuntos nomeados (Ibitiraquire, Marumbi, Anhangava-Baitaca, Graciosa-Capivari, Serra do Canal, Serra da Prata, Serra da Igreja, Serra do Araçatuba e Serra do Quiriri) mais um balde genérico, coloridos por região e rotulados por altitude (cumes emblemáticos com rótulo fixo; demais ao passar o mouse ou tocar).
+- **127 trilhas e rotas reais** nomeadas (326 feições no total), geometria do **OpenStreetMap**, cobrindo os nove conjuntos: travessia do Ibitiraquire, vias Frontal/Noroeste/Rochedinho do Marumbi, Caminho do Itupava, Torre da Prata, a travessia Araçatuba-Monte Crista, a Estrada da Graciosa e a ferrovia Curitiba-Paranaguá (Serra Verde Express).
 - **Perfil de elevação ao clicar num caminho**: a trilha clicada é destacada e o popup traz o perfil (altitude máxima, mínima, D+ e D−), com o ponto exato do clique marcado. Passar o mouse pelo perfil mostra a altitude e a distância naquele ponto, e um marcador acompanha no mapa. Vale para as trilhas do OSM e para os GPX enviados.
 - **462 locais de interesse** (POIs) do OSM, com toggles por categoria: refúgios/abrigos, inícios de trilha, estacionamentos, mirantes, pontos de água, cachoeiras e campings.
 - **36 unidades de conservação** (limites) do OSM, como contorno tracejado com preenchimento sutil (clique para nome e área).
@@ -25,7 +25,7 @@ O mapa abre em **2D (Leaflet)** — leve, sem WebGL nem workers, renderiza de fo
 - **27 paredões / costões naturais** (`natural=cliff`) do OSM, como linha tracejada de contexto.
 - **Envio de GPX**: qualquer visitante arrasta um `.gpx` na aba GPX e vê a trilha e os pontos no mapa na hora, com distância calculada. Com o backend publicado (`gas/`), o arquivo vai para o Google Drive e volta para todo mundo depois de aprovado; sem backend, tudo continua funcionando só no navegador dele.
 - **Painel de dados**: barras de altitude dos cumes e distribuição por região (donut).
-- **História interativa** em 6 capítulos, com a câmera voando a cada tema (2D e 3D).
+- **História interativa** em 13 capítulos, um para cada conjunto montanhoso (norte a sul) mais os temáticos (Mata Atlântica, geologia, Graciosa, ferrovia), com a câmera voando a cada tema (2D e 3D) num zoom escolhido por capítulo.
 - **Modo 3D (Cesium)**: terreno real ArcGIS + satélite Esri, com os 273 cumes posicionados sobre o relevo.
 - **Responsivo**: no celular, os painéis viram uma gaveta inferior com abas (História · Dados · Camadas) e os alvos de toque são ampliados.
 
@@ -60,6 +60,32 @@ py -3 make_logo.py          # gera e injeta a logo do header (portfólio)
 ```
 
 Os coletores cacheam o resultado bruto do Overpass/Wikidata (arquivos `*_raw.json`, ignorados no git). Ajuste bboxes e regras de curadoria no topo de cada `fetch_*.py`. Para reconsultar o Overpass, apague o cache antes: os coletores usam o `*_raw.json` sem revalidar.
+
+### Conjuntos e cobertura das trilhas
+
+Os conjuntos saem de âncoras em `fetch_peaks.py`: vence a âncora mais próxima dentro de
+~17 km, e o resto cai no balde genérico `Serra do Mar (PR)`. Duas correções que valem
+lembrar, porque erraram calado:
+
+- As âncoras agora ficam **sobre o cume homônimo**, não num centroide chutado. Com o chute,
+  o pico literalmente chamado `Morro dos Perdidos` caía em `Serra da Igreja`, enquanto os
+  vizinhos a 2 km dele caíam em `Morro dos Perdidos`.
+- `Serra do Araçatuba` e `Serra do Quiriri` são conjuntos distintos e não existiam.
+  O Pico Araçatuba (1.673 m, o mais alto do Paraná fora do Ibitiraquire) estava dentro de
+  `Serra da Igreja`, e o Quiriri, 12 km ao sul, estava misturado no mesmo balde.
+  `Morro dos Perdidos` é um cume dentro do Araçatuba, não um conjunto.
+
+`fetch_osm_trails.py` **deriva as caixas de busca de `peaks.geojson`**, uma por conjunto
+nomeado, com folga de ~2 km. Caixas escritas à mão envelhecem quando um conjunto é criado ou
+reancorado, e foi exatamente o que aconteceu: o bbox parava em -25,60 e excluía calado toda a
+metade sul (Prata, Igreja, Araçatuba, Quiriri), 41% dos cumes, que ficaram sem trilha nenhuma.
+O balde genérico é pulado de propósito: ele cobre o estado inteiro, e uma consulta de
+`highway=path` nessa extensão traria cada calçada de Curitiba.
+
+Nome não prova que a via foi traçada: o OSM tem tocos de poucos metros com nomes grandiosos
+(a `Rota Quiriri - Monte Crista` são 3 nós somando 1,5 m). Quem decide é o comprimento
+(`MIN_KM_ANY`), não o nome. A travessia de verdade está lá, como `Trilha Araçatuba - Monte
+Crista`, com 21,8 km.
 
 ### Sobre `parse_routes.py`
 

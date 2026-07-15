@@ -16,7 +16,10 @@ REGION = (-26.30, -49.50, -24.60, -48.20)
 OSM_CACHE = "peaks_osm_raw.json"
 WD_CACHE = "peaks_wikidata_raw.json"
 
-# massif anchors (name, lat, lon); nearest within RADIUS wins, else generic
+# Massif anchors (name, lat, lon); nearest within RADIUS wins, else the generic bucket.
+# Anchors sit on the namesake summit wherever one exists, because anchoring on a guessed
+# centroid mis-sorted whole groups: the peak literally called "Morro dos Perdidos" used to
+# land in "Serra da Igreja", while its neighbours 2 km away landed in "Morro dos Perdidos".
 MASSIFS = [
     ("Ibitiraquire",       -25.25, -48.82),
     ("Marumbi",            -25.45, -48.92),
@@ -24,8 +27,14 @@ MASSIFS = [
     ("Serra do Canal",     -25.51, -48.98),
     ("Graciosa-Capivari",  -25.35, -48.905),
     ("Serra da Prata",     -25.62, -48.62),
-    ("Morro dos Perdidos", -25.98, -48.90),
-    ("Serra da Igreja",    -25.80, -48.98),
+    ("Serra da Igreja",    -25.75, -48.93),
+    # Serra do Araçatuba (Tijucas do Sul / Guaratuba): anchored on Pico Araçatuba, 1.673 m,
+    # the highest point of Paraná outside the Ibitiraquire. Morro dos Perdidos is a summit
+    # inside this range, not a range of its own, so it no longer gets its own anchor.
+    ("Serra do Araçatuba", -25.905, -48.990),
+    # Serra do Quiriri, on the SC border, was being swallowed by the Perdidos anchor even
+    # though it is a separate range ~12 km further south.
+    ("Serra do Quiriri",   -26.015, -48.950),
 ]
 RADIUS = 0.16  # deg (~17 km)
 
