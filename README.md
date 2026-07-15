@@ -20,6 +20,8 @@ O mapa abre em **2D (Leaflet)** — leve, sem WebGL nem workers, renderiza de fo
 - **75 trilhas e rotas reais** + segmentos, geometria do **OpenStreetMap**: travessia do Ibitiraquire, vias Frontal/Noroeste/Rochedinho do Marumbi, Caminho do Itupava, Estrada da Graciosa e a ferrovia Curitiba-Paranaguá (Serra Verde Express). Clique numa rota para nome e distância.
 - **462 locais de interesse** (POIs) do OSM, com toggles por categoria: refúgios/abrigos, inícios de trilha, estacionamentos, mirantes, pontos de água, cachoeiras e campings.
 - **36 unidades de conservação** (limites) do OSM, como contorno tracejado com preenchimento sutil (clique para nome e área).
+- **440 vias de escalada** (322 vias + 118 boulders) em **11 montanhas**, vindas da planilha `Lista de Rotas de Escalada.xlsx`: Anhangava (com os boulders do Castelinhos), Morro do Canal, o maciço Marumbi (Abrolhos, Esfinge, Torre dos Sinos, Ponta do Tigre, Gigante, Olimpo) e o Ibitiraquire (Ferraria, Ibitirati, Itapiroca). Clique numa área para a lista completa, agrupada por setor, com grau, altura e ano de conquista. Marcador colorido pela faixa de dificuldade dominante.
+- **27 paredões / costões naturais** (`natural=cliff`) do OSM, como linha tracejada de contexto.
 - **Painel de dados**: barras de altitude dos cumes e distribuição por região (donut).
 - **História interativa** em 6 capítulos, com a câmera voando a cada tema (2D e 3D).
 - **Modo 3D (Cesium)**: terreno real ArcGIS + satélite Esri, com os 273 cumes posicionados sobre o relevo.
@@ -31,8 +33,9 @@ O mapa abre em **2D (Leaflet)** — leve, sem WebGL nem workers, renderiza de fo
 |---|---|---|
 | Imagem de satélite (2D e 3D) | Esri World Imagery (Maxar, Earthstar) | ToS Esri (uso leve / atribuição) |
 | Terreno 3D (modo Cesium) | ArcGIS World Elevation 3D (Terrain3D) | ToS Esri, sem chave |
-| Cumes, trilhas, POIs, parques | © OpenStreetMap contributors (Overpass) | ODbL |
+| Cumes, trilhas, POIs, parques, paredões | © OpenStreetMap contributors (Overpass) | ODbL |
 | Cumes (enriquecimento) | Wikidata | CC0 |
+| Vias de escalada | `Lista de Rotas de Escalada.xlsx` (compilação da comunidade) | uso interno do projeto |
 | Motor 2D | Leaflet 1.9.4 | BSD |
 | Motor 3D (opcional) | CesiumJS 1.124 | Apache 2.0 |
 
@@ -45,20 +48,37 @@ py -3 fetch_peaks.py        # cumes (OSM natural=peak + Wikidata) -> peaks.geojs
 py -3 fetch_pois.py         # POIs (refúgios, água, mirantes, etc.) -> pois.geojson
 py -3 fetch_parks.py        # unidades de conservação (OSM protected_area) -> parks.geojson
 py -3 fetch_osm_trails.py   # trilhas/estradas/ferrovia (Overpass) -> serra_trails.geojson
-py -3 embed_atlas.py        # injeta peaks + pois + parks no index.html
+py -3 fetch_crags.py        # paredões naturais (OSM natural=cliff) -> crags.geojson
+py -3 parse_routes.py       # vias da planilha -> routes.geojson (mapa) + routes.json (completo)
+py -3 embed_atlas.py        # injeta peaks + pois + parks + routes + crags no index.html
 py -3 embed_trails.py       # injeta serra_trails.geojson no index.html
 py -3 make_logo.py          # gera e injeta a logo do header (portfólio)
 ```
 
-Os coletores cacheam o resultado bruto do Overpass/Wikidata (arquivos `*_raw.json`, ignorados no git). Ajuste bboxes e regras de curadoria no topo de cada `fetch_*.py`.
+Os coletores cacheam o resultado bruto do Overpass/Wikidata (arquivos `*_raw.json`, ignorados no git). Ajuste bboxes e regras de curadoria no topo de cada `fetch_*.py`. Para reconsultar o Overpass, apague o cache antes: os coletores usam o `*_raw.json` sem revalidar.
+
+### Sobre `parse_routes.py`
+
+A planilha é mantida à mão e cada aba tem um formato próprio, então o parser trata: graus esparsos (a célula é preenchida uma vez e vale para as linhas abaixo), setores lado a lado em blocos de colunas (Purunã, Macarrão), linhas de soma e cabeçalhos repetidos no meio da tabela, e grafias variantes do mesmo setor.
+
+Ele produz dois arquivos:
+
+- `routes.geojson` — só o escopo do mapa (Serra do Mar / PR montanha), agrupado por montanha e geolocalizado contra `peaks.geojson`. É o que entra no `index.html`.
+- `routes.json` — a planilha inteira sem filtro, incluindo o que fica fora do mapa: São Luis Purunã e Macarrão (Ponta Grossa, sem coordenada disponível), as vias históricas de SP e RJ, os desempenhos do Big 1000/500 e as listas curadas (big 500, Croquiteca Raiz 1000, treino de fendas).
+
+**Graus:** a planilha mistura três escalas (brasileira, francesa e V/Hueco para boulder), que não compartilham eixo numérico. Em vez de forjar uma conversão, o parser classifica em quatro faixas (Iniciante, Intermediário, Avançado, Elite) alinhadas só no nível da faixa, e preserva o texto original do grau, além de decompor os componentes (livre, artificial `A0-A3`, exposição `E1-E5`, misto `M1-M3`, variante entre parênteses).
+
+**Geolocalização:** a planilha nomeia setores, mas só as montanhas têm coordenada, então cada marcador é uma montanha e o popup reagrupa por setor. Os boulders do Castelinhos do Anhangava sobem no ponto do Anhangava: o `Castelinho` do `peaks.geojson` é outro morro, 94 km ao sul, e inventar coordenada seria pior que agrupar.
 
 ## Arquivos versionados
 
 - `index.html` — a aplicação completa (todos os dados embutidos).
 - `vendor/leaflet.js` · `vendor/leaflet.css` · `vendor/images/` — Leaflet auto-hospedado (motor 2D).
-- `fetch_peaks.py` · `fetch_pois.py` · `fetch_parks.py` · `fetch_osm_trails.py` — coletores OSM/Wikidata.
+- `fetch_peaks.py` · `fetch_pois.py` · `fetch_parks.py` · `fetch_osm_trails.py` · `fetch_crags.py` — coletores OSM/Wikidata.
+- `parse_routes.py` — parser da planilha de escalada.
 - `embed_atlas.py` · `embed_trails.py` · `make_logo.py` — injetores.
-- `peaks.geojson` · `pois.geojson` · `parks.geojson` · `serra_trails.geojson` — dados curados (também embutidos no HTML).
+- `peaks.geojson` · `pois.geojson` · `parks.geojson` · `serra_trails.geojson` · `crags.geojson` · `routes.geojson` · `routes.json` — dados curados (também embutidos no HTML).
+- `Lista de Rotas de Escalada.xlsx` — planilha-fonte das vias de escalada.
 
 ## Stack
 
