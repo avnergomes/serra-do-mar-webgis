@@ -456,6 +456,52 @@ window.addEventListener('load',function(){
     border:2px solid var(--pc,#8ecae6);box-shadow:0 1px 5px rgba(0,0,0,.6);
     font-size:13px;line-height:1;cursor:pointer;transition:transform .12s}
   .poi-emoji .pe:hover{transform:scale(1.18)}
+
+  /* Aviso legal / regras de visitação */
+  .aviso-btn{pointer-events:auto;border:1px solid #f4a26188;background:rgba(244,162,97,.14);color:#ffd9b0;
+    font-family:inherit;font-weight:700;font-size:11.5px;padding:6px 11px;border-radius:999px;cursor:pointer;
+    white-space:nowrap;transition:.15s}
+  .aviso-btn:hover{background:rgba(244,162,97,.24);border-color:#f4a261}
+  .aviso-modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
+    background:rgba(4,10,8,.72);backdrop-filter:blur(3px);padding:20px}
+  .aviso-modal.hidden{display:none}
+  .aviso-card{position:relative;max-width:640px;width:100%;max-height:88vh;overflow:auto;
+    background:#0d1a16;border:1px solid var(--stroke-strong);border-radius:16px;padding:24px 26px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);color:var(--txt)}
+  .aviso-card h2{margin:0 0 12px;font-size:18px;font-weight:750;color:#ffd9b0}
+  .aviso-card p{margin:9px 0;font-size:13px;line-height:1.5;color:#d7e6df}
+  .aviso-card .av-lead{font-size:13.5px;color:#eafff8}
+  .aviso-x{position:absolute;top:12px;right:14px;background:none;border:0;color:var(--txt-dim);
+    font-size:24px;line-height:1;cursor:pointer;font-family:inherit}
+  .aviso-x:hover{color:#fff}
+  .av-list{margin:8px 0;padding-left:18px}
+  .av-list li{font-size:12.5px;line-height:1.5;color:#d7e6df;margin:5px 0}
+  .av-box{margin:12px 0;padding:11px 13px;border-left:3px solid #f4a261;background:rgba(244,162,97,.10);
+    border-radius:8px;font-size:12.5px;line-height:1.5;color:#f2e3d5}
+  .av-box-t{font-weight:750;color:#ffd9b0;margin-bottom:4px}
+  .av-author{font-weight:650;color:#eafff8;border-top:1px solid var(--stroke);padding-top:10px}
+  .av-risk{font-size:12px;color:var(--txt-dim)}
+  .av-src{margin-top:12px;font-size:11px;color:var(--txt-dim);line-height:1.7}
+  .av-src a{color:var(--accent-2)}
+  .intro-legal{margin:14px 0 0;font-size:11px;line-height:1.5;color:var(--txt-dim)}
+  .intro-legal a{color:var(--accent-2);font-weight:650;white-space:nowrap}
+
+  /* Regulatory card in UC popups + caveats in trail/peak popups */
+  .uc-reg{margin-top:8px;border-top:1px solid var(--stroke);padding-top:7px}
+  .uc-sev{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.2px;color:#0a1a12;
+    background:var(--sc,#ffd166);border-radius:4px;padding:1px 6px;margin-bottom:5px}
+  .uc-rule{font-size:11.5px;line-height:1.45;color:#dcebe5}
+  .uc-meta{font-size:11px;color:var(--txt-dim);margin-top:4px}
+  .uc-meta a{color:var(--accent-2)}
+  .uc-nota{font-size:11px;line-height:1.45;color:#e9d7c4;background:rgba(244,162,97,.10);
+    border-left:2px solid #f4a261;border-radius:5px;padding:5px 7px;margin-top:5px}
+  .uc-cite{font-size:9.5px;color:var(--txt-dim);margin-top:6px}
+  .uc-cite a{color:var(--accent-2)}
+  .tr-caveat{font-size:10.5px;line-height:1.4;color:#ffd9b0;background:rgba(244,162,97,.12);
+    border-radius:6px;padding:5px 7px;margin-top:7px}
+  .tr-ucrule{font-size:10.5px;line-height:1.4;color:#dcebe5;border-left:3px solid var(--sc,#ffd166);
+    padding:3px 0 3px 7px;margin-top:5px}
+  .tr-ucrule a,.tr-caveat a{color:var(--accent-2);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -469,6 +515,7 @@ window.addEventListener('load',function(){
     <p data-i18n="brand.sub">Atlas do montanhismo · Web GIS</p>
   </div>
   <div class="byline byline-portfolio"><a class="chip pf-link" href="https://avnergomes.github.io/portfolio" target="_blank" rel="noopener" title="Portfólio de Avner Paes Gomes"><img class="pf-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAlOUlEQVR42u19e5zdVXXv2r/HeWTO5EVCCKFBQUVe8hBoVayg2F61aPVTUepFpT7qs2pb26roAOVeqfVT8apU1FYvtaK5tIIioqCjqJFKkFSHRAeSmEkmmTNn5rx+r7332nuv+8dv7zO/GSYwgMZAfiuf88mZc87vcc5ae+31/C6AkkoqqaSSSiqppJIOO2JPlC9CRAwAvMJ3IgAgz/MMES38nPvs4HMAQIwxKgXg8cV0zzLSMMbMw3xPWsL5fPvUHC7CEDyOV7pjugEA6Ha7qyqVyonGmBMZYyf4vr+ReWwNGVqrtf7a0NDQB7u97nX1Wv10TbpNmvYwxnZ4nreNE9/2sas/tosxphcKg73GYacZDknGF1YoAAC0o+gZnPO/llJ+ExGbdACSUn4BACBJ4jsXf19wifLnKeef7SfJK/r9/poDaIaSftuMn5ycXJNl2VuEED+UUqp5jESpEVGiQoEKuURMiEgIIT4NABAl0a1EJBAxQZTCfg6VVgsFZppLeX0URS8sbpOlIBx85g9+8D179hyTZdlVEnG/YxQqJEQp8wdKVChRoV5EA9wAABAn8ebi64YMIaKSKKVEKaSUUuJ8oULEu6MovXhkZMRzdofdhko6GMwfHR2tcc7fj4gzBYZi/i+nRRje4pL/NM2yb3DOrxdCXEJEQbvdfr+U8paMZz8SUuyUUibF47TWhIMzS4kKB8IghLi71+u9qNQGB0flewAA/X7/eVLKnxIRGWMoX6mopJSIOLfSJcqWEOKmhPN3JUnyu61Wa3gp12o2m0dlUXSBEOJKIcSdUsq0cE5lBUGhmhMyzvmXWq3W0fZeAyjdwF+vW+fcuSRJrqrWqh/wPR9QoWLAPAIiBgyCIPANESjEOxDx39ptdcvGjSvbhfPUoyg61gu9Y7XWR9Yr9TXgAQMDIKWcBYD9QRD8qlqt7mKMoTuu2+0eV6vVXu77/sVBEDwTAACV0rkPSeCurZTalwrx5ysajVussB6WMYTfiMpvt9srMiG+Zvd4JVEqRDQSJRbU8df6/f7z3LFbtmwJsyy7QAjxESnlPVj47EORlDITQvxYCHF5t9s9u3g/cRz/kRDiOwVbAKWURqKUuf1AlKbpiBNcZyOU9BiYv3fv3t+RUt5rVbCUUhpEVEopYxm2pdeLX+KO6/V6J2RCfFRK2SowdSrLsluSJLkyjuNLsyw7n3P+aa01xnH62izLnh/H8euTJPlwmqZ3SJS9OSbLX0gp/6bZbB7lrhFF0UWI+AsrBFqi1FJKjZjbB1zy60dgxCMiVgrBo4/mQZqmGxFx3DJRIiK5Va+UkilPR0ZHRwNrG5wkpfz3AtPH0jR9XxzHZ4yNjVUWXiPl6d8QEfV6vacuYgc00jR9XpZl1zhDE5VKMiE+EsfxUQAArVZrWAjxMec5SCmVRGkkoiQiyrL0pltvvbVaegiPgvlExCYnJ9dIKd0qk6iQnKqVUj7Q7/d/HwBgbGyskonsKqWUsO99KU3TZy2mUYgoIKIaEfkp5x8iIorj+Ewi8sfHx6v2/XkrdseOHSuyLHuDlHKbvZfZJEn+wr3f7/dfgYizVlsgIhIiCsq3g5sAgNlrl0Kw1ADP6OhowIX4fpH5qPKVhSjunJ6eXm+NwrMQ8SfWBtjTT5K37t69+/ixsbHVcRyvHx8fXzs5ObmskOQZWOlpml5mBeB0AIBNmzb5C+4jJKLqApviTdIyW0gxOj09/TRro5wqUd7v7ILcPsmFIE7Tf36ieAcHQwACAADO+T/nez7OU/tZln1jbGysYQ2yNyqtMrvypJAyllJmSiEJwbmUMuKcTwshdiilftHtdl9lr1G11/ggEVEn7iwmAPOEwW0zAAC7W7uP5pz/i2X2dK/Xe6mNRm6UUo45TVA0DpMkeVsZJ1ii0RdF0cUDgw+lkTJnPuf8m5s2baoAAGRZdqX9TJam6VaZ/86kck1BSivSen7wr5vkFv1AAGQuAAs1gNsCer3es+I0/ZuiZnL3yDn/lNZK5UEiNEmSvBkAYHzPnmOczSKkUFJKrbRCRBSdTi5oC7eYkgr7/szMzAaJsq2U0lJK7UKwUsp72u32Cqv2P2JX3y/b/fa5o6OjQb/ff46U8n6ttc5Xn8iPzyVDc56OFq4TFDVAHMdnEBHbtGmT75iTJMlLiYiiJLmiKDRbt24dEkLcWHRHlQ0+RVH0dmeMosJZrbUW+XdwAnzP6OhoUNoDD7H60yzdVAjrak1aSylnms3mUwAAkiy7wq3oOI6vKZ6j3W6/rBCtMyilVkqhMYaiKDqvaAhaAbjMMu5k+14tF8Le79nt5iP29QoAwMzMzEmIeI+9BuZ2iSJEqbXOr9ONoldZAXqZMYaUUmjdVmmv9Z5yKzgA8/v9/vOMMXlwBXNf3xhD/X7/FdZo+1MbmzdSirZSqLnk/93tdo8jIi/LsidLlNzG7pVSCq2gvNdeJ1xgBOY2QNQ5b3x8fPnAPUzTY9M0ffU8lzFNX4OI3QHzEQ0iGlRorHeitdYaFSZJkpyVC3P2T3NGYf6+lLIdRdG6Ymi7FACr/jnnP3Kr30Xt0jT9vN2Pn4aIfSIyUsp2s908jQt+NxFRmqVft3bBk4UUQimFqHLhccbXYoZmmqYfst7DLCLuT9P0AwvC4CxJkrM45ze4vIOz8Bd92NyAlHL7zMzMciKqCym2E5Gx2UX3nf6p1AIPNvxeaFeLkihVvpdjy64Wj3P+PRv8MVEUXWTV7IWI2EnTJN66devQ2NhYJU3TX9rzmE6n8wanwtM0/WwURa8p7ueptQFUIVXMebYlSZN/zbLkBi75PS6pqBCVjfgNGD7veW7xD4JAKU8/aT2VF7vvhYhaKWUkyq6LKh72UUKnBrMs+5pdKej2yziOP2Dfe4NL1WdZ9qPiKt68eXN9dnb2Wc6C73Q6Z0gpr3cpWiLym81mg3P+syiNLp4nAGk64lxIiXMGZ5Fyhi2y6hVS/vxBAqFtmFq7rYAL/u1CfEBaLfD+wz424Jjf6XSeJFFmSimDiEprbYQQ07t3717VbDYbQoo92vp0UZJ8wbll/aT/8izL3nigXPxiUb2RkRFvbGysQkRemqbvtyFe6Rhok0zSpZjdqpcFJhdXfvE19/ogZiGyW62g5baN9RqMMSSE2Gbvj8HhHvSJ0ugvC35/vkKy7ON29b/NBYSUUhoVdqIoes3IyEgghNhh1e239u/fP/RIr5+m6bWF8K1Bx0gpCyp9/vM5hudqf3DcgmOUUkpppZMkeSYAgJT8noEWUKiVVqY70z1nYQAKDqd6AJfnzzj/Xq1afR4iKsaYxxgDzvlZQ0NDWwXi1moYnqq00kTkBX7g3t/m+/7xzPNY4PuVjGc39rq998ZxrE1OtMj1KAgCHwBg3bp1ZywbWnYjAxaQMQwYQN4nwIAxACIY/L/oL0ILOg3m/XIMAEiFQRhyzq+v1+uv45y/p1qt/hMqRACAMAjDNE2vHhoaeh8RBYwxdVgJABExxhhNTU2tW7V69f1hEAwrrVQYhIEQ4r5arXZKkiRn1+q1nxhjDBAw+0sTAKMgCHytNRgyxBhjgb/0rVQigu8xYMwDbTTlLAciImCsWOZR5K77K38n/39+a4EVH/c58v3AU0q1u53OsUEQrBoeHn7A873QGKPt97y7Vqud434LOMz6AjwA0I1G47RKGA4rhdpx2BhzOxExLuUrPOaBIaMBILDsZwDElEINBBAEvo+oZlOR/msQBDWAwZ46x08YrGjP83xOxpwKXnC+MQYYYz4QGACyvKMCU9mcyLHi4nfiQQNBcJqCmBMMYEZrVQnD1fV6/YLly5fflGXZz8IwPMsYQ8YY8Dx20szMzAbG2GSx6ulwEQAGeffG2ZavhtnXiOj7jDHigp+3mEZijAEBMc/zgAAAEV/TaDS+tZSLjo6O1s4999wtvu8Hxphc7TNgxlDeUMIgD9AQADAqqHeCBysE5kQEwN18QTtQLhZUqVb+gIhu5pL/EADOAgDQRuswrAwF1eAkAJg81MrwDoYAEACA7/unup+NMc9XCpUQ4t6JiYk6A3aCXXHe/AOJPOYBY4xlPHtto9H4lg3XPtQK8gFAc579RxAEJydJ8n7G2InVavU12mhdCSuhSxmjQisIc2yhBcwnIGA0b8/P2c1oIAT2DQYEz2SMUZqmd82JDRkA8Bn4JwLA7YeaAByM4IQBAPA970nuV/V9nxlDrTvuuGPvqlWrjveDYJXSioCAMWC5PmeMPOYNwrONZY1/s0aUZIypAz0AQAKAIYIdSZL8YaPR+HClUtlNRDpLs79SSu3NsvR2RLw/DEKPMTboA2TuH8utBfd3kWXz/6Z5vYeMsY2bNm3ytdb3aaMBGATuIz5jxx2WRR8AeSWPkGKnc/NsxuxeG/q9sFhcgYja+utCaSXjOL60GN9fasyhSEmSXEVE5FLMAADdbvd4KWVX6bze0AZ2pMp9RVUI/ND84NCDXEXlOou4EGJiYmJDu91ewQWPbeOJICJKsuyLh2JA6KDczMqVK4eJYHlxk2c+iwEAKpXKmny/ByACCoLAdfyCECK5++67b7BMVUv0OEyv13tatVr9W8/3ztRK7wUGR2ut9QUXXPAHRDQRx/HU8PDwjizLvh+G4YUS5UQlrGwsakSllQYiz+p6t98TODuR5ftDGIS+lDLVTPMwDFevXr16TaPRmJRSdBmwIXLGKpm1RY14uAgAAwBatmz1kMfYMkNz311KGQMACCWGalADQ2Ssy7QF0Xw8CNhTlVJnP/WpTx1ijPGHi6Q56zqO4zOr1eodQRCssn746Xa/p5UrV3wdAKBWq+3rdrvP1Vr/JwC8FCXemKG6oeb7FyiljvU974xavf67SilDQIwBIwaMBUHgISIxxoDy+/WllFs453/q+/7bKmHl3WEYslyAdD8MYYPzeIIwqB62IWAi2iikS9/afHkc3QwA0O/330pE1G6336aUijjnX1oY0s2ziKPBYiHf4rVGRkY8IcSPbbSR28RMHpNTLp4vXYz+qwDApJRNrXXmEkiF6OHfueSOMYaEFFpwPqu1JpHXHxiJ2G82m8fbbeYfbMbx9Fx7ZffZ+xD59sC/d9hVCbkM2MTMxAYuRJynWW3VjBDfs2r+kryMKzknTdPn2gqhdy60IxZLKy8UtGazebyQEpVWWj44jUtWCLTSCpVSutntPiVN01e6hFCn03u9FbLQZhHvsGnpOIqiF05OTm5ExJ7SColIp2l6h7t+mqafICKKRHSK1XB7XNjb2jyjh6IA/EZv5vLLLycAgKSV9D3GojxaY/dUohW2WqcLAFD1vFOWLVv2gwzxDxhjf4+IP5qdnX0OY4wco9I0urjVap3gLPeCIDAiYrVazYPct2fWNXcR34LlzpgxBnzf91bUap9btmzZ/+v3+89O0/TtWuMdAKDt+TwuxMcAgAkhrh0eHr59w4YNE6jxv3zPDwDAI6J7XWuYF3hHAgCk3XTGVicPwSDIAGDIdJ5osDxL9gJGR0eDTIhxV2VjCyn3joyMeO2ofaq1kq9wx83MzGwQKDbblXOXkCIttGgJzvnni5U9Rcp4dteglatguS+04l1nj5Tyc/v27TsWFm8ebXDBO1EUPQPmegOeg4j3I+JdWZY9yb3OBf+JlDLetGmT3+12nyJRalRobK0ixXH8qUPRC2AHKxGUpul36/X6+UopZB4LyRgpJR7X7XY7Rx55ZE8b893pZvOP6/V6MDY2ll1++eVwyy23XNloNN6njQYypGxo1guCwJNS/iQ16atkX87sEDv0svYyr9NZoU87bcXvDi8fvhkA6jAIKYM3p+0KgFHAdBgEQZbx+x544P7nrl27Vu7atcusX7+efN9nWmtqrFhxaRpFX77vvvvSer3Ozj//fDE6Orqi1WqJtWvX4vHnnRcG+/c31qxds8OQ2VWr1E6L4/glQ0NDtyiFCgAoCMIwSZK/azQa/3CoJYQOhgAEjDGVpOlnl9Xrb8T8R2FhEPpJkryo0WjcxjnfGobhM1CpHmNQtfl+zRiLPeatLAZUbEhXh0EYSJQREHECGAZgxIAYABOVSmXFwvtQWhEDYGRDdzYUbMIgzF1OKTIGzAdwrsogK5AQUJ1ySQYCCBhjCRAEAFDJ40IsC8NwZSayz9Wr9TdnWXZZvV6/0mYEWRiEQRRFf7J8+fL/ONQE4KCpI010r43vk42f+sxnv0dE38qy7Aee553GAH7AgDUZYz5jTBsyTwmC4DyltWKMAiIgm/XxUaGqhJVhKWXkMfZFG6IjIONJJaX1tz0wYMCDswM/ONtoY1yAF4CZMAg9LvgPPeaN+Z5fISLDmAdzvnueWMrzF3mwjwhCxtgzUOGM53kPGDLgMe9MADhbo/4OqzHinD/HLTCPMR8VGgDYdijGAQ6aK9jtds+2IA/GoXokafJdAIAoii6wXTV/sTChI6WcKBRYUKFKB4nIpJzf/nD3wDn/W1vf7yqCNBEZlHLvxMRE/bF+x0yIm1Ep1ev1jmg2mw2Jsm2jgGhdw12jo7tqB/JqDgtDcGJios6FGDDT+tPx1NTUurGxsQoizkopf2UbN0MiqjDGXCfw1jkQKOkMObS1gzdZ1801fBYfNSIKhBBXDErC1Fwpl23oBCKqL3LsQz2Ye97pdJ6slDLOrU2S5I9dz4LtcTRJlnz5UK0O/o37pNZd8zdu3JgZrW93qJw6z6EPNRqNl55yyikSNd4QhuGx69evP9eGfbUxxlu+fPm28fHxc4UUPwyDkBGBKfp0Wuuv2z1VL5IYcs9NMTfJrGvGGNtuw8fZQyWYFnm441W1Wr3Y931mtP4cAIDnexdbE8OQsS6qptsPOxdwsZLwOI5fNFgdVj266t/Z2dmTtdZGSPGt4jEuKNPr9Z7tCi4xr+o1Qoidk5OTy+yKZAfsC+B8ZMEWgERkelHvfwIA7N279/TFcAUeprOZ7dq1q4aIe3OMwol6r9c7QkrZ1UYTKlRKKyOlTGZnZ3/nsC4Nt6sMJicnlwkpdtvGCyUxD6n2+/3n2MLQm4iI2hYPwPXWERHbsWPHOiF4z7WR2/arVz2Uap0TAFcWnguAss0knU7nSZ1O50ytNbVarbMBlla46c6bJMnb7VbyPnud9zpBc0JW2GYOSeYflJtijJExJtiwYUNqtPm/NplCQGR832dBJbjM9fEbY/SyauWjhdUyqKMjAKO1piAIQiHE94aHh79CRH4R4nXxL+k5BWwAQPp+4Ash7l21atWvfL/yZGMMSimbAAD33XcfLcGoNd1ud1W1Wh1RCqf2799/LRHVfS9426COJXcjGSJ+5rBW/wu9gZmZmWMkYmw7Z7RSSmmtTacTvcAKQR5TT9O/LDZs9nq9pwkplNJKK6Ww0+mc8XCGVaE5dGQB+OOeKJo9xWqXZfv27TvpUeAa/Ivdwl4PABCng9WPcm6L+uWWLVvCAkI5lO1hOZOvcYmSAtjSViKqttvtFVLKcaWU6Ha7Z7ktxNkAORJH/MmlWNUFZn3IZuR+LIS4yqGOPFKXbNDfEEWvsuf7JhGxVqt1NGLeJm47j1yz6htKxJBFsnjNuHmUlLKrlNJ5BZCNCyTJ/wIAaLfb5yqtlES5yzErSqOLHApYr9c74kCG3wEE4INERK1e64RFUtVL6t5152q326dprROJOJkkyTE2DrBpgBYyt/q3uc6kEiNg8SbRdw+0gEKtVJ6i7cbdP7QG1tusSr1rfPzWaq/X+zO7qj641FV1AICIoAgD80hWfrPZPF4pNaG1Ut1u9wLr2fyZU/2Yg1WjRSR7UdkZ/BDgUETkFzN3qPJeQUTc3+x2XZHFlTZzeGMvij6slNL79u079pGuWj6HEnb6I23Rcm7o7t27j5MyB4fq9TqX2ujmWagw0VornEMpoSRLvlgyfykGYX/mJERMlVIKFRZhYv7bYfanafoxCxahsiy70TFlKWp1oQZot9unLdUlc9E+AIBOp3O6UmrCblPvcMYsIv5qQau7EVJO2i3KK4EhlrAVONWubOeuU6GIeNfevXuPsGrWBXIe6Pf7z13AYLZUAegsQQMUGW+t+0tQodBa617cu8RqpqOVwp8NYGqkNHYLM51O5wXl6n+Ee2uapp9y/ft52ZbDCcQtLooWp/HrBtFDkV3dbDYbxfMsFmVbZAs47UACUASVckjinPPr7X3s6vf75wIAtHqtExBx29y+j0VcoL8qrf5HYQ+MjIx4nPPbXBRNKUUOMg4Rd872Zp9tDcdnCJFXCqHC3WmaXlI06BwTXQRxy5YtrrbvQ3nNXw7fNjo6GthiU39h7/727duHkyR5j1IqshVJ109OTq7JI5XRC5RS+xzzlVZUAIL4bMl8eHSFoxY2bjnntrdeoUSl5rB4ELOE83fBXKPHOwa4vojjCefvmpmZOeYAkLGeCwR1cqjYRZG9m93u8Zzzy9zsIVR4X5IkL4MB3jD/OzdAQubIIIOCzyzLbrHQcyUs3GMxCpvN5lGIeJ+L2yulyCKJ5DDxUn47iqJTAQD2798/lE8SkZMDGHkpbueSvydJknMmJiZWO0Zzzt9LRKbZzUu4AcCbmppa1+/3f59z/gFXf2ivuy0T4k0F2PjTHWy80krbEvMi8+/cvHlzfSlxiZKWYBTOzMxskFJuLyZv5hVxInIhxCeKKz5JkpdJKW8sjoCRKElIsQcRN0uUO606v1Og+LGQYnJBaHiGc/75KIougLnC1GMyIa5BxKzg5xtbWu6Y/31XnPp4tfgPtYkhPmNMz8zMbFixYsW3gyA4CRUqj3kBAIAhoz3m+b7vg1Kqr425QSF+ptFo/NSdo5f0fq8e1p8DxpxtGBzPgB0JADUAkIzBkCGKmcf2eeCNK1J3a6l/0Gg0tsLcfIBTKpXKm5jnXRIGwSpDBrTWmjHbqUqgbDJq9IEHHnjpKaecEh9qPf9PCE2Qx9flz12gSClFFqxRIyKaweQwRUKIuzjnlyXJ/KkfjiYmJurj4+PLx8fHqwcoGTuRc/4eIcV3ikOoBqhhCskCW0mXA9i8eXO9xAP+DQvB1NTUuozze4sIXwPUzhzVC1ENZMENj5gUQtyRpuknZmZmNizcl4mITXemz0DE/yOkvFlIuUPOyRNZyx7tDEKHEDpgvpTyG06QSuYfBCHYtm3bEZzzHxeyh2YhnBsqRDcz0JAZTPdyqeROp/P8LMve6rKLeeVO3qhi93djq4XQahizQNikLe78OhFVSvjXg+wdbN++fRgRv1+ElscFUG6u70+TVojY3r9//5G2yujjRTBIbt3JOI7/BxEpJzgFYXJMt8WnA+bfPDY2VrHFLCXzfwsuYkNI+Z2id1Do+DW22ldZ63wzAEC/33+6MYZUDkfLrSvZbjabDQtMOTMAh1Bzq15ZISi4el/dct114RNx5R/yX4YxZojIW7duXXzP1JY/EkJ8OwiCEIDUPEeGBh0fYIgEAAAEcES+Yo0GBgHk1cY1Y8yya6+9NiWixIE/5EfOIY0BgcP/++rVV1/9yme++c3KlqeV1v5vUxNYoOivOU0wD87VRuq44L8aHx+v5tO++E4iIm00uT59IvKzLDseEYW17vW8JlI7syhJkq/YCF+55x9KFUXXXXddmGXpV20CSSzA9s0LMuLe6wDyjiQhxPcRca+U4uZut3ucHUjx4bntxB07N/AhSQY5/XIe4KEoBJs2bfKzLPvKXNh44BVoC0E/vXAaaHEqqFKKa60VKrv/q7mVzzn/QjkpHA79BBIAMC75l6yFLwp+u7buXZJl2UejKHp+HMdnxnH8Ys75pxFRa6NpntU/x/zPlcx//AhBPoOA8y8u9A4kSu32/YU0aDLNM44D5kspP1NsSCl/5cfRqHnO+b8vKCoxeZlZnrudFz0cuH2yuPI/XTL/8S8EX5gXNlZYXOVGKWWU+xvRKK1cMccnS+Y/QYQgy7IvzBWV4IDhSilSWpFS8wc/RUn0jyXzn2BCkCTJdcVC04EQaDUPoCLLsqtK5j9BhSBN04/b7J7VBDnmr1K52s9EdmVh3lDJ/CdaoWnespUPdMw1gTRKa7Szh0ZK5h8mQiCE+MdcE2iH1/f+kvmHjxAEVgg+rI2mKOq9aykNJSU9sYSAAQDMzs4+q6ziOYwFoWQ+PP7qAYqdxI/mmMKxngWBcl4CezRJqNE5yPqAiAKXKi7F6HFac7jEDmN/ied6XGqX4FBW2b1eb2W1Wj2Lc47XXHPNnVdccYV5uAGVcRyvr1arJyulTBAEoEABKIBaLYA0lanneVP1ev1XDljqQMMc3evuc1EUner7/omo8WgwYMIwnCGiB2ZnZ3/OGMvKJfWbwBW0wRzbefuCont3oE5gIcQb6SEIFWaIeG+SJO9xjaWLlI4PEMqSJHkLKrUFER+UWjTGkJRyZ5zEH221Wk8v28N+jau/2+2uFlLMKKUUEZk0y77+UIacE4BMiNcTkUaF3CYCKS8JM665Y8DIlPPvjo+PLy/m/t35W63W0dIWoQ5awxRqsmXnmDeqoDt/mqa3lbgAv0bMgCRL3uHKwG1TJs7MzJx0ICEoaIBL3Xg6VGiEEL2MZ1Nc8FkphRqAOtgq4TRNP1fcx4mIRVG0Tkj5CzfzxxWYCCGkkGKnlPJ+IUXPCYcmbZIkeTlA3npecvExaoDR0dGAcz5mEUXR5eyLadsDa4DsUlsckhERdbvdd27ZsmXF1NTUular9fQkSa5WeXZQKa2VRCnb7fax7rwjIyMeF/zbbvCUvQeeJMkVrVbrhHELSj09Pb2+1+tdmIns1iRNtzs8wHILeAzkVk8cxy+2aldZZhpN2kgpZ/fu3WtLvR+0b88XAJULQK/Xu3ThdbIss7BuuRboJ/0/gblpYa+0xwuttULEOMuy8x/qvqemptaVcYBfA5133nkGAMALgncDAHm+52VZ9g0i2scIWBiGq1etWvVaykd4L7rXer5HxckwxjBX1h3ati5fa33bYP4zAIGG1YXj3wIARIbI8zyfS35ZvV4ftXD0nlvlBTQS76ijjmo+Xle+dyhV+zLGTLvdPq0SBM9XWgEQY0mS/JU25g7GPDDGkBcEf26hXxbFBzbaDfdmdmj1YE48AwCPMaYZY8uLQuJ5nnKGn+d5ZxtjIAiCqkQ52e/2P2NtDummldmHKULRL+ZKlnEAeORYBbVltXf4vu8DAHHBt65du/aX3W73y7Vq9XXGGF2rVE542oknvoQxdtNi83e8OYnKJ3gSCcskCZA3llQqlUvsOKmAAJj29C8AACqVyrGBHwxrrTEIglBrc8+GDRtSK5wEkBejXnjhhTVYDwD780sdeeSRND09zXbu3CkuuugiXW7mj7LrZ2pqap1E2XVWd5ymf01EwdjYWEMI8YDDCuacf3ehN7DQC0DEzBhD/bg/Eov4tG63e04URa9GRAdOKYiIMs7HXLt3lmXPJyLjbIMo6l1bmA7iAQBEIjpZSrlXCDEhpJgQQuzhgu9GxMnp9vTzSlfwMbh+sR3XqrTSQgo3gBHyMq/snQXsIN3pdM5cMFgisLOIX18cDmEnhpLz15117/z5KIpeCHMTxc+xVr/rDvrywlBvkiTPPFCQKY4ff/CwwSES+NG7du2qhb7/ZgAgj3keGrVn5cqVL46iqArgI5FeprU2+b7ue9Vq9Z0AcOmDx5MBAz/fTwwABL4PdtKYnQDOIAzCqlKqx5G/fXh4+Ha3lSilJhEx832/BgDgB8EzrWdi3BZlZwvEwJgmIuYxtowxBkEQeAqobBx9tKs/irqvdq6fnEPdpgVgTsK2fhlE7LdaraMXgjwWtgCplCIhRVcIsV+inEIpJznn/5Vl2f+empo6biFqeI5XmG0lIiNRSmMMJUlyIQCAHWbFtmzZErZaraNbrdbR09PTT+OcT7mtqdvNga7LLeBR7P8Z5z9yeEAPFcsvqug4TYvlXfMFwMYBoiR6FxENd7vd1UV00YWMKqCWXmYbTLgVtF0OrXSxvEHG+V53b49HAQh+66hgAGa213t2GATPUlopP/ADIcUd2tC9RDpgjBkw1rXzAEI/fI3neWuNMRQG/psmJiY+BgB8kbhAPmZGU8bs4Op8Sg0x+1mzYNSMJiK2b9++T/u+/44wDNdZb+BJy5cvvzNJkr/evr37TcZYCpADT61YseI83/OWG6ON5/llBPBRTxDJ0k22ehellNmePXuOOdAxSZJcVVzh3W73InuumrXkbS5AZtaQe2shEMSWCGD9Eq012UGXogBAtTPl6XdTno5yIXYV8IW4LTgtZwQ8UtXfTtsbMZ8hJInIxGl8s31/4SDIChEFvV7vqYjItVaCiHTK09Eirr9Q4nV5NlAlRKT7/f5bHgmG72CgRRq9GhFjF4p2buMCm0QqbbONWlOv13tWKQCP0Pjr9/sfLyJ4WPAmdoCEj3PFvl5kRKvTOa8Q53+j3cPJ2gDvfKQgzu7as9HsyUKI/5Qy1yaL1hcgJlLKr/b77XNtyRkrkUIfAXW73XOq1eqQ9dPVbbfd9uMDRdPcjzuTputXVionZFmm62EYtPv93evWrdsBADA9Pb1+1apVT8+yTNfrdb/X642vWbNm8kCVPw+HWgoA0Gw2n7J8+fLfBzAnM+YfkcMQ0X6l1Hat9eaVK1fuLJf0ExeNxPt1fa7UAAe2BVgBFUwvMXhU/MHNYLjkQ7z3GO/xQAw2JXJYSSWVVFJJJZVUUkkllVRSSSWVVFJJJZVUUkkllVRSSSWVVFJJJZVUUkkllVRSSSWV9Num/w+UoN2ceXA0HAAAAABJRU5ErkJggg==" alt="Logo Avner Paes Gomes" /><span>por <b>Avner Paes Gomes</b> · Data &amp; Geo</span><span class="arr">↗</span></a></div>
+  <button id="avisoBtn" class="aviso-btn" type="button" onclick="openAviso()" data-i18n="aviso.btn">⚠️ Regras de visitação</button>
 </header>
 
 <!-- 2D / 3D VIEW TOGGLE -->
@@ -572,6 +619,16 @@ window.addEventListener('load',function(){
       <div class="s"><div class="n" id="isTrails">–</div><div class="t" data-i18n="intro.trails">Rotas</div></div>
     </div>
     <button class="btn primary" id="startBtn" style="font-size:14px;padding:11px 26px" data-i18n="intro.cta">Explorar o mapa →</button>
+    <p class="intro-legal"><span data-i18n="intro.legal">As trilhas vêm do OpenStreetMap e não indicam rota oficial ou autorizada. O acesso a unidades de conservação segue o órgão gestor.</span> <a href="#" onclick="openAviso();return false;" data-i18n="intro.legalLink">Regras de visitação →</a></p>
+  </div>
+</div>
+
+<!-- AVISO LEGAL / REGRAS DE VISITAÇÃO -->
+<div id="aviso" class="aviso-modal hidden" role="dialog" aria-modal="true">
+  <div class="aviso-card">
+    <button class="aviso-x" type="button" onclick="closeAviso()" aria-label="Fechar">×</button>
+    <h2 data-i18n="aviso.title">⚠️ Regras de visitação e aviso legal</h2>
+    <div id="avisoBody"></div>
   </div>
 </div>
 
@@ -770,6 +827,10 @@ const I18N = {
     'park.PN':'Parque Nacional',
     'park.RN':'Reserva Natural',
     'park.EE':'Estação Ecológica',
+    'park.ESEC':'Estação Ecológica',
+    'park.PARNA':'Parque Nacional',
+    'park.Reserva':'Reserva particular',
+    'park.Outro':'Unidade de conservação',
     'park.UC':'Unidade de conservação',
     'crag.paredao':'Paredão / costão',
     'crag.unnamed':'sem nome',
@@ -777,6 +838,15 @@ const I18N = {
     'pop.osmTrail':'Traçado real do OpenStreetMap.',
     'pop.highway':'Rodovia',
     'pop.access':'Via de acesso',
+    'reg.orgao':'Órgão gestor',
+    'reg.base':'Base legal',
+    'reg.more':'Regras de visitação',
+    'trail.caveat':'Geometria do OpenStreetMap; não indica trilha oficial, autorizada ou segura.',
+    'trail.inUC':'Dentro de: {0}.',
+    'aviso.title':'⚠️ Regras de visitação e aviso legal',
+    'aviso.btn':'⚠️ Regras de visitação',
+    'intro.legal':'As trilhas vêm do OpenStreetMap e não indicam rota oficial ou autorizada. O acesso a unidades de conservação segue o órgão gestor.',
+    'intro.legalLink':'Regras de visitação →',
     'pop.osm':'OpenStreetMap',
     'pop.km2':'km²',
     'pop.vias':'{0} vias',
@@ -912,6 +982,10 @@ const I18N = {
     'park.PN':'National Park',
     'park.RN':'Nature Reserve',
     'park.EE':'Ecological Station',
+    'park.ESEC':'Ecological Station',
+    'park.PARNA':'National Park',
+    'park.Reserva':'Private reserve',
+    'park.Outro':'Protected area',
     'park.UC':'Protected area',
     'crag.paredao':'Cliff / rock face',
     'crag.unnamed':'unnamed',
@@ -919,6 +993,15 @@ const I18N = {
     'pop.osmTrail':'Real geometry from OpenStreetMap.',
     'pop.highway':'Highway',
     'pop.access':'Access road',
+    'reg.orgao':'Managing body',
+    'reg.base':'Legal basis',
+    'reg.more':'Visitation rules',
+    'trail.caveat':'OpenStreetMap geometry; not a statement that the trail is official, authorised or safe.',
+    'trail.inUC':'Inside: {0}.',
+    'aviso.title':'⚠️ Visitation rules and legal notice',
+    'aviso.btn':'⚠️ Visitation rules',
+    'intro.legal':'Trails come from OpenStreetMap and do not indicate an official or authorised route. Access to conservation units follows the managing body.',
+    'intro.legalLink':'Visitation rules →',
     'pop.osm':'OpenStreetMap',
     'pop.km2':'km²',
     'pop.vias':'{0} routes',
@@ -1107,8 +1190,196 @@ const parksLayer = L.geoJSON(PARKS_GEO, {
     // p.label is Portuguese in the data; p.klass is the stable key, so the popup can speak
     // either language without regenerating parks.geojson.
     layer.bindPopup(function(){ return '<h3>'+esc(p.name)+'</h3><div class="pk-meta">'+
-      tr('park.'+(p.klass||'UC'))+' · '+p.km2+' '+tr('pop.km2')+' · '+tr('pop.osm')+'</div>'; }); }
+      tr('park.'+(p.klass||'UC'))+' · '+p.km2+' '+tr('pop.km2')+' · '+tr('pop.osm')+'</div>'+ucRegCard(p); },
+      popupOpts({maxWidth:320, minWidth:250})); }
 });
+
+/* ============================================================
+   REGRAS DE VISITAÇÃO / SITUAÇÃO LEGAL DAS UNIDADES DE CONSERVAÇÃO
+   A regra por CATEGORIA é lei federal (SNUC, Lei 9.985/2000) e vale para toda UC
+   daquela categoria, independentemente do estado ou do órgão gestor. Os complementos
+   (órgão, plano de manejo, nota) são por UC e só entram onde foram verificados em fonte
+   oficial do IAT. Nada é afirmado sem fonte. Procedência completa em FONTES_REGRAS_UC.md.
+   ============================================================ */
+const SNUC_RULE = {
+  ESEC:{sev:'no', cite:'SNUC (Lei 9.985/2000), art. 9º',
+    pt:'Estação Ecológica — proteção integral. Visitação pública vedada por lei, salvo objetivo educacional autorizado; pesquisa só com autorização prévia. Trilhas e travessias recreativas não são permitidas.',
+    en:'Ecological Station — strict protection. Public visitation is prohibited by law except for authorised educational purposes; research needs prior authorisation. Recreational trails and traverses are not allowed.'},
+  PARQUE:{sev:'cond', cite:'SNUC, art. 11, §2º',
+    pt:'Parque — visitação pública permitida somente nas condições do plano de manejo e das normas do órgão gestor. Fora dessas condições, o acesso pode ser irregular.',
+    en:'Park — public visitation is allowed only under the terms of the management plan and the managing body’s rules. Outside those terms, access may be irregular.'},
+  RPPN:{sev:'priv', cite:'SNUC, art. 21, §2º',
+    pt:'Reserva particular (RPPN) — área privada. Acesso e visitação apenas com autorização do proprietário.',
+    en:'Private reserve (RPPN) — private land. Access and visitation only with the owner’s authorisation.'},
+  MONA:{sev:'cond', cite:'SNUC, art. 12, §2º',
+    pt:'Monumento Natural — visitação sujeita ao plano de manejo e às normas do órgão gestor.',
+    en:'Natural Monument — visitation subject to the management plan and the managing body’s rules.'},
+  RVS:{sev:'cond', cite:'SNUC, art. 13, §2º',
+    pt:'Refúgio de Vida Silvestre — visitação sujeita ao plano de manejo e às normas do órgão gestor.',
+    en:'Wildlife Refuge — visitation subject to the management plan and the managing body’s rules.'}
+};
+const SEV_META = {
+  no:  {color:'#ef476f', pt:'Visitação vedada por lei', en:'Visitation prohibited by law'},
+  cond:{color:'#ffd166', pt:'Visitação condicionada ao plano/órgão', en:'Visitation conditional (plan/agency)'},
+  priv:{color:'#c77dff', pt:'Área privada', en:'Private land'}
+};
+// Complementos por UC (só o verificado). plano.url = fonte oficial IAT.
+const UC_INFO = {
+  'Parque Estadual Pico Paraná':{orgao:'IAT (Paraná)',
+    plano:{pt:'Plano de Uso Público (Portaria IAT 470/2025)', en:'Public Use Plan (IAT Ordinance 470/2025)', url:'https://www.iat.pr.gov.br/Pagina/Planos-de-Uso-Publico'},
+    pt:'Aberto só pelos setores oficiais (Caratuva, Camapuã, Discoporto). Obrigatórios o cadastro e a assinatura do Termo de Conhecimento de Riscos e Normas. Só é permitido usar as trilhas demarcadas e sinalizadas; abrir ou usar trilhas não oficiais é proibido. Pernoite só em clareiras com agendamento prévio. Sem acesso em dias de chuva.',
+    en:'Open only through the official sectors (Caratuva, Camapuã, Discoporto). Registration and signing the Risk & Rules Acknowledgement are mandatory. Only marked, signed trails may be used; opening or using non-official trails is prohibited. Overnight only at pre-booked clearings. No access on rainy days.'},
+  'Parque Estadual Pico do Marumbi':{orgao:'IAT (Paraná)',
+    plano:{pt:'Plano de Manejo (IAT)', en:'Management Plan (IAT)', url:'https://www.iat.pr.gov.br/sites/agua-terra/arquivos_restritos/files/documento/2020-07/pm_pe_marumbi.pdf'},
+    pt:'Visitação nas trilhas sinalizadas e nos termos do plano de manejo. Inserido na AEIT do Marumbi.',
+    en:'Visitation on the signed trails and under the management plan. Part of the Marumbi AEIT.'},
+  'Parque Estadual Serra da Baitaca':{orgao:'IAT (Paraná)',
+    plano:{pt:'Plano de Manejo (IAT)', en:'Management Plan (IAT)', url:'https://www.iat.pr.gov.br/Pagina/Plano-de-Manejo-Parque-Estadual-da-Serra-da-Baitaca'},
+    pt:'Anhangava e Baitaca. Visitação nas trilhas e nos termos do plano de manejo.',
+    en:'Anhangava and Baitaca. Visitation on the trails and under the management plan.'},
+  'Parque Estadual Roberto Ribas Lange':{orgao:'IAT (Paraná)',
+    pt:'Sem plano de manejo publicado e sem estrutura de uso público autorizada. Acesso e travessias por conta e risco e podem ser irregulares.',
+    en:'No published management plan and no authorised public-use structure. Access and traverses are at your own risk and may be irregular.'},
+  'Parque Estadual Serra da Graciosa':{orgao:'IAT (Paraná)',
+    pt:'Sem plano de manejo publicado e sem estrutura de uso público autorizada. Acesso por conta e risco e pode ser irregular.',
+    en:'No published management plan and no authorised public-use structure. Access is at your own risk and may be irregular.'},
+  'Estação Ecológica Ilha do Mel':{orgao:'IAT (Paraná)', plano:{pt:'Plano de Manejo (IAT)', en:'Management Plan (IAT)', url:'https://www.iat.pr.gov.br/Pagina/Plano-de-Manejo-Estacao-Ecologica-Ilha-do-Mel'}},
+  'Estação Ecológica do Guaraguaçu':{orgao:'IAT (Paraná)', plano:{pt:'Plano de Manejo (IAT)', en:'Management Plan (IAT)', url:'https://www.iat.pr.gov.br/Pagina/Plano-de-Manejo-Estacao-Ecologica-do-Guaraguacu'}},
+  'Estação Ecológica de Guaraqueçaba':{orgao:'ICMBio (federal)'},
+  'Parque Estadual da Ilha do Mel':{orgao:'IAT (Paraná)', plano:{pt:'Plano de Manejo (IAT)', en:'Management Plan (IAT)', url:'https://www.iat.pr.gov.br/Pagina/Plano-de-Manejo-Parque-Estadual-Ilha-do-Mel'}},
+  'Parque Estadual de Campinhos':{orgao:'IAT (Paraná)', plano:{pt:'Plano de Manejo (IAT)', en:'Management Plan (IAT)', url:'https://www.iat.pr.gov.br/sites/agua-terra/arquivos_restritos/files/documento/2020-07/plano_manejo.pdf'}},
+  'Parque Nacional Marinho das Ilhas dos Currais':{orgao:'ICMBio (federal)',
+    pt:'Parque nacional marinho; sem visitação terrestre estruturada.', en:'Marine national park; no structured land visitation.'}
+};
+function ucCat(p){
+  var n=p.name||'', k=p.klass||'';
+  if(/^RPPN|Reserva Particular|Refúgio do Bugio|^Fazenda /i.test(n) || k==='Reserva') return 'RPPN';
+  if(k==='ESEC' || /Estação Ecológica|Campos Naturais de Curitiba/i.test(n)) return 'ESEC';
+  if(/Monumento Natural/i.test(n)) return 'MONA';
+  if(/Refúgio d[ae] Vida/i.test(n)) return 'RVS';
+  return 'PARQUE';   // PE, PARNA e parques municipais
+}
+function ucOrgao(p){
+  var o=(UC_INFO[p.name]||{}).orgao; if(o) return o;
+  var n=p.name||'', en=LANG==='en';
+  if(/Nacional/i.test(n)) return 'ICMBio (federal)';
+  if(/^RPPN|Reserva Particular|Refúgio do Bugio|^Fazenda /i.test(n)) return en?'Owner (private reserve)':'Proprietário (reserva particular)';
+  if(/Municipal|^Bosque|Parque Iguaçu|Rolf Colin|Anibal Khury|Barigui|Carijós|Papa João/i.test(n)) return en?'Municipality':'Prefeitura municipal';
+  return en?'Competent state agency':'Órgão gestor estadual competente';
+}
+function ucRegulatory(p){
+  var cat=ucCat(p), rule=SNUC_RULE[cat]||SNUC_RULE.PARQUE, info=UC_INFO[p.name]||{}, en=LANG==='en';
+  return {cat:cat, sev:rule.sev, rule:en?rule.en:rule.pt, cite:rule.cite,
+    orgao:ucOrgao(p), plano:info.plano, nota:en?info.en:info.pt};
+}
+function ucRegCard(p){
+  var r=ucRegulatory(p), sm=SEV_META[r.sev], en=LANG==='en';
+  var h='<div class="uc-reg"><div class="uc-sev" style="--sc:'+sm.color+'">'+(en?sm.en:sm.pt)+'</div>';
+  h+='<div class="uc-rule">'+esc(r.rule)+'</div>';
+  h+='<div class="uc-meta"><b>'+tr('reg.orgao')+':</b> '+esc(r.orgao)+'</div>';
+  if(r.nota) h+='<div class="uc-nota">'+esc(r.nota)+'</div>';
+  if(r.plano) h+='<div class="uc-meta"><a href="'+r.plano.url+'" target="_blank" rel="noopener">'+esc(en?r.plano.en:r.plano.pt)+' ↗</a></div>';
+  h+='<div class="uc-cite">'+tr('reg.base')+': '+esc(r.cite)+' · <a href="#" onclick="openAviso();return false;">'+tr('reg.more')+'</a></div></div>';
+  return h;
+}
+/* ---- Ponto-em-polígono: descobre em que UC um ponto (e uma trilha) cai. ---- */
+const UC_FEATURES = (PARKS_GEO&&PARKS_GEO.features)||[];
+function pointInRing(x,y,ring){
+  var inside=false;
+  for(var i=0,j=ring.length-1;i<ring.length;j=i++){
+    var xi=ring[i][0], yi=ring[i][1], xj=ring[j][0], yj=ring[j][1];
+    if(((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi)) inside=!inside;
+  }
+  return inside;
+}
+function pointInFeature(x,y,geom){
+  var polys = geom.type==='MultiPolygon'?geom.coordinates:(geom.type==='Polygon'?[geom.coordinates]:[]);
+  for(var pi=0;pi<polys.length;pi++){
+    var rings=polys[pi];
+    if(rings.length && pointInRing(x,y,rings[0])){
+      var hole=false; for(var h=1;h<rings.length;h++){ if(pointInRing(x,y,rings[h])){ hole=true; break; } }
+      if(!hole) return true;
+    }
+  }
+  return false;
+}
+function ucAt(lng,lat){
+  for(var i=0;i<UC_FEATURES.length;i++){ if(pointInFeature(lng,lat,UC_FEATURES[i].geometry)) return UC_FEATURES[i]; }
+  return null;
+}
+function featureUC(f){          // qual UC contém a maioria dos pontos amostrados da trilha
+  if(f._ucDone) return f._uc;
+  var g=f.geometry, segs=g.type==='MultiLineString'?g.coordinates:(g.type==='LineString'?[g.coordinates]:[]);
+  var all=[]; segs.forEach(function(s){ all=all.concat(s); });
+  var step=Math.max(1,Math.floor(all.length/8)), tally={};
+  for(var i=0;i<all.length;i+=step){ var u=ucAt(all[i][0],all[i][1]); if(u){ var k=u.properties.name; tally[k]=(tally[k]||0)+1; } }
+  var best=null,bn=0; for(var k in tally){ if(tally[k]>bn){bn=tally[k];best=k;} }
+  f._uc = best ? UC_FEATURES.filter(function(x){return x.properties.name===best;})[0] : null;
+  f._ucDone=true; return f._uc;
+}
+/* Ressalva de trilha: a geometria é do OSM e não atesta trilha oficial; se a trilha cai
+   dentro de uma UC, mostra a regra daquela UC. É assim que o atlas "discrimina" oficial de
+   não oficial sem inventar status por trilha: amarra cada trilha à regra legal do lugar. */
+function trailReg(f){
+  var uc=featureUC(f), h='<div class="tr-caveat">⚠️ '+tr('trail.caveat');
+  if(uc) h+=' '+tr('trail.inUC').replace('{0}', esc(uc.properties.name));
+  h+='</div>';
+  if(uc){ var r=ucRegulatory(uc.properties);
+    h+='<div class="tr-ucrule" style="--sc:'+SEV_META[r.sev].color+'">'+esc(r.rule)+
+       ' <a href="#" onclick="openAviso();return false;">'+tr('reg.more')+'</a></div>'; }
+  return h;
+}
+/* Linha curta de UC para popups de ponto (cumes). */
+function pointUCLine(lng,lat){
+  var uc=ucAt(lng,lat); if(!uc) return '';
+  var r=ucRegulatory(uc.properties);
+  return '<div class="tr-ucrule" style="--sc:'+SEV_META[r.sev].color+'">'+
+    esc(uc.properties.name)+' — '+esc(LANG==='en'?SEV_META[r.sev].en:SEV_META[r.sev].pt)+
+    ' <a href="#" onclick="openAviso();return false;">'+tr('reg.more')+'</a></div>';
+}
+window.openAviso = function(){ var a=document.getElementById('aviso'); if(a){ renderAviso(); a.classList.remove('hidden'); } };
+window.closeAviso = function(){ var a=document.getElementById('aviso'); if(a) a.classList.add('hidden'); };
+function renderAviso(){
+  var el=document.getElementById('avisoBody'); if(!el) return;
+  var en=LANG==='en';
+  var L = en ? {
+    lead:'This atlas is informational and educational. The trails, summits and places come from OpenStreetMap and public sources. A line on the map does not mean the trail is official, authorised or safe.',
+    frame:'Access to conservation units is governed by the SNUC (Federal Law 9.985/2000) and by each unit’s management plan or public-use plan, plus the rules of the managing body (IAT, ICMBio, municipality or owner):',
+    esec:'<b>Ecological Stations (ESEC):</b> public visitation is prohibited by law (SNUC, art. 9). Trails and traverses for recreation are not allowed.',
+    park:'<b>Parks:</b> public visitation is allowed only under the management plan and the managing body’s rules (SNUC, art. 11).',
+    rppn:'<b>Private reserves (RPPN):</b> access only with the owner’s authorisation (SNUC, art. 21).',
+    trav:'Traverses (<i>travessias</i>) and trails outside the plan may be irregular and may require registration and authorisation.',
+    ppTitle:'Pico Paraná — an example with an in-force plan',
+    pp:'The Public Use Plan (IAT Ordinance 470/2025) requires registration and signing a Risk & Rules Acknowledgement, allows only the marked/signed trails, prohibits opening or using non-official trails, restricts overnight stays to booked clearings, and closes access on rainy days.',
+    author:'The author of this atlas does not organise, guide or encourage irregular activities. Before any activity, check with the managing body and the rules in force.',
+    risk:'Mountaineering and traverses carry real risk. Each person is responsible for their own safety.',
+    src:'Sources'
+  } : {
+    lead:'Este atlas é informativo e educacional. As trilhas, cumes e locais vêm do OpenStreetMap e de fontes públicas. Uma linha no mapa não significa que a trilha seja oficial, autorizada ou segura.',
+    frame:'O acesso a unidades de conservação é regido pelo SNUC (Lei federal 9.985/2000) e pelo plano de manejo ou plano de uso público de cada unidade, além das normas do órgão gestor (IAT, ICMBio, prefeitura ou proprietário):',
+    esec:'<b>Estações Ecológicas (ESEC):</b> visitação pública vedada por lei (SNUC, art. 9º). Trilhas e travessias recreativas não são permitidas.',
+    park:'<b>Parques:</b> visitação só nas condições do plano de manejo e do órgão gestor (SNUC, art. 11).',
+    rppn:'<b>Reservas particulares (RPPN):</b> acesso só com autorização do proprietário (SNUC, art. 21).',
+    trav:'Travessias e trilhas fora do plano podem ser irregulares e exigir cadastro e autorização.',
+    ppTitle:'Pico Paraná — um exemplo com plano em vigor',
+    pp:'O Plano de Uso Público (Portaria IAT 470/2025) exige cadastro e assinatura do Termo de Conhecimento de Riscos e Normas, permite só as trilhas demarcadas e sinalizadas, proíbe abrir ou usar trilhas não oficiais, restringe o pernoite a clareiras agendadas e não permite acesso em dias de chuva.',
+    author:'O autor deste atlas não organiza, não conduz e não incentiva atividades irregulares. Antes de qualquer atividade, consulte o órgão gestor e as regras vigentes.',
+    risk:'Montanhismo e travessias envolvem risco real. Cada pessoa é responsável pela própria segurança.',
+    src:'Fontes'
+  };
+  el.innerHTML =
+    '<p class="av-lead">'+L.lead+'</p>'+
+    '<p>'+L.frame+'</p>'+
+    '<ul class="av-list"><li>'+L.esec+'</li><li>'+L.park+'</li><li>'+L.rppn+'</li></ul>'+
+    '<p>'+L.trav+'</p>'+
+    '<div class="av-box"><div class="av-box-t">'+L.ppTitle+'</div>'+L.pp+'</div>'+
+    '<p class="av-author">'+L.author+'</p>'+
+    '<p class="av-risk">'+L.risk+'</p>'+
+    '<div class="av-src"><b>'+L.src+':</b> '+
+      '<a href="https://www.planalto.gov.br/ccivil_03/leis/l9985.htm" target="_blank" rel="noopener">SNUC – Lei 9.985/2000 ↗</a> · '+
+      '<a href="https://www.iat.pr.gov.br/Pagina/Planos-de-Manejo" target="_blank" rel="noopener">IAT – Planos de Manejo ↗</a> · '+
+      '<a href="https://www.iat.pr.gov.br/Pagina/Planos-de-Uso-Publico" target="_blank" rel="noopener">IAT – Planos de Uso Público ↗</a></div>';
+}
 
 /* ============================================================
    ELEVATION PROFILE
@@ -1271,7 +1542,7 @@ const trailsLayer = L.geoJSON(trailData(), {
       var head = '<h3>'+esc(p.name||'Trilha (OSM)')+'</h3>'+
                  '<div class="pk-el">'+ic+' '+(p.km||'')+' km</div>';
       var d = (LANG==='en' && TRAIL_DESC_EN[p.name]) || TRAIL_DESC[p.name] || '';
-      var body = '<div class="pk-meta">'+(d||tr('pop.osmTrail'))+'</div>';
+      var body = '<div class="pk-meta">'+(d||tr('pop.osmTrail'))+'</div>'+trailReg(f);
       if(!prof) return head+body;
       layer._prof = prof;
       var pu = layer.getPopup(), ll = pu && pu.getLatLng();
@@ -1299,7 +1570,7 @@ PEAKS.forEach(function(p){
     var elTxt = p.elevation_m ? ('▲ '+p.elevation_m+' m') : ('▲ '+tr('peak.noEle'));
     var note = (LANG==='en' && HERO_NOTES_EN[p.name]) || HERO_NOTES[p.name] || p.note || '';
     return '<h3>'+esc(p.name)+'</h3><div class="pk-el">'+elTxt+'</div>'+
-           '<div class="pk-meta">'+esc(p.massif)+(note?'<br>'+esc(note):'')+'</div>';
+           '<div class="pk-meta">'+esc(p.massif)+(note?'<br>'+esc(note):'')+'</div>'+pointUCLine(p.lon,p.lat);
   };
   cm.bindPopup(cm._peakHtml());
   var lbl = p.name + (p.elevation_m?' <span class="tt-m">'+p.elevation_m+'</span>':'');
@@ -2388,6 +2659,7 @@ function setLang(l){
   renderLayerChips(); renderGpxUi();
   refreshPoiMarkers();
   rebuildStaticPopups();
+  var av=document.getElementById('aviso'); if(av && !av.classList.contains('hidden')) renderAviso();
   if (cesiumViewer) rebuildCesiumTooltips();
 }
 
