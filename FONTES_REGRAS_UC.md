@@ -121,3 +121,8 @@ edita-se a lista no `mark_official_trails.py` e roda-se de novo + `embed_trails.
 Importante: `oficial = nd` significa **"não verificada como oficial"**, não "proibida". A regra
 de acesso do lugar continua vindo do popup da UC (que, para o Pico Paraná, já diz que só as
 trilhas sinalizadas são permitidas e que as não oficiais são fechadas).
+
+A **Estrada da Graciosa** e a **ferrovia** (Serra Verde / Estrada de Ferro Engenheiro Bley)
+não são trilhas de caminhada e recebem `oficial = infra`: são infraestrutura de referência,
+desenhadas com o **mesmo status das rodovias** (linha cheia e nítida), sem o selo oficial nem a
+ressalva de trilha. A régua oficial/não verificada só se aplica a `kind = trilha`.

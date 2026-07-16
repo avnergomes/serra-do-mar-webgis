@@ -85,8 +85,14 @@ def main():
 
     n_of = 0
     rep = []
+    n_infra = 0
     for f in trails['features']:
         p = f['properties']
+        # Estrada da Graciosa e a ferrovia são infraestrutura de referência (mesmo status
+        # das rodovias), não trilhas de caminhada: não entram na régua oficial/não oficial.
+        if p.get('kind') != 'trilha':
+            p['oficial'] = 'infra'; p.pop('oficial_fonte', None); n_infra += 1
+            continue
         name = (p.get('name') or '').strip()
         nl = name.lower()
         uc = uc_of(f)
@@ -107,7 +113,8 @@ def main():
             p.pop('oficial_fonte', None)
 
     json.dump(trails, open(TRAILS, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
-    print("Trilhas oficiais marcadas: %d de %d feições\n" % (n_of, len(trails['features'])))
+    print("Trilhas oficiais marcadas: %d de %d feições (%d infraestrutura: estrada/ferrovia)\n"
+          % (n_of, len(trails['features']), n_infra))
     for nm, uc in sorted(rep):
         print("  [oficial] %-38s  (%s)" % (nm[:38], uc))
 
