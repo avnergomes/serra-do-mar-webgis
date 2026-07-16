@@ -1413,12 +1413,45 @@ let profMarker = null, profSelected = null;
 /** Polyline latlngs come nested for MultiLineString, flat for LineString. */
 function asLines(ll){ return (ll.length && Array.isArray(ll[0])) ? ll : [ll]; }
 
-/** Walk the path once: cumulative distance + altitude per vertex. */
+/** Order disjoint OSM segments end-to-end (greedy nearest-neighbour, flipping as needed)
+    so the elevation profile follows the actual road/trail. OSM merges a named road (the
+    Estrada da Graciosa, the Serra Verde railway) from dozens of segments in arbitrary
+    order; walked as stored, the profile jumps tens of km between segments and plots the
+    altitudes at meaningless distances. Rendering is unaffected by order, so this only
+    matters for the profile. Already-ordered or single-segment paths pass through unchanged. */
+function stitchLines(lines){
+  var segs = lines.filter(function(l){ return l && l.length>=2; });
+  if(segs.length<=1) return segs;
+  var used=new Array(segs.length).fill(false), order=[segs[0].slice()]; used[0]=true;
+  var head=order[0][0], tail=order[0][order[0].length-1];
+  for(var k=1;k<segs.length;k++){
+    var best=-1, flip=false, atEnd=true, bd=Infinity;
+    for(var i=0;i<segs.length;i++){
+      if(used[i]) continue;
+      var s=segs[i], sh=s[0], st=s[s.length-1], d;
+      d=tail.distanceTo(sh); if(d<bd){bd=d;best=i;flip=false;atEnd=true;}
+      d=tail.distanceTo(st); if(d<bd){bd=d;best=i;flip=true;atEnd=true;}
+      d=head.distanceTo(st); if(d<bd){bd=d;best=i;flip=false;atEnd=false;}
+      d=head.distanceTo(sh); if(d<bd){bd=d;best=i;flip=true;atEnd=false;}
+    }
+    if(best<0) break;
+    used[best]=true;
+    var seg=segs[best].slice(); if(flip) seg.reverse();
+    if(atEnd){ order.push(seg); tail=seg[seg.length-1]; }
+    else { order.unshift(seg); head=seg[0]; }
+  }
+  return order;   // ordered list of segments (boundaries kept, so joins can be detected)
+}
+
+/** Walk the path once: cumulative distance + altitude per vertex. Real within-segment
+    steps always count; a join between two segments only counts when they actually touch
+    (< 150 m) — a large join is a pen-up between disconnected OSM pieces, not real distance. */
 function profileOf(lines){
+  lines = stitchLines(lines);
   var pts=[], d=0, prev=null;
   lines.forEach(function(line){
-    line.forEach(function(p){
-      if(prev) d += prev.distanceTo(p)/1000;
+    line.forEach(function(p, i){
+      if(prev){ var step=prev.distanceTo(p)/1000; if(!(i===0 && step>0.15)) d += step; }
       prev = p;
       pts.push({d:d, z:(p.alt==null?null:p.alt), ll:p});
     });
