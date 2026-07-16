@@ -93,3 +93,31 @@ irregular. Isso é afirmado como tal no atlas, sem inventar regras.
   polígono), mostra a regra daquela UC.
 - **Painel "Regras de visitação / Aviso legal"**: o enquadramento completo, com os links das
   fontes, e a declaração de que o autor não organiza, conduz nem incentiva atividades irregulares.
+
+## 6. Coluna `oficial` na tabela de atributos das trilhas
+
+`mark_official_trails.py` grava em cada feição de `serra_trails.geojson` a coluna **`oficial`**
+(`sim` | `nd`) e, quando `sim`, a coluna **`oficial_fonte`** com a citação. A regra é conservadora:
+só é marcada `sim` a trilha que se apoia numa fonte oficial. O critério (editável no próprio
+script) é:
+
+- **Pico Paraná (PEPP):** trilha dentro do parque cujo nome corresponde a um cume/atrativo
+  **consolidado** no Plano de Uso Público (Portaria IAT 470/2025, seção 2.7 "Atrativos e
+  atividades de uso público consolidados", Tabelas 1-13: Caratuva, Pico Paraná, Itapiroca,
+  União, Ferraria, Taipabuçu, Tucum, Camapuã, Cerro Verde, Siririca, Pedra Branca, Ibitirati,
+  Morro dos Camelos, Discoporto).
+- **Marumbi:** trilhas sinalizadas por cor (Frontal/branca, Noroeste/vermelha, Rochedinho/azul,
+  Torre/amarela), o Circuito e o Caminho do Itupava (Plano de Manejo do PE Pico do Marumbi).
+- **Serra da Baitaca:** trilha de acesso ao Anhangava (Plano de Manejo do PE Serra da Baitaca).
+- **Nunca oficial:** nomes com marcador de informalidade (mal demarcada, perigosa, conquista,
+  picada, confusão, cuidado, clandestina).
+
+Tudo o mais fica `nd` (não verificada) e recebe **ênfase reduzida** no mapa (linha fina,
+pontilhada, translúcida); as `sim` são desenhadas em **destaque** (linha cheia, mais grossa) e
+o popup mostra o selo "✓ Trilha oficial" com a fonte. Resultado atual: **30 trilhas oficiais**
+de 326 feições. A lista completa sai no relatório do script; para incluir ou remover uma trilha,
+edita-se a lista no `mark_official_trails.py` e roda-se de novo + `embed_trails.py`.
+
+Importante: `oficial = nd` significa **"não verificada como oficial"**, não "proibida". A regra
+de acesso do lugar continua vindo do popup da UC (que, para o Pico Paraná, já diz que só as
+trilhas sinalizadas são permitidas e que as não oficiais são fechadas).
