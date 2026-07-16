@@ -26,7 +26,7 @@ PARKS = "parks.geojson"
 FONTE = {
     'pp': 'Plano de Uso Público do PE Pico Paraná (Portaria IAT 470/2025), seção 2.7 – trilhas/atrativos consolidados',
     'marumbi': 'Plano de Manejo do PE Pico do Marumbi (IAT) – trilhas sinalizadas (branca/vermelha/azul/amarela), Circuito e Caminho do Itupava',
-    'baitaca': 'Plano de Manejo do PE Serra da Baitaca (IAT) – trilha de acesso ao Anhangava',
+    'baitaca': 'Plano de Manejo do PE Serra da Baitaca (IAT) – trilhas de acesso ao Anhangava, Pão de Loth, Samambaia e ao Campo de Asa Delta',
 }
 # Cumes/atrativos consolidados no plano do Pico Paraná (exige UC == Pico Paraná).
 PP_CONSOLIDATED = ['caratuva', 'pico paran', 'itapiroca', 'uniao', 'união', 'ferraria',
@@ -36,7 +36,9 @@ PP_CONSOLIDATED = ['caratuva', 'pico paran', 'itapiroca', 'uniao', 'união', 'fe
 # Marumbi / Baitaca: nomes distintivos, casados independentemente do polígono da UC
 # (o limite do OSM às vezes deixa a trilha oficial um pouco de fora).
 MARUMBI_OFICIAL = ['frontal', 'noroeste', 'rochedinho', 'torre amarela', 'circuito marumbi', 'itupava']
-BAITACA_OFICIAL = ['anhangava']
+# Serra da Baitaca: casadas só dentro do parque (samambaia é palavra comum). A "Trilha Mal
+# Demarcada para o Corvo" fica de fora pelo marcador de informalidade (INFORMAL).
+BAITACA_OFICIAL = ['anhangava', 'baitaca', 'pão de lo', 'pao de lo', 'asa delta', 'samambaia']
 INFORMAL = ['mal demarcad', 'perigos', 'conquista', 'picada', 'confus', 'cuidado', 'clandestin']
 
 # ---- point-in-polygon ----
@@ -103,7 +105,7 @@ def main():
                 oficial, fonte = 'sim', FONTE['pp']
             elif any(k in nl for k in MARUMBI_OFICIAL):
                 oficial, fonte = 'sim', FONTE['marumbi']
-            elif any(k in nl for k in BAITACA_OFICIAL) and 'cachoeira' not in nl:
+            elif uc == 'Parque Estadual Serra da Baitaca' and any(k in nl for k in BAITACA_OFICIAL) and 'cachoeira' not in nl:
                 oficial, fonte = 'sim', FONTE['baitaca']
         p['oficial'] = oficial
         if fonte:
