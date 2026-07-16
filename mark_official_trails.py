@@ -38,8 +38,10 @@ PP_CONSOLIDATED = ['caratuva', 'pico paran', 'itapiroca', 'uniao', 'união', 'fe
 MARUMBI_OFICIAL = ['frontal', 'noroeste', 'rochedinho', 'torre amarela', 'circuito marumbi', 'itupava']
 # Serra da Baitaca: casadas só dentro do parque (samambaia é palavra comum). A "Trilha Mal
 # Demarcada para o Corvo" fica de fora pelo marcador de informalidade (INFORMAL).
-BAITACA_OFICIAL = ['anhangava', 'baitaca', 'pão de lo', 'pao de lo', 'asa delta', 'samambaia']
-INFORMAL = ['mal demarcad', 'perigos', 'conquista', 'picada', 'confus', 'cuidado', 'clandestin']
+BAITACA_OFICIAL = ['anhangava', 'baitaca', 'pão de lo', 'pao de lo', 'asa delta', 'samambaia', 'confus']
+INFORMAL = ['mal demarcad', 'perigos', 'conquista', 'picada', 'cuidado', 'clandestin']
+# Trilhas que o cliente pediu para inativar (não desenhar no mapa): oficial='off'.
+HIDE_NAMES = {'trilha cachoeira anhangava'}
 
 # ---- point-in-polygon ----
 def rings_of(g):
@@ -87,7 +89,7 @@ def main():
 
     n_of = 0
     rep = []
-    n_infra = 0
+    n_infra = 0; n_hidden = 0
     for f in trails['features']:
         p = f['properties']
         # Estrada da Graciosa e a ferrovia são infraestrutura de referência (mesmo status
@@ -97,6 +99,9 @@ def main():
             continue
         name = (p.get('name') or '').strip()
         nl = name.lower()
+        if nl in HIDE_NAMES:
+            p['oficial'] = 'off'; p.pop('oficial_fonte', None); n_hidden += 1
+            continue
         uc = uc_of(f)
         oficial, fonte = 'nd', ''
         informal = any(k in nl for k in INFORMAL)
@@ -115,8 +120,8 @@ def main():
             p.pop('oficial_fonte', None)
 
     json.dump(trails, open(TRAILS, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
-    print("Trilhas oficiais marcadas: %d de %d feições (%d infraestrutura: estrada/ferrovia)\n"
-          % (n_of, len(trails['features']), n_infra))
+    print("Trilhas oficiais marcadas: %d de %d feições (%d infraestrutura, %d ocultas)\n"
+          % (n_of, len(trails['features']), n_infra, n_hidden))
     for nm, uc in sorted(rep):
         print("  [oficial] %-38s  (%s)" % (nm[:38], uc))
 

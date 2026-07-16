@@ -108,15 +108,17 @@ script) é:
   Morro dos Camelos, Discoporto).
 - **Marumbi:** trilhas sinalizadas por cor (Frontal/branca, Noroeste/vermelha, Rochedinho/azul,
   Torre/amarela), o Circuito e o Caminho do Itupava (Plano de Manejo do PE Pico do Marumbi).
-- **Serra da Baitaca:** trilhas de acesso ao Anhangava, Pão de Loth, Samambaia e ao Campo de
-  Asa Delta (Plano de Manejo do PE Serra da Baitaca). A "Trilha Mal Demarcada para o Corvo"
-  fica de fora pelo marcador de informalidade.
+- **Serra da Baitaca:** trilhas de acesso ao Anhangava, Pão de Loth, Samambaia, Campo de Asa
+  Delta e o Caminho da Confusão (Plano de Manejo do PE Serra da Baitaca). A "Trilha Mal
+  Demarcada para o Corvo" fica de fora pelo marcador de informalidade.
+- **Trilhas inativadas** (`oficial = off`, listadas em `HIDE_NAMES`): não são desenhadas no
+  mapa (2D e 3D), a pedido do cliente. Hoje: "Trilha Cachoeira Anhangava".
 - **Nunca oficial:** nomes com marcador de informalidade (mal demarcada, perigosa, conquista,
   picada, confusão, cuidado, clandestina).
 
 Tudo o mais fica `nd` (não verificada) e recebe **ênfase reduzida** no mapa (linha fina,
 pontilhada, translúcida); as `sim` são desenhadas em **destaque** (linha cheia, mais grossa) e
-o popup mostra o selo "✓ Trilha oficial" com a fonte. Resultado atual: **33 trilhas oficiais**
+o popup mostra o selo "✓ Trilha oficial" com a fonte. Resultado atual: **34 trilhas oficiais**
 de 326 feições. A lista completa sai no relatório do script; para incluir ou remover uma trilha,
 edita-se a lista no `mark_official_trails.py` e roda-se de novo + `embed_trails.py`.
 
