@@ -112,13 +112,13 @@ script) é:
   Delta e o Caminho da Confusão (Plano de Manejo do PE Serra da Baitaca). A "Trilha Mal
   Demarcada para o Corvo" fica de fora pelo marcador de informalidade.
 - **Trilhas inativadas** (`oficial = off`, listadas em `HIDE_NAMES`): não são desenhadas no
-  mapa (2D e 3D), a pedido do cliente. Hoje: "Trilha Cachoeira Anhangava".
+  mapa (2D e 3D), a pedido do cliente. Hoje: "Trilha para o Anhangava" (trecho junto ao Estacionamento Baitacão).
 - **Nunca oficial:** nomes com marcador de informalidade (mal demarcada, perigosa, conquista,
-  picada, confusão, cuidado, clandestina).
+  picada, cuidado, clandestina).
 
 Tudo o mais fica `nd` (não verificada) e recebe **ênfase reduzida** no mapa (linha fina,
 pontilhada, translúcida); as `sim` são desenhadas em **destaque** (linha cheia, mais grossa) e
-o popup mostra o selo "✓ Trilha oficial" com a fonte. Resultado atual: **34 trilhas oficiais**
+o popup mostra o selo "✓ Trilha oficial" com a fonte. Resultado atual: **33 trilhas oficiais**
 de 326 feições. A lista completa sai no relatório do script; para incluir ou remover uma trilha,
 edita-se a lista no `mark_official_trails.py` e roda-se de novo + `embed_trails.py`.
 

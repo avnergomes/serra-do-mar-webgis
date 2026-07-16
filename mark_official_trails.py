@@ -41,7 +41,8 @@ MARUMBI_OFICIAL = ['frontal', 'noroeste', 'rochedinho', 'torre amarela', 'circui
 BAITACA_OFICIAL = ['anhangava', 'baitaca', 'pão de lo', 'pao de lo', 'asa delta', 'samambaia', 'confus']
 INFORMAL = ['mal demarcad', 'perigos', 'conquista', 'picada', 'cuidado', 'clandestin']
 # Trilhas que o cliente pediu para inativar (não desenhar no mapa): oficial='off'.
-HIDE_NAMES = {'trilha cachoeira anhangava'}
+# "Trilha para o Anhangava": trecho que sai bem do lado do Estacionamento Baitacão do Anhangava.
+HIDE_NAMES = {'trilha para o anhangava'}
 
 # ---- point-in-polygon ----
 def rings_of(g):
