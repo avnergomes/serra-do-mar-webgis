@@ -26,6 +26,7 @@
   <meta property="og:locale:alternate" content="en_US" />
   <meta property="og:locale:alternate" content="en_US" />
   <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:locale:alternate" content="en_US" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Serra do Mar Paranaense · Atlas do Montanhismo" />
   <meta name="twitter:description" content="273 cumes, trilhas reais, vias de escalada e perfis de elevação num Web GIS autocontido." />
@@ -1450,9 +1451,16 @@ function stitchLines(lines){
     used[best]=true; var seg=segs[best].slice(); if(flip) seg.reverse();
     order.push(seg); tail=seg[seg.length-1];
   }
-  // Split the ordered chain into runs at real gaps (join > 150 m) and drop tiny disconnected
-  // orphans (< 2 km), always keeping the largest run. This leaves the railway's main line
-  // clean while preserving a road split into several legitimate pieces (the Graciosa).
+  // Split the ordered chain into runs at real gaps (join > 150 m), then keep the main run,
+  // plus any run that is either a substantial length on its own (>= 2 km, a legitimate
+  // piece of a long line split by OSM — the Graciosa's road sections, the Araçatuba–Monte
+  // Crista traverse) OR a real fraction of the whole (>= 15%, a legitimate half of a short
+  // trail). The old absolute-only rule was tuned for the 55 km railway and truncated short
+  // trails: it discarded the 1.4 km half of a 3.9 km trail and the 0.5 km half of a 1 km
+  // trail, so their profiles showed only part of the walk. Adding the relative clause keeps
+  // those halves (with the data gap collapsed to a pen-up), while a tiny far spur on long
+  // infrastructure and a genuine mid-line branch spur — small in both absolute and relative
+  // terms — still drop out, so the profile follows the trail's spine.
   function lineKm(a){ var s=0; for(var i=1;i<a.length;i++) s+=a[i-1].distanceTo(a[i]); return s; }
   var runs=[order[0].slice()];
   for(var j=1;j<order.length;j++){
@@ -1460,7 +1468,8 @@ function stitchLines(lines){
     else runs[runs.length-1] = runs[runs.length-1].concat(order[j]);
   }
   var lens=runs.map(lineKm), maxLen=Math.max.apply(null, lens);
-  var kept=runs.filter(function(r,i){ return lens[i]>=2000 || lens[i]===maxLen; });
+  var total=lens.reduce(function(a,b){ return a+b; }, 0);
+  var kept=runs.filter(function(r,i){ return lens[i]===maxLen || lens[i]>=2000 || lens[i] >= 0.15*total; });
   return kept.length ? kept : runs;   // list of continuous run-lines
 }
 
