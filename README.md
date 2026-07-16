@@ -19,10 +19,11 @@ O mapa abre em **2D (Leaflet)** — leve, sem WebGL nem workers, renderiza de fo
 - **273 cumes nomeados** da Serra do Mar paranaense, agrupados em 9 conjuntos nomeados (Ibitiraquire, Marumbi, Anhangava-Baitaca, Graciosa-Capivari, Serra do Canal, Serra da Prata, Serra da Igreja, Serra do Araçatuba e Serra do Quiriri) mais um balde genérico, coloridos por região e rotulados por altitude (cumes emblemáticos com rótulo fixo; demais ao passar o mouse ou tocar).
 - **127 trilhas e rotas reais** nomeadas (326 feições no total), geometria do **OpenStreetMap**, cobrindo os nove conjuntos: travessia do Ibitiraquire, vias Frontal/Noroeste/Rochedinho do Marumbi, Caminho do Itupava, Torre da Prata, a travessia Araçatuba-Monte Crista, a Estrada da Graciosa e a ferrovia Curitiba-Paranaguá (Serra Verde Express). A camada soma **707,7 km**, mas só `kind=trilha` é trilha: **583,6 km** em 300 feições. O resto é a ferrovia (81,2 km em 25 feições) e a Estrada da Graciosa (42,9 km), que são as duas feições mais longas do conjunto. Quem for citar "km de trilha" em texto público usa 584, não 708. As 127 nomeadas somam 469,0 km; as 199 sem nome, 238,7 km.
 - **Perfil de elevação ao clicar num caminho**: a trilha clicada é destacada e o popup traz o perfil (altitude máxima, mínima, D+ e D−), com o ponto exato do clique marcado. Passar o mouse pelo perfil mostra a altitude e a distância naquele ponto, e um marcador acompanha no mapa. Vale para as trilhas do OSM e para os GPX enviados.
-- **462 locais de interesse** (POIs) do OSM, com toggles por categoria: refúgios/abrigos, inícios de trilha, estacionamentos, mirantes, pontos de água, cachoeiras e campings.
+- **462 locais de interesse** (POIs) do OSM, com toggles por categoria: refúgios/abrigos, inícios de trilha, estacionamentos, mirantes, pontos de água, cachoeiras e campings. Cada POI é um **marcador com o emoji da categoria** (🏠 🥾 🅿️ 🔭 💧 💦 ⛺) num disco de anel colorido, para diferenciar o tipo de local à primeira vista, não só pela cor. Os marcadores são recortados para o campo de visão (só os visíveis são montados), o que mantém a navegação fluida mesmo com 460+ pontos.
 - **35 unidades de conservação** (limites) do OSM, como contorno tracejado com preenchimento sutil (clique para nome e área).
 - **440 vias de escalada** (322 vias + 118 boulders) em **11 montanhas**, vindas da planilha `Lista de Rotas de Escalada.xlsx`: Anhangava (com os boulders do Castelinhos), Morro do Canal, o maciço Marumbi (Abrolhos, Esfinge, Torre dos Sinos, Ponta do Tigre, Gigante, Olimpo) e o Ibitiraquire (Ferraria, Ibitirati, Itapiroca). Clique numa área para a lista completa, agrupada por setor, com o grau e, quando a planilha traz, a altura. Marcador colorido pela faixa de dificuldade dominante. Cobertura dos atributos sobre as 440 linhas: grau 438 (99,5%, contando `grau` das vias e `vscale` dos boulders), setor 428 (97,3%), altura 208 (47,3%, ou 65% se contar só as vias), **ano de conquista 13 (3,0%)**. O ano é esparso demais para ser anunciado como atributo do conjunto: o Anhangava, que sozinho é 294 das 440 linhas, não tem ano em nenhuma.
 - **27 paredões / costões naturais** (`natural=cliff`) do OSM, como linha tracejada de contexto.
+- **Rodovias de referência** (OSM), para localizar qualquer ponto do mapa: as federais **BR-277, BR-116 e BR-376** e o **Rodoanel (Contorno de Curitiba)** em laranja forte, e a rede estadual (**PR-*** ), as estradas de acesso aos maciços, em âmbar mais leve. Cada via leva placas com o número (BR-277, PR-506, …) espaçadas ao longo do traçado, e o popup traz o nome próprio da rodovia (Rodovia do Café, Régis Bittencourt, Rodovia dos Minérios, …). 26 vias no total (4 federais + 22 estaduais). A Estrada da Graciosa (PR-410) fica na camada de trilhas, onde já tem descrição própria, para não desenhar a mesma estrada duas vezes.
 - **Envio de GPX**: qualquer visitante arrasta um `.gpx` na aba GPX e vê a trilha e os pontos no mapa na hora, com distância calculada. Com o backend publicado (`gas/`), o arquivo vai para o Google Drive e volta para todo mundo depois de aprovado; sem backend, tudo continua funcionando só no navegador dele.
 - **Painel de dados**: barras de altitude dos cumes e distribuição por região (donut).
 - **História interativa** em 13 capítulos, um para cada conjunto montanhoso (norte a sul) mais os temáticos (Mata Atlântica, geologia, Graciosa, ferrovia), com a câmera voando a cada tema (2D e 3D) num zoom escolhido por capítulo.
@@ -52,9 +53,10 @@ py -3 fetch_pois.py         # POIs (refúgios, água, mirantes, etc.) -> pois.ge
 py -3 fetch_parks.py        # unidades de conservação (OSM protected_area) -> parks.geojson
 py -3 fetch_osm_trails.py   # trilhas/estradas/ferrovia (Overpass) -> serra_trails.geojson
 py -3 fetch_crags.py        # paredões naturais (OSM natural=cliff) -> crags.geojson
+py -3 fetch_highways.py     # rodovias BR/PR + Rodoanel (Overpass) -> highways.geojson
 py -3 fetch_elevation.py    # altitude (SRTM 30m) -> grava Z em serra_trails.geojson
 py -3 parse_routes.py       # vias da planilha -> routes.geojson (mapa) + routes.json (completo)
-py -3 embed_atlas.py        # injeta peaks + pois + parks + routes + crags no index.html
+py -3 embed_atlas.py        # injeta peaks + pois + parks + routes + crags + highways no index.html
 py -3 embed_trails.py       # injeta serra_trails.geojson no index.html
 py -3 make_logo.py          # gera e injeta a logo do header (portfólio)
 py -3 make_brand.py         # favicon + og-image (pt e en) + tags do <head>
@@ -131,7 +133,7 @@ Ele produz dois arquivos:
 
 - `index.html` — a aplicação completa (todos os dados embutidos).
 - `vendor/leaflet.js` · `vendor/leaflet.css` · `vendor/images/` — Leaflet auto-hospedado (motor 2D).
-- `fetch_peaks.py` · `fetch_pois.py` · `fetch_parks.py` · `fetch_osm_trails.py` · `fetch_crags.py` · `fetch_elevation.py` — coletores OSM/Wikidata/SRTM.
+- `fetch_peaks.py` · `fetch_pois.py` · `fetch_parks.py` · `fetch_osm_trails.py` · `fetch_crags.py` · `fetch_highways.py` · `fetch_elevation.py` — coletores OSM/Wikidata/SRTM.
 - `parse_routes.py` — parser da planilha de escalada.
 - `embed_atlas.py` · `embed_trails.py` · `make_logo.py` — injetores.
 - `peaks.geojson` · `pois.geojson` · `parks.geojson` · `serra_trails.geojson` · `crags.geojson` · `routes.geojson` · `routes.json` — dados curados (também embutidos no HTML).
@@ -199,4 +201,4 @@ que está ligado.
 
 ## Stack
 
-**Leaflet 1.9.4** (2D, main-thread, canvas para 273 cumes + 462 POIs, sem WebGL/workers) como padrão · **CesiumJS 1.124** carregado sob demanda para o modo 3D (terreno ArcGIS + satélite Esri) · GeoJSON para trilhas e parques · SVG para os dashboards. Tokenless.
+**Leaflet 1.9.4** (2D, main-thread, canvas para os 273 cumes e as rodovias, marcadores emoji recortados ao campo de visão para os 462 POIs, sem WebGL/workers) como padrão · **CesiumJS 1.124** carregado sob demanda para o modo 3D (terreno ArcGIS + satélite Esri) · GeoJSON para trilhas, parques e rodovias · SVG para os dashboards. Tokenless.
